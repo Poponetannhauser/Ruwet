@@ -1,6 +1,15 @@
--- 1. Users (Supabase Auth udah handle sebagian, ini profile tambahan)
+-- Clear existing definitions for idempotent execution
+drop table if exists comments cascade;
+drop table if exists activity_log cascade;
+drop table if exists tasks cascade;
+drop table if exists columns cascade;
+drop table if exists board_members cascade;
+drop table if exists boards cascade;
+drop table if exists profiles cascade;
+
+-- 1. Users (Profiles)
 create table profiles (
-  id uuid references auth.users primary key,
+  id uuid references auth.users on delete cascade primary key,
   full_name text not null,
   avatar_url text,
   created_at timestamptz default now()
@@ -10,7 +19,7 @@ create table profiles (
 create table boards (
   id uuid primary key default gen_random_uuid(),
   name text not null,
-  owner_id uuid references profiles(id),
+  owner_id uuid references profiles(id) on delete set null,
   created_at timestamptz default now()
 );
 
@@ -18,52 +27,161 @@ create table boards (
 create table board_members (
   id uuid primary key default gen_random_uuid(),
   board_id uuid references boards(id) on delete cascade,
-  user_id uuid references profiles(id),
+  user_id uuid references profiles(id) on delete cascade,
   role text default 'member', -- 'owner' | 'member'
   joined_at timestamptz default now(),
   unique(board_id, user_id)
 );
 
--- 4. Task columns (status kolom, biar fleksibel bukan hardcode)
+-- 4. Task columns
 create table columns (
   id uuid primary key default gen_random_uuid(),
   board_id uuid references boards(id) on delete cascade,
   name text not null, -- 'To Do', 'In Progress', 'Review', 'Done'
-  position int not null -- urutan kolom
+  position int not null
 );
 
--- 5. Tasks (inti dari semuanya)
+-- 5. Tasks
 create table tasks (
   id uuid primary key default gen_random_uuid(),
   board_id uuid references boards(id) on delete cascade,
-  column_id uuid references columns(id),
+  column_id uuid references columns(id) on delete set null,
   title text not null,
   description text,
-  assignee_id uuid references profiles(id),
+  assignee_id uuid references profiles(id) on delete set null,
   due_date date,
-  position int not null, -- urutan dalam kolom (buat drag-drop)
-  status_updated_at timestamptz default now(), -- kunci buat stale detection
-  created_by uuid references profiles(id),
+  position int not null,
+  status_updated_at timestamptz default now(),
+  created_by uuid references profiles(id) on delete set null,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
 
--- 6. Task activity log (buat activity feed & implicit comms)
+-- 6. Task activity log
 create table activity_log (
   id uuid primary key default gen_random_uuid(),
   task_id uuid references tasks(id) on delete cascade,
   board_id uuid references boards(id) on delete cascade,
-  user_id uuid references profiles(id),
-  action_type text not null, -- 'created' | 'assigned' | 'status_changed' | 'commented'
-  detail jsonb, -- fleksibel: {"from": "To Do", "to": "In Progress"}
+  user_id uuid references profiles(id) on delete set null,
+  action_type text not null,
+  detail jsonb,
   created_at timestamptz default now()
 );
 
--- 7. Comments (biar diskusi nggak lari ke chat app luar)
+-- 7. Comments
 create table comments (
   id uuid primary key default gen_random_uuid(),
   task_id uuid references tasks(id) on delete cascade,
-  user_id uuid references profiles(id),
+  user_id uuid references profiles(id) on delete set null,
   content text not null,
   created_at timestamptz default now()
 );
+
+-------------------------------------------------------
+-- ROW LEVEL SECURITY (RLS) POLICIES & FUNCTIONS
+-------------------------------------------------------
+
+-- Helper function to check if current authenticated user is member of a board
+create or replace function is_board_member(p_board_id uuid, p_user_id uuid)
+returns boolean as $$
+begin
+  return exists (
+    select 1 from board_members
+    where board_id = p_board_id and user_id = p_user_id
+  );
+end;
+$$ language plpgsql security definer;
+
+-- Enable RLS on all tables
+alter table profiles enable row level security;
+alter table boards enable row level security;
+alter table board_members enable row level security;
+alter table columns enable row level security;
+alter table tasks enable row level security;
+alter table activity_log enable row level security;
+alter table comments enable row level security;
+
+-- 1. Profiles Policies
+create policy "Allow authenticated users to view profiles"
+  on profiles for select
+  to authenticated
+  using (true);
+
+create policy "Allow users to update their own profile"
+  on profiles for update
+  to authenticated
+  using (auth.uid() = id);
+
+create policy "Allow users to insert their own profile"
+  on profiles for insert
+  to authenticated
+  with check (auth.uid() = id);
+
+-- 2. Boards Policies
+create policy "Users can view boards they are members of"
+  on boards for select
+  to authenticated
+  using (
+    owner_id = auth.uid() or is_board_member(id, auth.uid())
+  );
+
+create policy "Authenticated users can create boards"
+  on boards for insert
+  to authenticated
+  with check (auth.uid() = owner_id);
+
+create policy "Board owner or member can update board"
+  on boards for update
+  to authenticated
+  using (
+    owner_id = auth.uid() or is_board_member(id, auth.uid())
+  );
+
+create policy "Only owner can delete board"
+  on boards for delete
+  to authenticated
+  using (owner_id = auth.uid());
+
+-- 3. Board Members Policies
+create policy "Users can view members of boards they belong to"
+  on board_members for select
+  to authenticated
+  using (
+    is_board_member(board_id, auth.uid())
+  );
+
+create policy "Board owner or member can add board members"
+  on board_members for insert
+  to authenticated
+  with check (
+    is_board_member(board_id, auth.uid()) or
+    exists (select 1 from boards where id = board_id and owner_id = auth.uid())
+  );
+
+create policy "Board owner can remove board members"
+  on board_members for delete
+  to authenticated
+  using (
+    user_id = auth.uid() or
+    exists (select 1 from boards where id = board_id and owner_id = auth.uid())
+  );
+
+-- Automatically create profile trigger on auth.users sign up
+create or replace function public.handle_new_user()
+returns trigger as $$
+begin
+  insert into public.profiles (id, full_name, avatar_url)
+  values (
+    new.id,
+    coalesce(new.raw_user_meta_data->>'full_name', new.email),
+    new.raw_user_meta_data->>'avatar_url'
+  );
+  return new;
+end;
+$$ language plpgsql security definer;
+
+-- Trigger execution
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
