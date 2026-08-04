@@ -57,14 +57,14 @@
 **Deskripsi:** Buat project Supabase, hubungkan ke aplikasi, setup environment variable.
 
 **Langkah:**
-- [ ] Buat project di Supabase
-- [ ] Install `@supabase/supabase-js`
-- [ ] Buat `lib/supabase/client.ts` (client-side) dan `lib/supabase/server.ts` (server-side)
-- [ ] Simpan `SUPABASE_URL` & `SUPABASE_ANON_KEY` di `.env.local`
+- [x] Buat project di Supabase
+- [x] Install `@supabase/supabase-js`
+- [x] Buat `lib/supabase/client.ts` (client-side) dan `lib/supabase/server.ts` (server-side)
+- [x] Simpan `SUPABASE_URL` & `SUPABASE_ANON_KEY` di `.env.local`
 
 **DoD:**
-- [ ] Koneksi ke Supabase berhasil (test query sederhana, misal `select now()`)
-- [ ] Tidak ada key/secret yang ke-commit ke repo
+- [x] Koneksi ke Supabase berhasil (test query sederhana, misal `select now()`)
+- [x] Tidak ada key/secret yang ke-commit ke repo
 
 **Commit contoh:** `chore: integrasi supabase client`
 
