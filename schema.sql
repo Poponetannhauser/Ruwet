@@ -150,10 +150,11 @@ create policy "Users can view members of boards they belong to"
     is_board_member(board_id, auth.uid())
   );
 
-create policy "Board owner or member can add board members"
+create policy "Board owner or member or joining user can add board members"
   on board_members for insert
   to authenticated
   with check (
+    user_id = auth.uid() or
     is_board_member(board_id, auth.uid()) or
     exists (select 1 from boards where id = board_id and owner_id = auth.uid())
   );
