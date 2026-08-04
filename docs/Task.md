@@ -121,15 +121,15 @@
 **Deskripsi:** User bisa buat, edit nama, hapus board (user story #9, PRD section 5 P0).
 
 **Langkah:**
-- [ ] Form buat board baru
-- [ ] Saat board dibuat → otomatis generate 4 kolom default (To Do, In Progress, Review, Done) sesuai flow 1
-- [ ] Edit nama board
-- [ ] Hapus board (dengan konfirmasi)
-- [ ] List board milik user (yang dia jadi member)
+- [x] Form buat board baru
+- [x] Saat board dibuat → otomatis generate 4 kolom default (To Do, In Progress, Review, Done) sesuai flow 1
+- [x] Edit nama board
+- [x] Hapus board (dengan konfirmasi)
+- [x] List board milik user (yang dia jadi member)
 
 **DoD:**
-- [ ] Buat board baru langsung muncul 4 kolom default
-- [ ] Edit & hapus board berjalan dan RLS tetap terjaga (user lain tidak bisa edit board yang bukan miliknya)
+- [x] Buat board baru langsung muncul 4 kolom default
+- [x] Edit & hapus board berjalan dan RLS tetap terjaga (user lain tidak bisa edit board yang bukan miliknya)
 
 **Commit contoh:** `feat(board): CRUD board + auto-generate kolom default`
 
