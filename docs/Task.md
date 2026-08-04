@@ -200,15 +200,15 @@
 **Deskripsi:** User story #3, pakai `dnd-kit`, TANPA realtime sync dulu (itu masuk Milestone 3).
 
 **Langkah:**
-- [ ] Setup `dnd-kit` untuk drag antar kolom
-- [ ] Reorder task dalam kolom yang sama
-- [ ] Update `status_updated_at` setiap kali task pindah kolom (bukan saat reorder dalam kolom sama)
-- [ ] Optimistic update di UI (update tampilan dulu, baru sync ke DB)
+- [x] Setup `dnd-kit` untuk drag antar kolom
+- [x] Reorder task dalam kolom yang sama
+- [x] Update `status_updated_at` setiap kali task pindah kolom (bukan saat reorder dalam kolom sama)
+- [x] Optimistic update di UI (update tampilan dulu, baru sync ke DB)
 
 **DoD:**
-- [ ] Drag antar kolom & reorder jalan mulus di desktop
-- [ ] `status_updated_at` hanya berubah saat pindah kolom, bukan saat reorder saja
-- [ ] Kalau update ke DB gagal, UI rollback ke posisi semula (PRD section 7 — reliabilitas)
+- [x] Drag antar kolom & reorder jalan mulus di desktop
+- [x] `status_updated_at` hanya berubah saat pindah kolom, bukan saat reorder saja
+- [x] Kalau update ke DB gagal, UI rollback ke posisi semula (PRD section 7 — reliabilitas)
 
 **Commit contoh:** `feat(kanban): drag-and-drop dasar dengan dnd-kit`
 

@@ -2,10 +2,7 @@ import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { BoardHeader } from './BoardHeader'
-import { ColumnHeader } from './ColumnHeader'
-import { AddColumnButton } from './AddColumnButton'
-import { CreateTaskModal } from './CreateTaskModal'
-import { TaskCard } from './TaskCard'
+import { KanbanBoard } from './KanbanBoard'
 
 export default async function BoardDetailPage({
   params,
@@ -79,48 +76,13 @@ export default async function BoardDetailPage({
       <BoardHeader board={board} isOwner={isOwner} members={members} />
 
       <main className="flex-1 p-8 overflow-x-auto">
-        <div className="flex gap-6 items-start">
-          {columns && columns.length > 0 && (
-            columns.map((col) => {
-              const columnTasks = tasks.filter((t) => t.column_id === col.id)
-
-              return (
-                <div
-                  key={col.id}
-                  className="w-72 flex-shrink-0 rounded-xl bg-zinc-200/70 p-4 dark:bg-zinc-900 border border-zinc-300/50 dark:border-zinc-800"
-                >
-                  <ColumnHeader column={col} />
-
-                  <div className="flex flex-col gap-2.5 min-h-[150px]">
-                    {columnTasks.length > 0 ? (
-                      columnTasks.map((task) => (
-                        <TaskCard
-                          key={task.id}
-                          task={task}
-                          columns={columns}
-                          members={members}
-                          currentUserId={user.id}
-                        />
-                      ))
-                    ) : (
-                      <div className="min-h-[100px] flex items-center justify-center rounded-lg border border-dashed border-zinc-300 dark:border-zinc-800 text-xs text-zinc-400">
-                        Belum ada task
-                      </div>
-                    )}
-                  </div>
-
-                  <CreateTaskModal
-                    boardId={id}
-                    columnId={col.id}
-                    columnName={col.name}
-                    members={members}
-                  />
-                </div>
-              )
-            })
-          )}
-          <AddColumnButton boardId={id} />
-        </div>
+        <KanbanBoard
+          boardId={id}
+          initialColumns={columns || []}
+          initialTasks={tasks}
+          members={members}
+          currentUserId={user.id}
+        />
       </main>
     </div>
   )

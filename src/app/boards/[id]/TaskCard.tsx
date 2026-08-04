@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import { assignSelf } from './taskActions'
 import { EditTaskModal } from './EditTaskModal'
 
@@ -43,6 +45,21 @@ export function TaskCard({ task, columns, members, currentUserId }: TaskCardProp
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: task.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+  }
+
   const isAssignedToMe = task.assignee_id === currentUserId
   const assigneeName = task.profiles?.full_name || 'Unassigned'
   const assigneeInitial = assigneeName.charAt(0).toUpperCase()
@@ -57,8 +74,12 @@ export function TaskCard({ task, columns, members, currentUserId }: TaskCardProp
   return (
     <>
       <div
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
+        {...listeners}
         onClick={() => setIsEditOpen(true)}
-        className="group relative cursor-pointer rounded-lg border border-zinc-200 bg-white p-3 shadow-sm hover:border-indigo-400 hover:shadow transition dark:border-zinc-800 dark:bg-zinc-900/90 dark:hover:border-indigo-600"
+        className="group relative cursor-grab active:cursor-grabbing rounded-lg border border-zinc-200 bg-white p-3 shadow-sm hover:border-indigo-400 hover:shadow transition dark:border-zinc-800 dark:bg-zinc-900/90 dark:hover:border-indigo-600"
       >
         <h4 className="font-semibold text-xs text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">
           {task.title}
