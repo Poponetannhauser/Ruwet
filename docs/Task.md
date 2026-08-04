@@ -96,16 +96,16 @@
 **Deskripsi:** Implementasi auth pakai Supabase Auth sesuai user story #9 dan flow onboarding di PRD section 6.
 
 **Langkah:**
-- [ ] Halaman sign up (email + password)
-- [ ] Verifikasi email (pakai flow default Supabase)
-- [ ] Halaman login
-- [ ] Logout + proteksi route (redirect ke login kalau belum auth)
-- [ ] Trigger otomatis: saat sign up sukses, buat row di `profiles`
+- [x] Halaman sign up (email + password)
+- [x] Verifikasi email (pakai flow default Supabase)
+- [x] Halaman login
+- [x] Logout + proteksi route (redirect ke login kalau belum auth)
+- [x] Trigger otomatis: saat sign up sukses, buat row di `profiles`
 
 **DoD:**
-- [ ] User baru bisa sign up → dapat email verifikasi → login sukses
-- [ ] Route yang butuh auth tidak bisa diakses tanpa login (coba akses langsung via URL)
-- [ ] Logout menghapus session dengan benar
+- [x] User baru bisa sign up → dapat email verifikasi → login sukses
+- [x] Route yang butuh auth tidak bisa diakses tanpa login (coba akses langsung via URL)
+- [x] Logout menghapus session dengan benar
 
 **Commit contoh:** `feat(auth): implementasi sign up, login, logout`
 
