@@ -132,6 +132,21 @@ export function KanbanBoard({
   const [tasks, setTasks] = useState<Task[]>(initialTasks)
   const [activeTask, setActiveTask] = useState<Task | null>(null)
   const [previousTasksState, setPreviousTasksState] = useState<Task[]>(initialTasks)
+  // Track online/offline status via useSyncExternalStore
+  const isOnline = useSyncExternalStore(
+    (callback) => {
+      window.addEventListener('online', callback)
+      window.addEventListener('offline', callback)
+      return () => {
+        window.removeEventListener('online', callback)
+        window.removeEventListener('offline', callback)
+      }
+    },
+    () => navigator.onLine,
+    () => true
+  )
+  const isOffline = !isOnline
+  const [toastMessage, setToastMessage] = useState<string | null>(null)
 
   // Track props update
   const [prevInitialTasks, setPrevInitialTasks] = useState(initialTasks)
@@ -214,16 +229,23 @@ export function KanbanBoard({
   }
 
   function handleDragStart(event: DragStartEvent) {
+    if (isOffline || (typeof navigator !== 'undefined' && !navigator.onLine)) {
+      setToastMessage('Tidak bisa memindahkan task dalam kondisi offline!')
+      return
+    }
+
     const { active } = event
     const task = tasks.find((t) => t.id === active.id)
     if (task) {
       setActiveTask(task)
-      // Simpan snapshot keadaan sebelum di-drag (untuk rollback jika koneksi terputus/gagal)
+      // Simpan snapshot keadaan sebelum di-drag (last known good state)
       setPreviousTasksState([...tasks])
     }
   }
 
   function handleDragOver(event: DragOverEvent) {
+    if (isOffline) return
+
     const { active, over } = event
     if (!over) return
 
@@ -259,6 +281,12 @@ export function KanbanBoard({
 
     if (!over) return
 
+    if (isOffline || (typeof navigator !== 'undefined' && !navigator.onLine)) {
+      setTasks(previousTasksState)
+      setToastMessage('Koneksi terputus! Perubahan posisi task dibatalkan (rollback).')
+      return
+    }
+
     const activeId = active.id as string
     const overId = over.id as string
 
@@ -283,24 +311,26 @@ export function KanbanBoard({
     const finalPosition = reorderedTasks.findIndex((t) => t.id === activeId) + 1
     const isColumnChanged = originalTask.column_id !== targetColumnId
 
-    // 2. Perform DB update with try-catch rollback
+    // Function to run server action with 5s timeout
+    const moveTaskWithTimeout = () =>
+      Promise.race([
+        moveTask(activeId, boardId, targetColumnId, finalPosition, isColumnChanged),
+        new Promise<{ error: string }>((_, reject) =>
+          setTimeout(() => reject(new Error('Waktu koneksi habis (Timeout 5s)')), 5000)
+        ),
+      ])
+
     try {
-      const result = await moveTask(
-        activeId,
-        boardId,
-        targetColumnId,
-        finalPosition,
-        isColumnChanged
-      )
+      const result = await moveTaskWithTimeout()
 
       if (result && result.error) {
         setTasks(previousTasksState)
-        alert(`Gagal memindahkan task: ${result.error}`)
+        setToastMessage(`Gagal memindahkan task: ${result.error}`)
       }
-    } catch {
-      // Direct network error / fetch failure during offline mode
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Koneksi terputus'
       setTasks(previousTasksState)
-      alert('Koneksi terputus! Perubahan posisi task dibatalkan (rollback).')
+      setToastMessage(`${errorMessage}! Perubahan posisi task dibatalkan (rollback).`)
     }
   }
 
@@ -326,13 +356,32 @@ export function KanbanBoard({
   }
 
   return (
-    <DndContext
-      sensors={sensors}
-      onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
-      onDragEnd={handleDragEnd}
-    >
-      <div className="flex gap-6 items-start">
+    <div className="space-y-4">
+      {isOffline && (
+        <div className="flex items-center justify-between rounded-lg bg-amber-50 px-4 py-2 text-xs font-semibold text-amber-800 border border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800">
+          <span>⚠️ Anda sedang dalam mode Offline. Interaksi board dibatasi sementara.</span>
+        </div>
+      )}
+
+      {toastMessage && (
+        <div className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-xs font-medium text-white shadow-lg transition">
+          <span>{toastMessage}</span>
+          <button
+            onClick={() => setToastMessage(null)}
+            className="ml-2 font-bold hover:opacity-80"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      <DndContext
+        sensors={sensors}
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
+        onDragEnd={handleDragEnd}
+      >
+        <div className="flex gap-6 items-start">
         {initialColumns.map((col) => {
           const colTasks = tasks.filter((t) => t.column_id === col.id)
           return (
@@ -362,5 +411,6 @@ export function KanbanBoard({
         ) : null}
       </DragOverlay>
     </DndContext>
+    </div>
   )
 }
