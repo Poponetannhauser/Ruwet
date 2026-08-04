@@ -4,6 +4,8 @@ import { createClient } from '@/lib/supabase/server'
 import { BoardHeader } from './BoardHeader'
 import { ColumnHeader } from './ColumnHeader'
 import { AddColumnButton } from './AddColumnButton'
+import { CreateTaskModal } from './CreateTaskModal'
+import { TaskCard } from './TaskCard'
 
 export default async function BoardDetailPage({
   params,
@@ -35,11 +37,12 @@ export default async function BoardDetailPage({
   // Fetch board members with profiles
   const { data: rawMembers } = await supabase
     .from('board_members')
-    .select('id, role, profiles(full_name, avatar_url)')
+    .select('id, user_id, role, profiles(full_name, avatar_url)')
     .eq('board_id', id)
 
   const members = (rawMembers || []).map((m) => ({
     id: m.id,
+    user_id: m.user_id,
     role: m.role || 'member',
     profiles: Array.isArray(m.profiles) ? m.profiles[0] : m.profiles,
   }))
@@ -50,6 +53,18 @@ export default async function BoardDetailPage({
     .select('*')
     .eq('board_id', id)
     .order('position', { ascending: true })
+
+  // Fetch board tasks
+  const { data: rawTasks } = await supabase
+    .from('tasks')
+    .select('*, profiles:assignee_id(full_name, avatar_url)')
+    .eq('board_id', id)
+    .order('position', { ascending: true })
+
+  const tasks = (rawTasks || []).map((t) => ({
+    ...t,
+    profiles: Array.isArray(t.profiles) ? t.profiles[0] : t.profiles,
+  }))
 
   const isOwner = board.owner_id === user.id
 
@@ -66,17 +81,43 @@ export default async function BoardDetailPage({
       <main className="flex-1 p-8 overflow-x-auto">
         <div className="flex gap-6 items-start">
           {columns && columns.length > 0 && (
-            columns.map((col) => (
-              <div
-                key={col.id}
-                className="w-72 flex-shrink-0 rounded-xl bg-zinc-200/70 p-4 dark:bg-zinc-900 border border-zinc-300/50 dark:border-zinc-800"
-              >
-                <ColumnHeader column={col} />
-                <div className="min-h-[200px] flex items-center justify-center rounded-lg border border-dashed border-zinc-300 dark:border-zinc-800 text-xs text-zinc-400">
-                  Belum ada task
+            columns.map((col) => {
+              const columnTasks = tasks.filter((t) => t.column_id === col.id)
+
+              return (
+                <div
+                  key={col.id}
+                  className="w-72 flex-shrink-0 rounded-xl bg-zinc-200/70 p-4 dark:bg-zinc-900 border border-zinc-300/50 dark:border-zinc-800"
+                >
+                  <ColumnHeader column={col} />
+
+                  <div className="flex flex-col gap-2.5 min-h-[150px]">
+                    {columnTasks.length > 0 ? (
+                      columnTasks.map((task) => (
+                        <TaskCard
+                          key={task.id}
+                          task={task}
+                          columns={columns}
+                          members={members}
+                          currentUserId={user.id}
+                        />
+                      ))
+                    ) : (
+                      <div className="min-h-[100px] flex items-center justify-center rounded-lg border border-dashed border-zinc-300 dark:border-zinc-800 text-xs text-zinc-400">
+                        Belum ada task
+                      </div>
+                    )}
+                  </div>
+
+                  <CreateTaskModal
+                    boardId={id}
+                    columnId={col.id}
+                    columnName={col.name}
+                    members={members}
+                  />
                 </div>
-              </div>
-            ))
+              )
+            })
           )}
           <AddColumnButton boardId={id} />
         </div>

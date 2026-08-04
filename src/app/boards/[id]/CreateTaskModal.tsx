@@ -1,0 +1,151 @@
+'use client'
+
+import { useState } from 'react'
+import { createTask } from './taskActions'
+
+type Member = {
+  id: string
+  user_id?: string
+  role: string
+  profiles: {
+    full_name: string
+    avatar_url: string | null
+  } | null
+}
+
+type CreateTaskModalProps = {
+  boardId: string
+  columnId: string
+  columnName: string
+  members: Member[]
+}
+
+export function CreateTaskModal({
+  boardId,
+  columnId,
+  columnName,
+  members,
+}: CreateTaskModalProps) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setError(null)
+    setLoading(true)
+
+    const formData = new FormData(event.currentTarget)
+    const result = await createTask(boardId, columnId, formData)
+
+    if (result && result.error) {
+      setError(result.error)
+      setLoading(false)
+    } else {
+      setIsOpen(false)
+      setLoading(false)
+    }
+  }
+
+  return (
+    <>
+      <button
+        onClick={() => setIsOpen(true)}
+        className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-zinc-300 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/50 py-2 text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:border-indigo-500 hover:text-indigo-600 dark:hover:bg-zinc-800 transition"
+      >
+        + Tambah Task
+      </button>
+
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl dark:bg-zinc-900">
+            <h3 className="text-lg font-bold text-zinc-900 dark:text-white">
+              Tambah Task Baru ({columnName})
+            </h3>
+
+            {error && (
+              <div className="mt-3 rounded-md bg-red-50 p-3 text-xs text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                  Judul Task <span className="text-red-500">*</span>
+                </label>
+                <input
+                  name="title"
+                  type="text"
+                  required
+                  autoFocus
+                  placeholder="Misal: Buat desain landing page"
+                  className="w-full rounded-md border border-zinc-300 px-3 py-2 text-xs text-zinc-900 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                  Deskripsi (Opsional)
+                </label>
+                <textarea
+                  name="description"
+                  rows={3}
+                  placeholder="Detail penjelasan task..."
+                  className="w-full rounded-md border border-zinc-300 px-3 py-2 text-xs text-zinc-900 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                    Assignee
+                  </label>
+                  <select
+                    name="assignee_id"
+                    className="w-full rounded-md border border-zinc-300 px-3 py-2 text-xs text-zinc-900 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                  >
+                    <option value="">Belum di-assign</option>
+                    {members.map((m) => (
+                      <option key={m.id} value={m.user_id || ''}>
+                        {m.profiles?.full_name || 'User'} ({m.role})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                    Tenggat Waktu (Due Date)
+                  </label>
+                  <input
+                    name="due_date"
+                    type="date"
+                    className="w-full rounded-md border border-zinc-300 px-3 py-2 text-xs text-zinc-900 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsOpen(false)}
+                  className="rounded-md border border-zinc-300 px-4 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="rounded-md bg-indigo-600 px-4 py-2 text-xs font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+                >
+                  {loading ? 'Menyimpan...' : 'Tambah Task'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}

@@ -179,16 +179,16 @@
 **Deskripsi:** Task dengan judul, deskripsi, assignee, due date (PRD user story #1, #2).
 
 **Langkah:**
-- [ ] Buat task baru di kolom tertentu
-- [ ] Edit task (judul, deskripsi, assignee, due date)
-- [ ] Hapus task
-- [ ] Assign diri sendiri ke task (user story #2)
-- [ ] Saat task dibuat, set `status_updated_at` = waktu sekarang
+- [x] Buat task baru di kolom tertentu
+- [x] Edit task (judul, deskripsi, assignee, due date)
+- [x] Hapus task
+- [x] Assign diri sendiri ke task (user story #2)
+- [x] Saat task dibuat, set `status_updated_at` = waktu sekarang
 
 **DoD:**
-- [ ] CRUD task berjalan penuh
-- [ ] Assign diri berhasil dan langsung terlihat siapa assignee-nya
-- [ ] Field `status_updated_at` konsisten dengan `updated_at` (dua kolom terpisah sesuai PRD section 10)
+- [x] CRUD task berjalan penuh
+- [x] Assign diri berhasil dan langsung terlihat siapa assignee-nya
+- [x] Field `status_updated_at` konsisten dengan `updated_at` (dua kolom terpisah sesuai PRD section 10)
 
 **Commit contoh:** `feat(task): CRUD task + self-assign`
 
