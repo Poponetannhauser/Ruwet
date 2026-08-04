@@ -76,15 +76,15 @@
 **Deskripsi:** Buat tabel `profiles`, `boards`, `board_members` sesuai PRD section 10, plus RLS policy dasar.
 
 **Langkah:**
-- [ ] Tulis migration SQL untuk `profiles`, `boards`, `board_members`
-- [ ] Aktifkan RLS di semua tabel
-- [ ] Policy: user hanya bisa `select` board yang dia jadi member-nya
-- [ ] Simpan semua SQL di `schema.sql` (sesuai referensi PRD section 14)
+- [x] Tulis migration SQL untuk `profiles`, `boards`, `board_members`
+- [x] Aktifkan RLS di semua tabel
+- [x] Policy: user hanya bisa `select` board yang dia jadi member-nya
+- [x] Simpan semua SQL di `schema.sql` (sesuai referensi PRD section 14)
 
 **DoD:**
-- [ ] Migration bisa dijalankan ulang dari nol tanpa error
-- [ ] Test manual: user A tidak bisa lihat board milik user B lewat query langsung
-- [ ] Dokumentasi singkat struktur tabel di README/`docs/schema.md`
+- [x] Migration bisa dijalankan ulang dari nol tanpa error
+- [x] Test manual: user A tidak bisa lihat board milik user B lewat query langsung
+- [x] Dokumentasi singkat struktur tabel di README/`docs/schema.md`
 
 **Commit contoh:** `feat(db): tambah skema profiles, boards, board_members + RLS`
 
