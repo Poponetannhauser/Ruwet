@@ -141,13 +141,13 @@
 **Deskripsi:** User story #9 bagian invite, PRD flow 1 langkah 3.
 
 **Langkah:**
-- [ ] Generate invite link atau input email untuk invite
-- [ ] User yang diundang otomatis masuk `board_members` setelah accept
-- [ ] List anggota board di UI
+- [x] Generate invite link atau input email untuk invite
+- [x] User yang diundang otomatis masuk `board_members` setelah accept
+- [x] List anggota board di UI
 
 **DoD:**
-- [ ] User baru bisa join board lewat invite
-- [ ] User yang bukan member tidak bisa akses board tersebut (cek RLS lagi)
+- [x] User baru bisa join board lewat invite
+- [x] User yang bukan member tidak bisa akses board tersebut (cek RLS lagi)
 
 **Commit contoh:** `feat(board): fitur invite anggota board`
 

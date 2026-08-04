@@ -1,7 +1,18 @@
 'use client'
 
 import { useState } from 'react'
-import { updateBoard, deleteBoard } from '../actions'
+import { updateBoard, deleteBoard, leaveBoard } from '../actions'
+import { InviteMemberModal } from './InviteMemberModal'
+import { MemberList } from './MemberList'
+
+type Member = {
+  id: string
+  role: string
+  profiles: {
+    full_name: string
+    avatar_url: string | null
+  } | null
+}
 
 type BoardHeaderProps = {
   board: {
@@ -10,9 +21,10 @@ type BoardHeaderProps = {
     owner_id: string
   }
   isOwner: boolean
+  members: Member[]
 }
 
-export function BoardHeader({ board, isOwner }: BoardHeaderProps) {
+export function BoardHeader({ board, isOwner, members }: BoardHeaderProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [name, setName] = useState(board.name)
@@ -40,6 +52,15 @@ export function BoardHeader({ board, isOwner }: BoardHeaderProps) {
   async function handleDelete() {
     setLoading(true)
     const result = await deleteBoard(board.id)
+    if (result && result.error) {
+      setError(result.error)
+      setLoading(false)
+    }
+  }
+
+  async function handleLeave() {
+    setLoading(true)
+    const result = await leaveBoard(board.id)
     if (result && result.error) {
       setError(result.error)
       setLoading(false)
@@ -91,44 +112,57 @@ export function BoardHeader({ board, isOwner }: BoardHeaderProps) {
         <div className="text-sm text-red-600 dark:text-red-400">{error}</div>
       )}
 
-      {isOwner && (
-        <div>
-          <button
-            onClick={() => setIsDeleting(true)}
-            className="rounded-md bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40 transition"
-          >
-            Hapus Board
-          </button>
+      <div className="flex items-center gap-4">
+        <MemberList members={members} />
+        {isOwner && <InviteMemberModal boardId={board.id} />}
 
-          {isDeleting && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-              <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl dark:bg-zinc-900">
-                <h3 className="text-lg font-bold text-zinc-900 dark:text-white">
-                  Konfirmasi Hapus
-                </h3>
-                <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-                  Apakah Anda yakin ingin menghapus board <strong>{name}</strong>? Tindakan ini tidak dapat dibatalkan.
-                </p>
-                <div className="mt-4 flex justify-end gap-2">
-                  <button
-                    onClick={() => setIsDeleting(false)}
-                    className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
-                  >
-                    Batal
-                  </button>
-                  <button
-                    onClick={handleDelete}
-                    disabled={loading}
-                    className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
-                  >
-                    {loading ? 'Menghapus...' : 'Hapus'}
-                  </button>
+        {isOwner ? (
+          <div>
+            <button
+              onClick={() => setIsDeleting(true)}
+              className="rounded-md bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40 transition"
+            >
+              Hapus Board
+            </button>
+
+            {isDeleting && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+                <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl dark:bg-zinc-900">
+                  <h3 className="text-lg font-bold text-zinc-900 dark:text-white">
+                    Konfirmasi Hapus
+                  </h3>
+                  <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+                    Apakah Anda yakin ingin menghapus board <strong>{name}</strong>? Tindakan ini tidak dapat dibatalkan.
+                  </p>
+                  <div className="mt-4 flex justify-end gap-2">
+                    <button
+                      onClick={() => setIsDeleting(false)}
+                      className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                    >
+                      Batal
+                    </button>
+                    <button
+                      onClick={handleDelete}
+                      disabled={loading}
+                      className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+                    >
+                      {loading ? 'Menghapus...' : 'Hapus'}
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
-      )}
+            )}
+          </div>
+        ) : (
+          <button
+            onClick={handleLeave}
+            disabled={loading}
+            className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800 transition"
+          >
+            {loading ? 'Keluar...' : 'Keluar Board'}
+          </button>
+        )}
+      </div>
     </div>
   )
 }

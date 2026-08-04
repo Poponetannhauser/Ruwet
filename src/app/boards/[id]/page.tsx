@@ -30,6 +30,18 @@ export default async function BoardDetailPage({
     notFound()
   }
 
+  // Fetch board members with profiles
+  const { data: rawMembers } = await supabase
+    .from('board_members')
+    .select('id, role, profiles(full_name, avatar_url)')
+    .eq('board_id', id)
+
+  const members = (rawMembers || []).map((m) => ({
+    id: m.id,
+    role: m.role || 'member',
+    profiles: Array.isArray(m.profiles) ? m.profiles[0] : m.profiles,
+  }))
+
   // Fetch board columns
   const { data: columns } = await supabase
     .from('columns')
@@ -47,7 +59,7 @@ export default async function BoardDetailPage({
         </Link>
       </div>
 
-      <BoardHeader board={board} isOwner={isOwner} />
+      <BoardHeader board={board} isOwner={isOwner} members={members} />
 
       <main className="flex-1 p-8 overflow-x-auto">
         <div className="flex gap-6 items-start">
