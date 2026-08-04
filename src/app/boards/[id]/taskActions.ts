@@ -161,3 +161,45 @@ export async function assignSelf(taskId: string, boardId: string) {
   revalidatePath(`/boards/${boardId}`)
   return { success: true }
 }
+
+export async function moveTask(
+  taskId: string,
+  boardId: string,
+  targetColumnId: string,
+  newPosition: number,
+  isColumnChanged: boolean
+) {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/login')
+  }
+
+  const now = new Date().toISOString()
+
+  const updateData: Record<string, unknown> = {
+    column_id: targetColumnId,
+    position: newPosition,
+    updated_at: now,
+  }
+
+  if (isColumnChanged) {
+    updateData.status_updated_at = now
+  }
+
+  const { error } = await supabase
+    .from('tasks')
+    .update(updateData)
+    .eq('id', taskId)
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  revalidatePath(`/boards/${boardId}`)
+  return { success: true }
+}
