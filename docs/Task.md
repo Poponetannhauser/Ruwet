@@ -224,13 +224,13 @@
 **Deskripsi:** Perubahan board/task terlihat real-time oleh semua anggota, target < 2 detik (PRD section 7).
 
 **Langkah:**
-- [ ] Subscribe ke perubahan tabel `tasks` dan `columns` per board
-- [ ] Update state lokal (Zustand) saat ada event realtime masuk
-- [ ] Handle kasus: user A drag task, user B lihat board yang sama — pastikan tidak dobel-update atau konflik dengan optimistic update milik user A sendiri
+- [x] Subscribe ke perubahan tabel `tasks` dan `columns` per board
+- [x] Update state lokal saat ada event realtime masuk
+- [x] Handle kasus: user A drag task, user B lihat board yang sama — pastikan tidak dobel-update atau konflik dengan optimistic update milik user A sendiri
 
 **DoD:**
-- [ ] Buka board di 2 browser berbeda, drag task di satu sisi → muncul di sisi lain dalam < 2 detik
-- [ ] Tidak ada flicker/dobel-render aneh saat event realtime masuk
+- [x] Buka board di 2 browser berbeda, drag task di satu sisi → muncul di sisi lain dalam < 2 detik
+- [x] Tidak ada flicker/dobel-render aneh saat event realtime masuk
 
 **Commit contoh:** `feat(realtime): integrasi supabase realtime untuk sync task & kolom`
 

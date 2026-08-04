@@ -253,3 +253,12 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
+
+-------------------------------------------------------
+-- SUPABASE REALTIME PUBLICATION SETUP
+-------------------------------------------------------
+
+-- Enable Realtime publication for tasks and columns
+alter publication supabase_realtime add table tasks;
+alter publication supabase_realtime add table columns;
+alter table tasks replica identity full;
