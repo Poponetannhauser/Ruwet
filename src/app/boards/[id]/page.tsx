@@ -2,6 +2,8 @@ import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { BoardHeader } from './BoardHeader'
+import { ColumnHeader } from './ColumnHeader'
+import { AddColumnButton } from './AddColumnButton'
 
 export default async function BoardDetailPage({
   params,
@@ -63,26 +65,20 @@ export default async function BoardDetailPage({
 
       <main className="flex-1 p-8 overflow-x-auto">
         <div className="flex gap-6 items-start">
-          {columns && columns.length > 0 ? (
+          {columns && columns.length > 0 && (
             columns.map((col) => (
               <div
                 key={col.id}
                 className="w-72 flex-shrink-0 rounded-xl bg-zinc-200/70 p-4 dark:bg-zinc-900 border border-zinc-300/50 dark:border-zinc-800"
               >
-                <div className="flex items-center justify-between font-semibold text-sm text-zinc-700 dark:text-zinc-300 mb-3">
-                  <span>{col.name}</span>
-                  <span className="rounded bg-zinc-300 dark:bg-zinc-800 px-2 py-0.5 text-xs text-zinc-600 dark:text-zinc-400">
-                    0
-                  </span>
-                </div>
+                <ColumnHeader column={col} />
                 <div className="min-h-[200px] flex items-center justify-center rounded-lg border border-dashed border-zinc-300 dark:border-zinc-800 text-xs text-zinc-400">
                   Belum ada task
                 </div>
               </div>
             ))
-          ) : (
-            <div className="text-sm text-zinc-500">Tidak ada kolom.</div>
           )}
+          <AddColumnButton boardId={id} />
         </div>
       </main>
     </div>

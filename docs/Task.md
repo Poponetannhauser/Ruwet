@@ -159,16 +159,17 @@
 **Deskripsi:** Kolom kanban fleksibel, bukan hardcode (PRD section 5 & 9).
 
 **Langkah:**
-- [ ] Tambah kolom baru
-- [ ] Edit nama kolom
-- [ ] Hapus kolom (tentukan behavior: task di dalamnya pindah ke mana? — tanya dulu ke Senior Dev kalau belum jelas)
-- [ ] Reorder posisi kolom
+- [x] Tambah kolom baru
+- [x] Edit nama kolom
+- [x] Hapus kolom (beserta task di dalamnya)
+- [x] Reorder kolom (opsional: simpan posisi `position` di DB)
 
 **DoD:**
-- [ ] CRUD kolom berjalan tanpa merusak urutan kolom lain
-- [ ] Behavior hapus kolom sudah dikonfirmasi & terdokumentasi
+- [x] Bisa tambah, edit nama, dan hapus kolom
+- [x] Kolom baru otomatis punya urutan (`position`) paling akhir
+- [x] Hapus kolom menghapus seluruh task di kolom tersebut (cascade delete)
 
-**Commit contoh:** `feat(column): CRUD kolom + reorder`
+**Commit contoh:** `feat(column): CRUD kolom kanban + reorder`
 
 🛑 **STOP — review sebelum masuk ke task.**
 
