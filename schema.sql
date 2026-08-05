@@ -252,6 +252,36 @@ create policy "Board members can insert activity logs"
   );
 
 
+-- 7. Comments Policies
+create policy "Board members can view comments"
+  on comments for select
+  to authenticated
+  using (
+    exists (
+      select 1 from tasks t
+      where t.id = comments.task_id
+      and (
+        is_board_member(t.board_id, auth.uid()) or
+        exists (select 1 from boards b where b.id = t.board_id and b.owner_id = auth.uid())
+      )
+    )
+  );
+
+create policy "Board members can insert comments"
+  on comments for insert
+  to authenticated
+  with check (
+    exists (
+      select 1 from tasks t
+      where t.id = comments.task_id
+      and (
+        is_board_member(t.board_id, auth.uid()) or
+        exists (select 1 from boards b where b.id = t.board_id and b.owner_id = auth.uid())
+      )
+    )
+  );
+
+
 -- Automatically create profile trigger on auth.users sign up
 create or replace function public.handle_new_user()
 returns trigger as $$
@@ -276,7 +306,8 @@ create trigger on_auth_user_created
 -- SUPABASE REALTIME PUBLICATION SETUP
 -------------------------------------------------------
 
--- Enable Realtime publication for tasks and columns
+-- Enable Realtime publication for tasks, columns, and comments
 alter publication supabase_realtime add table tasks;
 alter publication supabase_realtime add table columns;
+alter publication supabase_realtime add table comments;
 alter table tasks replica identity full;

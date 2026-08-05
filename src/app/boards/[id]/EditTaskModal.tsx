@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { updateTask, deleteTask } from './taskActions'
 import { ActivityFeed } from './ActivityFeed'
+import { CommentSection } from './CommentSection'
 
 type Member = {
   id: string
@@ -180,13 +181,6 @@ export function EditTaskModal({
             />
           </div>
 
-          <div className="border-t border-zinc-100 dark:border-zinc-800 pt-3 mt-3">
-            <h5 className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 mb-2">
-              📜 Riwayat Aktivitas
-            </h5>
-            <ActivityFeed taskId={task.id} />
-          </div>
-
           <div className="flex justify-end gap-2 pt-2">
             <button
               type="button"
@@ -204,6 +198,21 @@ export function EditTaskModal({
             </button>
           </div>
         </form>
+        <div className="border-t border-zinc-100 dark:border-zinc-800 pt-3 mt-4 space-y-4">
+          <div>
+            <h5 className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 mb-2">
+              💬 Komentar
+            </h5>
+            <CommentSection taskId={task.id} boardId={task.board_id} />
+          </div>
+
+          <div>
+            <h5 className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 mb-2">
+              📜 Riwayat Aktivitas
+            </h5>
+            <ActivityFeed taskId={task.id} />
+          </div>
+        </div>
       </div>
     </div>
   )

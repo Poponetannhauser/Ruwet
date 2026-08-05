@@ -283,12 +283,12 @@
 **Deskripsi:** User story #6, tabel `comments`.
 
 **Langkah:**
-- [ ] Form tambah komentar di detail task
-- [ ] List komentar urut waktu
-- [ ] RLS: hanya member board yang bisa komentar/lihat
+- [x] Form tambah komentar di detail task
+- [x] List komentar urut waktu
+- [x] RLS: hanya member board yang bisa komentar/lihat
 
 **DoD:**
-- [ ] Komentar tersimpan dan muncul real-time ke semua anggota yang sedang buka task itu
+- [x] Komentar tersimpan dan muncul real-time ke semua anggota yang sedang buka task itu
 
 **Commit contoh:** `feat(comments): fitur komentar per task`
 
