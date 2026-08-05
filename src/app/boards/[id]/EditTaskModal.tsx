@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { updateTask, deleteTask } from './taskActions'
+import { ActivityFeed } from './ActivityFeed'
 
 type Member = {
   id: string
@@ -177,6 +178,13 @@ export function EditTaskModal({
               defaultValue={task.due_date ? task.due_date.split('T')[0] : ''}
               className="w-full rounded-md border border-zinc-300 px-3 py-2 text-xs text-zinc-900 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
             />
+          </div>
+
+          <div className="border-t border-zinc-100 dark:border-zinc-800 pt-3 mt-3">
+            <h5 className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 mb-2">
+              📜 Riwayat Aktivitas
+            </h5>
+            <ActivityFeed taskId={task.id} />
           </div>
 
           <div className="flex justify-end gap-2 pt-2">
