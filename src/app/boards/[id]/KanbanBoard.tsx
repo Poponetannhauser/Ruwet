@@ -111,8 +111,10 @@ function ColumnContainer({
               />
             ))
           ) : (
-            <div className="min-h-[100px] flex items-center justify-center rounded-lg border border-dashed border-zinc-300 dark:border-zinc-800 text-xs text-zinc-400">
-              Belum ada task
+            <div className="min-h-[110px] flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-300/80 p-4 text-center text-xs text-zinc-400 dark:border-zinc-800">
+              <span className="text-xl opacity-60 mb-1">📋</span>
+              <span className="font-semibold text-zinc-500 dark:text-zinc-400">Kolom Kosong</span>
+              <span className="text-[10px] text-zinc-400 mt-0.5">Tarik task ke sini atau buat baru</span>
             </div>
           )}
         </div>

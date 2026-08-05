@@ -92,11 +92,15 @@ export default async function Home() {
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-300 dark:border-zinc-800 p-12 text-center bg-white dark:bg-zinc-900/50">
-                <p className="text-zinc-500 dark:text-zinc-400">
-                  Anda belum memiliki board kanban.
+              <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-zinc-300 dark:border-zinc-800 p-10 sm:p-14 text-center bg-white dark:bg-zinc-900/40 shadow-xs space-y-3">
+                <span className="text-4xl">⚡</span>
+                <h3 className="text-base font-bold text-zinc-900 dark:text-white">
+                  Belum Ada Board Kanban
+                </h3>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-sm">
+                  Anda belum terhubung ke board kanban mana pun. Buat board baru untuk mulai mengelola task tim Anda.
                 </p>
-                <div className="mt-4">
+                <div className="pt-2">
                   <CreateBoardModal />
                 </div>
               </div>
