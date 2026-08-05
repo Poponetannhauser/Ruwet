@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { updateTask, deleteTask } from './taskActions'
 import { ActivityFeed } from './ActivityFeed'
 import { CommentSection } from './CommentSection'
@@ -85,8 +86,21 @@ export function EditTaskModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3 sm:p-4">
-      <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-xl bg-white p-4 sm:p-6 shadow-xl dark:bg-zinc-900">
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3 sm:p-4 backdrop-blur-xs"
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 8 }}
+            transition={{ duration: 0.2 }}
+            className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-xl bg-white p-4 sm:p-6 shadow-xl dark:bg-zinc-900"
+          >
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-bold text-zinc-900 dark:text-white">
             Edit Task
@@ -213,7 +227,9 @@ export function EditTaskModal({
             <ActivityFeed taskId={task.id} />
           </div>
         </div>
-      </div>
-    </div>
-  )
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
+)
 }
