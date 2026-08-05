@@ -73,6 +73,7 @@ export function TaskCard({
   const isAssignedToMe = task.assignee_id === currentUserId
   const assigneeName = task.profiles?.full_name || 'Unassigned'
   const assigneeInitial = assigneeName.charAt(0).toUpperCase()
+  const taskIdShort = `TS-${task.id.slice(0, 4).toUpperCase()}`
 
   // Calculate Stale Status
   const currentColumn = columns.find((c) => c.id === task.column_id)
@@ -94,21 +95,19 @@ export function TaskCard({
     const updatedMs = new Date(task.status_updated_at).getTime()
     const diffMs = nowMs - updatedMs
     const thresholdMs = staleThresholdHours * 60 * 60 * 1000
-
     const ratio = diffMs / thresholdMs
 
-    // Calculate readable elapsed time
     const diffMinutes = Math.floor(diffMs / (1000 * 60))
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
 
     let elapsedText = ''
     if (diffDays > 0) {
-      elapsedText = `${diffDays} hari`
+      elapsedText = `${diffDays}d`
     } else if (diffHours > 0) {
-      elapsedText = `${diffHours} jam`
+      elapsedText = `${diffHours}h`
     } else {
-      elapsedText = `${diffMinutes} mnt`
+      elapsedText = `${diffMinutes}m`
     }
 
     if (ratio > 1) {
@@ -116,12 +115,18 @@ export function TaskCard({
       staleLabel = `Stale (${elapsedText})`
     } else if (ratio >= 0.7) {
       staleStatus = 'yellow'
-      staleLabel = `Perlu Perhatian (${elapsedText})`
+      staleLabel = `Warning (${elapsedText})`
     } else {
       staleStatus = 'green'
-      staleLabel = `Aktif (${elapsedText})`
+      staleLabel = `Fresh (${elapsedText})`
     }
   }
+
+  // Border color based on status according to DESIGN.md
+  let borderLeftColor = 'border-l-[#5b4df6]'
+  if (staleStatus === 'red') borderLeftColor = 'border-l-[#ba1a1a]'
+  else if (staleStatus === 'yellow') borderLeftColor = 'border-l-[#724900]'
+  else if (staleStatus === 'green') borderLeftColor = 'border-l-[#006c47]'
 
   async function handleAssignSelf(e: React.MouseEvent) {
     e.stopPropagation()
@@ -138,31 +143,32 @@ export function TaskCard({
         {...attributes}
         {...listeners}
         onClick={() => setIsEditOpen(true)}
-        className="group relative cursor-grab active:cursor-grabbing touch-manipulation rounded-lg border border-zinc-200 bg-white p-3 shadow-sm hover:border-indigo-400 hover:shadow focus:ring-2 focus:ring-indigo-500 focus:outline-none transition dark:border-zinc-800 dark:bg-zinc-900/90 dark:hover:border-indigo-600"
+        className={`group relative cursor-grab active:cursor-grabbing touch-manipulation rounded-lg border-t border-r border-b border-[#e1e2e6] border-l-4 ${borderLeftColor} bg-white p-3.5 shadow-level-1 hover:shadow-level-2 hover:border-[#5b4df6] focus:ring-2 focus:ring-[#5b4df6] focus:outline-none transition-all duration-150`}
       >
-        <div className="flex items-start justify-between gap-2">
-          <h4 className="font-semibold text-xs text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">
-            {task.title}
-          </h4>
+        {/* Header row: ID + Status Pill */}
+        <div className="flex items-center justify-between gap-2 mb-1.5">
+          <span className="font-data-mono text-[11px] font-semibold text-[#777587]">
+            {taskIdShort}
+          </span>
 
           {staleStatus && (
             <span
               title={`Status aktivitas: ${staleLabel}`}
-              className={`inline-flex flex-shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${
+              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${
                 staleStatus === 'red'
-                  ? 'bg-red-100 text-red-700 dark:bg-red-950/80 dark:text-red-400 animate-pulse'
+                  ? 'bg-[#ffdad6] text-[#ba1a1a]'
                   : staleStatus === 'yellow'
-                  ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-400'
-                  : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-400'
+                  ? 'bg-[#fff4e5] text-[#724900]'
+                  : 'bg-[#e6f7f0] text-[#006c47]'
               }`}
             >
               <span
-                className={`h-1.5 w-1.5 rounded-full ${
+                className={`w-1.5 h-1.5 rounded-full ${
                   staleStatus === 'red'
-                    ? 'bg-red-600 dark:bg-red-400'
+                    ? 'bg-[#ba1a1a]'
                     : staleStatus === 'yellow'
-                    ? 'bg-amber-500 dark:bg-amber-400'
-                    : 'bg-emerald-500 dark:bg-emerald-400'
+                    ? 'bg-[#724900]'
+                    : 'bg-[#006c47]'
                 }`}
               />
               {staleStatus === 'red' ? 'Stale' : staleStatus === 'yellow' ? 'Warning' : 'Fresh'}
@@ -170,39 +176,46 @@ export function TaskCard({
           )}
         </div>
 
+        {/* Task Title */}
+        <h4 className="font-sans font-semibold text-sm text-[#191c1f] group-hover:text-[#5b4df6] transition leading-snug">
+          {task.title}
+        </h4>
+
+        {/* Task Description */}
         {task.description && (
-          <p className="mt-1 line-clamp-2 text-[11px] text-zinc-500 dark:text-zinc-400">
+          <p className="mt-1 line-clamp-2 text-xs text-[#464556]">
             {task.description}
           </p>
         )}
 
-        <div className="mt-3 flex items-center justify-between border-t border-zinc-100 pt-2 text-[10px] text-zinc-500 dark:border-zinc-800/80 dark:text-zinc-400">
+        {/* Footer: Due date + Assignee */}
+        <div className="mt-3.5 flex items-center justify-between border-t border-[#f2f3f7] pt-2.5 text-xs text-[#777587]">
           <div>
             {task.due_date ? (
-              <span className="flex items-center gap-1 font-medium text-amber-600 dark:text-amber-400">
+              <span className="flex items-center gap-1 font-data-mono text-[11px] text-[#724900]">
                 📅 {new Date(task.due_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
               </span>
             ) : (
-              <span>Tanpa tenggat</span>
+              <span className="text-[11px]">No due date</span>
             )}
           </div>
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             {!isAssignedToMe && (
               <button
                 onClick={handleAssignSelf}
                 disabled={loading}
-                className="hidden rounded bg-indigo-50 px-1.5 py-0.5 font-medium text-indigo-600 hover:bg-indigo-100 group-hover:block dark:bg-indigo-950 dark:text-indigo-400 dark:hover:bg-indigo-900 transition"
+                className="hidden rounded bg-[#ebe7ff] px-2 py-0.5 text-[11px] font-semibold text-[#5b4df6] hover:bg-[#5b4df6] hover:text-white group-hover:block transition"
                 title="Assign task ini ke saya"
               >
-                +Saya
+                +Me
               </button>
             )}
 
             <div
               title={`Assignee: ${assigneeName}`}
-              className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white ${
-                task.assignee_id ? 'bg-indigo-600' : 'bg-zinc-300 dark:bg-zinc-700'
+              className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-xs ${
+                task.assignee_id ? 'bg-[#5b4df6]' : 'bg-[#c7c4d8]'
               }`}
             >
               {task.assignee_id ? assigneeInitial : '?'}

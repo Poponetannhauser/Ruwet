@@ -98,21 +98,21 @@ export function BoardHeader({ board, isOwner, members, columns = [], tasks = [] 
   }
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-200 bg-white px-4 sm:px-8 py-4 dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#e1e2e6] bg-white px-6 lg:px-10 py-5">
       {isEditing ? (
         <form onSubmit={handleUpdate} className="flex flex-wrap items-center gap-3">
           <div>
-            <label className="block text-[10px] uppercase font-semibold text-zinc-500 mb-0.5">Nama Board</label>
+            <label className="block text-[10px] uppercase font-bold text-[#777587] mb-1">Nama Board</label>
             <input
               name="name"
               defaultValue={name}
               required
-              className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-bold text-zinc-900 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+              className="rounded-md border border-[#c7c4d8] px-3 py-1.5 text-sm font-bold text-[#191c1f] focus:border-[#5b4df6] focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="block text-[10px] uppercase font-semibold text-zinc-500 mb-0.5">Stale Threshold (Jam)</label>
+            <label className="block text-[10px] uppercase font-bold text-[#777587] mb-1">Stale Threshold (Jam)</label>
             <input
               name="stale_threshold_hours"
               type="number"
@@ -120,39 +120,39 @@ export function BoardHeader({ board, isOwner, members, columns = [], tasks = [] 
               min="0.01"
               defaultValue={staleThreshold}
               placeholder="48"
-              className="w-28 rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-bold text-zinc-900 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+              className="w-28 rounded-md border border-[#c7c4d8] px-3 py-1.5 text-sm font-bold text-[#191c1f] focus:border-[#5b4df6] focus:outline-none"
             />
           </div>
 
-          <div className="flex items-center gap-1.5 self-end pb-0.5">
+          <div className="flex items-center gap-2 self-end pb-0.5">
             <button
               type="submit"
               disabled={loading}
-              className="rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+              className="rounded-md bg-[#5b4df6] px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-[#412dde] disabled:opacity-50 transition shadow-xs"
             >
               {loading ? 'Menyimpan...' : 'Simpan'}
             </button>
             <button
               type="button"
               onClick={() => setIsEditing(false)}
-              className="rounded-md border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              className="rounded-md border border-[#c7c4d8] px-3.5 py-1.5 text-xs font-semibold text-[#191c1f] hover:bg-[#edeef2] transition"
             >
               Batal
             </button>
           </div>
         </form>
       ) : (
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">
+        <div className="flex items-center gap-3.5">
+          <h1 className="font-heading text-2xl lg:text-3xl font-bold text-[#191c1f]">
             {name}
           </h1>
-          <span className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
-            ⏳ Stale Threshold: {staleThreshold} jam
+          <span className="rounded-full bg-[#ebe7ff] px-3 py-1 text-xs font-semibold text-[#5b4df6]">
+            ⏳ Stale: {staleThreshold} jam
           </span>
           {isOwner && (
             <button
               onClick={() => setIsEditing(true)}
-              className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+              className="text-xs font-semibold text-[#5b4df6] hover:underline"
             >
               Setting Board
             </button>
@@ -161,13 +161,13 @@ export function BoardHeader({ board, isOwner, members, columns = [], tasks = [] 
       )}
 
       {error && (
-        <div className="text-sm text-red-600 dark:text-red-400">{error}</div>
+        <div className="text-sm font-semibold text-[#ba1a1a]">{error}</div>
       )}
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         <button
           onClick={() => setIsSummaryOpen(true)}
-          className="rounded-md bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-950/40 dark:text-indigo-400 dark:hover:bg-indigo-900/50 transition flex items-center gap-1.5"
+          className="rounded-lg bg-[#ebe7ff] px-3.5 py-2 text-xs font-semibold text-[#5b4df6] hover:bg-[#5b4df6] hover:text-white transition flex items-center gap-1.5 shadow-xs"
         >
           📊 Ringkasan Board
         </button>
@@ -190,31 +190,31 @@ export function BoardHeader({ board, isOwner, members, columns = [], tasks = [] 
           <div>
             <button
               onClick={() => setIsDeleting(true)}
-              className="rounded-md bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40 transition"
+              className="rounded-lg bg-[#ffdad6] px-3.5 py-2 text-xs font-semibold text-[#ba1a1a] hover:bg-[#ba1a1a] hover:text-white transition shadow-xs"
             >
               Hapus Board
             </button>
 
             {isDeleting && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-                <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl dark:bg-zinc-900">
-                  <h3 className="text-lg font-bold text-zinc-900 dark:text-white">
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+                <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-level-2 border border-[#e1e2e6]">
+                  <h3 className="font-heading text-lg font-bold text-[#191c1f]">
                     Konfirmasi Hapus
                   </h3>
-                  <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+                  <p className="mt-2 text-xs text-[#464556]">
                     Apakah Anda yakin ingin menghapus board <strong>{name}</strong>? Tindakan ini tidak dapat dibatalkan.
                   </p>
-                  <div className="mt-4 flex justify-end gap-2">
+                  <div className="mt-5 flex justify-end gap-2">
                     <button
                       onClick={() => setIsDeleting(false)}
-                      className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                      className="rounded-md border border-[#c7c4d8] px-4 py-2 text-xs font-semibold text-[#191c1f] hover:bg-[#edeef2]"
                     >
                       Batal
                     </button>
                     <button
                       onClick={handleDelete}
                       disabled={loading}
-                      className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+                      className="rounded-md bg-[#ba1a1a] px-4 py-2 text-xs font-semibold text-white hover:bg-[#93000a] disabled:opacity-50"
                     >
                       {loading ? 'Menghapus...' : 'Hapus'}
                     </button>
@@ -227,7 +227,7 @@ export function BoardHeader({ board, isOwner, members, columns = [], tasks = [] 
           <button
             onClick={handleLeave}
             disabled={loading}
-            className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800 transition"
+            className="rounded-lg border border-[#c7c4d8] px-3.5 py-2 text-xs font-semibold text-[#191c1f] hover:bg-[#edeef2] transition"
           >
             {loading ? 'Keluar...' : 'Keluar Board'}
           </button>
@@ -235,4 +235,5 @@ export function BoardHeader({ board, isOwner, members, columns = [], tasks = [] 
       </div>
     </div>
   )
+
 }

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { BoardHeader } from './BoardHeader'
 import { KanbanBoard } from './KanbanBoard'
+import { Sidebar } from '@/app/components/Sidebar'
 
 export default async function BoardDetailPage({
   params,
@@ -51,31 +52,38 @@ export default async function BoardDetailPage({
   const isOwner = board.owner_id === user.id
 
   return (
-    <div className="flex flex-col flex-1 min-h-screen bg-zinc-50 dark:bg-zinc-950">
-      <div className="bg-zinc-100 px-4 sm:px-8 py-2 border-b border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800 text-xs">
-        <Link href="/" className="text-indigo-600 hover:underline dark:text-indigo-400">
-          ← Kembali ke Dashboard Board
-        </Link>
-      </div>
+    <div className="min-h-screen bg-[#f8f9fd] text-[#191c1f] flex">
+      {/* Sidebar Navigation */}
+      <Sidebar userEmail={user.email} />
 
-      <BoardHeader
-        board={board}
-        isOwner={isOwner}
-        members={members}
-        columns={columns || []}
-        tasks={tasks || []}
-      />
+      {/* Main Board Container */}
+      <div className="flex-1 lg:pl-64 flex flex-col min-h-screen">
+        {/* Sub-header breadcrumb */}
+        <div className="bg-[#edeef2] px-6 lg:px-10 py-2 border-b border-[#e1e2e6] text-xs">
+          <Link href="/" className="font-semibold text-[#5b4df6] hover:underline flex items-center gap-1.5">
+            ← Kembali ke Dashboard Board
+          </Link>
+        </div>
 
-      <main className="flex-1 p-4 sm:p-8 overflow-x-auto">
-        <KanbanBoard
-          boardId={id}
-          staleThresholdHours={board.stale_threshold_hours ? Number(board.stale_threshold_hours) : 48}
-          initialColumns={columns || []}
-          initialTasks={tasks}
+        <BoardHeader
+          board={board}
+          isOwner={isOwner}
           members={members}
-          currentUserId={user.id}
+          columns={columns || []}
+          tasks={tasks || []}
         />
-      </main>
+
+        <main className="flex-1 p-6 lg:p-10 overflow-x-auto">
+          <KanbanBoard
+            boardId={id}
+            staleThresholdHours={board.stale_threshold_hours ? Number(board.stale_threshold_hours) : 48}
+            initialColumns={columns || []}
+            initialTasks={tasks}
+            members={members}
+            currentUserId={user.id}
+          />
+        </main>
+      </div>
     </div>
   )
 }
