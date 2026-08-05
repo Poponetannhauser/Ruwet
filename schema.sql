@@ -234,6 +234,23 @@ create policy "Board members can delete tasks"
     exists (select 1 from boards where id = board_id and owner_id = auth.uid())
   );
 
+-- 6. Activity Log Policies
+create policy "Board members can view activity logs"
+  on activity_log for select
+  to authenticated
+  using (
+    is_board_member(board_id, auth.uid()) or
+    exists (select 1 from boards where id = board_id and owner_id = auth.uid())
+  );
+
+create policy "Board members can insert activity logs"
+  on activity_log for insert
+  to authenticated
+  with check (
+    is_board_member(board_id, auth.uid()) or
+    exists (select 1 from boards where id = board_id and owner_id = auth.uid())
+  );
+
 
 -- Automatically create profile trigger on auth.users sign up
 create or replace function public.handle_new_user()

@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { logActivity } from './activityActions'
 
 export async function createTask(boardId: string, columnId: string, formData: FormData) {
   const supabase = await createClient()
@@ -33,23 +34,32 @@ export async function createTask(boardId: string, columnId: string, formData: Fo
   const newPosition = (count || 0) + 1
   const now = new Date().toISOString()
 
-  const { error } = await supabase.from('tasks').insert({
-    board_id: boardId,
-    column_id: columnId,
-    title: title.trim(),
-    description: description ? description.trim() : null,
-    assignee_id: assigneeId && assigneeId !== '' ? assigneeId : null,
-    due_date: dueDate && dueDate !== '' ? dueDate : null,
-    position: newPosition,
-    created_by: user.id,
-    status_updated_at: now,
-    created_at: now,
-    updated_at: now,
-  })
+  const { data: newTask, error } = await supabase
+    .from('tasks')
+    .insert({
+      board_id: boardId,
+      column_id: columnId,
+      title: title.trim(),
+      description: description ? description.trim() : null,
+      assignee_id: assigneeId && assigneeId !== '' ? assigneeId : null,
+      due_date: dueDate && dueDate !== '' ? dueDate : null,
+      position: newPosition,
+      created_by: user.id,
+      status_updated_at: now,
+      created_at: now,
+      updated_at: now,
+    })
+    .select('id')
+    .single()
 
-  if (error) {
-    return { error: error.message }
+  if (error || !newTask) {
+    return { error: error?.message || 'Gagal membuat task' }
   }
+
+  // Log activity
+  await logActivity(newTask.id, boardId, user.id, 'task_created', {
+    title: title.trim(),
+  })
 
   revalidatePath(`/boards/${boardId}`)
   return { success: true }
@@ -108,6 +118,23 @@ export async function updateTask(taskId: string, boardId: string, formData: Form
     return { error: error.message }
   }
 
+  // Log Activity
+  if (isColumnChanged) {
+    const { data: targetCol } = await supabase
+      .from('columns')
+      .select('name')
+      .eq('id', columnId)
+      .single()
+
+    await logActivity(taskId, boardId, user.id, 'task_moved', {
+      column_name: targetCol?.name || 'kolom baru',
+    })
+  } else {
+    await logActivity(taskId, boardId, user.id, 'task_updated', {
+      title: title.trim(),
+    })
+  }
+
   revalidatePath(`/boards/${boardId}`)
   return { success: true }
 }
@@ -158,6 +185,11 @@ export async function assignSelf(taskId: string, boardId: string) {
     return { error: error.message }
   }
 
+  // Log activity
+  await logActivity(taskId, boardId, user.id, 'task_assigned', {
+    assigned_to_self: true,
+  })
+
   revalidatePath(`/boards/${boardId}`)
   return { success: true }
 }
@@ -198,6 +230,18 @@ export async function moveTask(
 
   if (error) {
     return { error: error.message }
+  }
+
+  if (isColumnChanged) {
+    const { data: targetCol } = await supabase
+      .from('columns')
+      .select('name')
+      .eq('id', targetColumnId)
+      .single()
+
+    await logActivity(taskId, boardId, user.id, 'task_moved', {
+      column_name: targetCol?.name || 'kolom baru',
+    })
   }
 
   revalidatePath(`/boards/${boardId}`)

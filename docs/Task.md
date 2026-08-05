@@ -261,13 +261,13 @@
 **Deskripsi:** PRD user story #5, tabel `activity_log`.
 
 **Langkah:**
-- [ ] Trigger/log otomatis saat: task dibuat, di-assign, pindah status/kolom
-- [ ] Simpan detail dalam format `jsonb` (siapa, apa, kapan)
-- [ ] UI: tampilkan activity feed di detail task, urut dari terbaru
+- [x] Trigger/log otomatis saat: task dibuat, di-assign, pindah status/kolom
+- [x] Simpan detail dalam format `jsonb` (siapa, apa, kapan)
+- [x] UI: tampilkan activity feed di detail task, urut dari terbaru
 
 **DoD:**
-- [ ] Semua aksi di atas tercatat otomatis tanpa input manual
-- [ ] Activity feed terbaca jelas ("User X mengambil task ini", dst — sesuai flow 2 langkah 3)
+- [x] Semua aksi di atas tercatat otomatis tanpa input manual
+- [x] Activity feed terbaca jelas ("User X mengambil task ini", dst — sesuai flow 2 langkah 3)
 
 **Commit contoh:** `feat(activity): activity log otomatis per task`
 
