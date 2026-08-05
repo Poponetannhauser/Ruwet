@@ -73,7 +73,13 @@ export default async function BoardDetailPage({
         </Link>
       </div>
 
-      <BoardHeader board={board} isOwner={isOwner} members={members} />
+      <BoardHeader
+        board={board}
+        isOwner={isOwner}
+        members={members}
+        columns={columns || []}
+        tasks={tasks || []}
+      />
 
       <main className="flex-1 p-8 overflow-x-auto">
         <KanbanBoard
