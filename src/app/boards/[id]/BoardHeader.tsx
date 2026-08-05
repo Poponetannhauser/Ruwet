@@ -19,6 +19,7 @@ type BoardHeaderProps = {
     id: string
     name: string
     owner_id: string
+    stale_threshold_hours?: number
   }
   isOwner: boolean
   members: Member[]
@@ -28,6 +29,7 @@ export function BoardHeader({ board, isOwner, members }: BoardHeaderProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [name, setName] = useState(board.name)
+  const [staleThreshold, setStaleThreshold] = useState(board.stale_threshold_hours || 48)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -46,6 +48,10 @@ export function BoardHeader({ board, isOwner, members }: BoardHeaderProps) {
       setIsEditing(false)
       setLoading(false)
       setName((formData.get('name') as string).trim())
+      const thresholdRaw = formData.get('stale_threshold_hours') as string
+      if (thresholdRaw) {
+        setStaleThreshold(parseFloat(thresholdRaw))
+      }
     }
   }
 
@@ -70,39 +76,61 @@ export function BoardHeader({ board, isOwner, members }: BoardHeaderProps) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-200 bg-white px-8 py-4 dark:border-zinc-800 dark:bg-zinc-900">
       {isEditing ? (
-        <form onSubmit={handleUpdate} className="flex items-center gap-2">
-          <input
-            name="name"
-            defaultValue={name}
-            required
-            className="rounded-md border border-zinc-300 px-3 py-1.5 text-lg font-bold text-zinc-900 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
-          >
-            {loading ? 'Menyimpan...' : 'Simpan'}
-          </button>
-          <button
-            type="button"
-            onClick={() => setIsEditing(false)}
-            className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
-          >
-            Batal
-          </button>
+        <form onSubmit={handleUpdate} className="flex flex-wrap items-center gap-3">
+          <div>
+            <label className="block text-[10px] uppercase font-semibold text-zinc-500 mb-0.5">Nama Board</label>
+            <input
+              name="name"
+              defaultValue={name}
+              required
+              className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-bold text-zinc-900 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[10px] uppercase font-semibold text-zinc-500 mb-0.5">Stale Threshold (Jam)</label>
+            <input
+              name="stale_threshold_hours"
+              type="number"
+              step="0.01"
+              min="0.01"
+              defaultValue={staleThreshold}
+              placeholder="48"
+              className="w-28 rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-bold text-zinc-900 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+            />
+          </div>
+
+          <div className="flex items-center gap-1.5 self-end pb-0.5">
+            <button
+              type="submit"
+              disabled={loading}
+              className="rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+            >
+              {loading ? 'Menyimpan...' : 'Simpan'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsEditing(false)}
+              className="rounded-md border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            >
+              Batal
+            </button>
+          </div>
         </form>
       ) : (
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">
             {name}
           </h1>
+          <span className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+            ⏳ Stale Threshold: {staleThreshold} jam
+          </span>
           {isOwner && (
             <button
               onClick={() => setIsEditing(true)}
               className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400"
             >
-              Edit Nama
+              Setting Board
             </button>
           )}
         </div>

@@ -242,14 +242,14 @@
 **Deskripsi:** Sesuai metodologi PRD section 8.
 
 **Langkah:**
-- [ ] Implementasi logika: task stale jika `assignee_id` ada, kolom bukan "Done", dan `now() - status_updated_at > threshold`
-- [ ] Badge visual: hijau (aman), kuning (>70% threshold), merah (lewat threshold)
-- [ ] Threshold dikonfigurasi per board (default 2 hari), simpan di tabel `boards`
-- [ ] Update badge secara real-time (tidak perlu refresh manual)
+- [x] Implementasi logika: task stale jika `assignee_id` ada, kolom bukan "Done", dan `now() - status_updated_at > threshold`
+- [x] Badge visual: hijau (aman), kuning (>70% threshold), merah (lewat threshold)
+- [x] Threshold dikonfigurasi per board (default 2 hari), simpan di tabel `boards`
+- [x] Update badge secara real-time (tidak perlu refresh manual)
 
 **DoD:**
-- [ ] Badge berubah warna sesuai kondisi waktu (test dengan threshold kecil dulu, misal 1 menit, untuk mempercepat testing)
-- [ ] Ubah threshold di setting board langsung berpengaruh ke semua task
+- [x] Badge berubah warna sesuai kondisi waktu (test dengan threshold kecil dulu, misal 1 menit, untuk mempercepat testing)
+- [x] Ubah threshold di setting board langsung berpengaruh ke semua task
 
 **Commit contoh:** `feat(stale): implementasi deteksi & indikator visual stale task`
 

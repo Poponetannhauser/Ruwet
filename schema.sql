@@ -20,6 +20,7 @@ create table boards (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   owner_id uuid references profiles(id) on delete set null,
+  stale_threshold_hours numeric default 48,
   created_at timestamptz default now()
 );
 

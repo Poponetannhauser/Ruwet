@@ -49,6 +49,7 @@ type Task = {
   description: string | null
   assignee_id: string | null
   due_date: string | null
+  status_updated_at?: string | null
   position: number
   profiles: {
     full_name: string
@@ -58,6 +59,7 @@ type Task = {
 
 type KanbanBoardProps = {
   boardId: string
+  staleThresholdHours?: number
   initialColumns: Column[]
   initialTasks: Task[]
   members: Member[]
@@ -70,12 +72,14 @@ function ColumnContainer({
   columns,
   members,
   currentUserId,
+  staleThresholdHours,
 }: {
   column: Column
   tasks: Task[]
   columns: Column[]
   members: Member[]
   currentUserId: string
+  staleThresholdHours?: number
 }) {
   const { setNodeRef } = useDroppable({
     id: column.id,
@@ -100,6 +104,7 @@ function ColumnContainer({
                 columns={columns}
                 members={members}
                 currentUserId={currentUserId}
+                staleThresholdHours={staleThresholdHours}
               />
             ))
           ) : (
@@ -109,7 +114,6 @@ function ColumnContainer({
           )}
         </div>
       </SortableContext>
-
       <CreateTaskModal
         boardId={column.board_id}
         columnId={column.id}
@@ -124,6 +128,7 @@ const emptySubscribe = () => () => {}
 
 export function KanbanBoard({
   boardId,
+  staleThresholdHours = 48,
   initialColumns,
   initialTasks,
   members,
@@ -132,6 +137,15 @@ export function KanbanBoard({
   const [tasks, setTasks] = useState<Task[]>(initialTasks)
   const [activeTask, setActiveTask] = useState<Task | null>(null)
   const [previousTasksState, setPreviousTasksState] = useState<Task[]>(initialTasks)
+  const [, setTick] = useState(0)
+
+  // Interval timer (setiap 30 detik) untuk update badge stale secara otomatis
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTick((t) => t + 1)
+    }, 30000)
+    return () => clearInterval(timer)
+  }, [])
   // Track online/offline status via useSyncExternalStore
   const isOnline = useSyncExternalStore(
     (callback) => {
@@ -392,6 +406,7 @@ export function KanbanBoard({
               columns={initialColumns}
               members={members}
               currentUserId={currentUserId}
+              staleThresholdHours={staleThresholdHours}
             />
           )
         })}
