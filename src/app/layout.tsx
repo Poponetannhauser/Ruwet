@@ -17,7 +17,13 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Ruwet — Real-time Kanban & Team Accountability",
   description: "Manage tasks, track stale items, and collaborate in real-time with instant accountability.",
+  icons: {
+    icon: "/ruwet-logo.png",
+    shortcut: "/ruwet-logo.png",
+    apple: "/ruwet-logo.png",
+  },
 };
+
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

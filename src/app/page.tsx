@@ -1,7 +1,9 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 import { logout } from './(auth)/actions'
 import { CreateBoardModal } from './boards/CreateBoardModal'
+
 
 export default async function Home() {
   const supabase = await createClient()
@@ -37,12 +39,18 @@ export default async function Home() {
       <header className="sticky top-0 z-40 border-b border-white/10 glass-panel px-6 sm:px-10 py-4">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-violet-600 to-indigo-400 flex items-center justify-center font-black text-white text-lg shadow-lg shadow-indigo-500/25">
-              R
-            </div>
+            <Image
+              src="/ruwet-logo.png"
+              alt="Logo Ruwet"
+              width={36}
+              height={36}
+              className="h-9 w-9 rounded-xl object-cover border border-white/10 shadow-md"
+            />
+
             <span className="text-xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-zinc-200 to-zinc-400">
               Ruwet
             </span>
+
             <span className="hidden sm:inline-block rounded-full bg-indigo-500/10 border border-indigo-500/20 px-2.5 py-0.5 text-[10px] font-semibold text-indigo-400">
               v1.0 Realtime
             </span>

@@ -52,61 +52,70 @@ export function ColumnHeader({ column }: ColumnHeaderProps) {
   return (
     <div className="mb-3">
       {isEditing ? (
-        <form onSubmit={handleUpdate} className="flex items-center gap-1">
+        <form onSubmit={handleUpdate} className="flex items-center gap-1.5">
           <input
             name="name"
             defaultValue={name}
             required
             autoFocus
-            className="w-full rounded border border-indigo-400 px-2 py-1 text-xs font-semibold text-zinc-900 focus:outline-none dark:border-indigo-600 dark:bg-zinc-800 dark:text-white"
+            className="w-full rounded-xl bg-zinc-900 border border-indigo-500/60 px-3 py-1.5 text-xs font-bold text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
           />
           <button
             type="submit"
             disabled={loading}
-            className="rounded bg-indigo-600 px-2 py-1 text-xs text-white hover:bg-indigo-700 disabled:opacity-50"
+            className="rounded-lg bg-indigo-600 px-2.5 py-1.5 text-xs font-bold text-white hover:bg-indigo-500 disabled:opacity-50 transition"
           >
             ✓
           </button>
           <button
             type="button"
             onClick={() => setIsEditing(false)}
-            className="rounded border border-zinc-300 px-2 py-1 text-xs text-zinc-600 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800"
+            className="rounded-lg bg-zinc-800 border border-white/10 px-2.5 py-1.5 text-xs font-bold text-zinc-400 hover:bg-zinc-700 hover:text-white transition"
           >
             ✕
           </button>
         </form>
       ) : (
-        <div className="flex items-center justify-between font-semibold text-sm text-zinc-700 dark:text-zinc-300 group">
-          <span
-            onClick={() => setIsEditing(true)}
-            className="cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 transition"
-            title="Klik untuk mengubah nama kolom"
-          >
-            {name}
-          </span>
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
+        <div className="flex items-center justify-between group py-1">
+          <div className="flex items-center gap-2">
+            <span
+              onClick={() => setIsEditing(true)}
+              className="cursor-pointer font-bold text-xs uppercase tracking-wider text-zinc-200 hover:text-indigo-300 transition-colors"
+              title="Klik untuk mengubah nama kolom"
+            >
+              {name}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               onClick={() => setIsEditing(true)}
-              className="text-xs text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+              className="rounded-md p-1 text-zinc-400 hover:bg-zinc-800 hover:text-indigo-300 transition-colors"
               title="Edit Nama Kolom"
             >
-              ✏️
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.89 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.89L16.863 4.487zm0 0L19.5 7.125" />
+              </svg>
             </button>
             <button
               onClick={handleDelete}
               disabled={loading}
-              className="text-xs text-zinc-400 hover:text-red-600 dark:hover:text-red-400"
+              className="rounded-md p-1 text-zinc-400 hover:bg-zinc-800 hover:text-rose-400 transition-colors"
               title="Hapus Kolom"
             >
-              🗑️
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+              </svg>
             </button>
+
           </div>
         </div>
       )}
 
       {error && (
-        <div className="mt-1 text-xs text-red-600 dark:text-red-400">{error}</div>
+        <div className="mt-1 text-xs text-rose-400 font-medium">{error}</div>
       )}
     </div>
   )
 }
+

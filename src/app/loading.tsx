@@ -1,31 +1,39 @@
 export default function DashboardLoading() {
   return (
-    <div className="flex flex-col flex-1 min-h-screen bg-zinc-50 font-sans dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50">
+    <div className="flex flex-col flex-1 min-h-screen bg-zinc-950 text-zinc-100 bg-mesh font-sans">
       {/* Header Skeleton */}
-      <header className="flex items-center justify-between px-4 sm:px-8 py-4 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
-        <div className="h-6 w-36 rounded-md bg-zinc-200 dark:bg-zinc-800 animate-pulse" />
-        <div className="h-8 w-24 rounded-md bg-zinc-200 dark:bg-zinc-800 animate-pulse" />
+      <header className="sticky top-0 z-40 border-b border-white/10 glass-panel px-6 sm:px-10 py-4">
+        <div className="flex items-center justify-between max-w-7xl mx-auto">
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-xl bg-zinc-800 animate-pulse" />
+            <div className="h-6 w-24 rounded-lg bg-zinc-800 animate-pulse" />
+          </div>
+          <div className="h-8 w-24 rounded-lg bg-zinc-800 animate-pulse" />
+        </div>
       </header>
 
       {/* Main Content Skeleton */}
-      <main className="flex flex-1 w-full max-w-6xl flex-col p-4 sm:p-8 mx-auto space-y-6">
-        <div className="flex items-center justify-between">
+      <main className="flex flex-1 w-full max-w-7xl flex-col p-6 sm:p-10 mx-auto space-y-8">
+        <div className="glass-panel p-6 sm:p-8 rounded-2xl flex items-center justify-between">
           <div className="space-y-2">
-            <div className="h-7 w-48 rounded-md bg-zinc-200 dark:bg-zinc-800 animate-pulse" />
-            <div className="h-4 w-72 rounded-md bg-zinc-200 dark:bg-zinc-800 animate-pulse" />
+            <div className="h-8 w-56 rounded-lg bg-zinc-800 animate-pulse" />
+            <div className="h-4 w-72 rounded-lg bg-zinc-800/60 animate-pulse" />
           </div>
-          <div className="h-9 w-32 rounded-lg bg-zinc-200 dark:bg-zinc-800 animate-pulse" />
+          <div className="h-10 w-36 rounded-xl bg-zinc-800 animate-pulse" />
         </div>
 
         {/* Boards Grid Skeleton */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-28 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-xs animate-pulse space-y-3"
+              className="h-36 rounded-2xl glass-card p-6 animate-pulse flex flex-col justify-between"
             >
-              <div className="h-5 w-3/4 rounded-md bg-zinc-200 dark:bg-zinc-800" />
-              <div className="h-3 w-1/2 rounded-md bg-zinc-200 dark:bg-zinc-800" />
+              <div className="space-y-3">
+                <div className="h-4 w-20 rounded bg-zinc-800" />
+                <div className="h-6 w-3/4 rounded-lg bg-zinc-800" />
+              </div>
+              <div className="h-4 w-full rounded bg-zinc-800/50" />
             </div>
           ))}
         </div>
@@ -33,3 +41,4 @@ export default function DashboardLoading() {
     </div>
   )
 }
+

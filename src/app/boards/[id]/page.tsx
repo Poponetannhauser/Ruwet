@@ -1,6 +1,6 @@
 import { notFound, redirect } from 'next/navigation'
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+
 import { BoardHeader } from './BoardHeader'
 import { KanbanBoard } from './KanbanBoard'
 
@@ -51,12 +51,8 @@ export default async function BoardDetailPage({
   const isOwner = board.owner_id === user.id
 
   return (
-    <div className="flex flex-col flex-1 min-h-screen bg-zinc-50 dark:bg-zinc-950">
-      <div className="bg-zinc-100 px-4 sm:px-8 py-2 border-b border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800 text-xs">
-        <Link href="/" className="text-indigo-600 hover:underline dark:text-indigo-400">
-          ← Kembali ke Dashboard Board
-        </Link>
-      </div>
+    <div className="flex flex-col flex-1 min-h-screen bg-zinc-950 text-zinc-100 selection:bg-indigo-500/30 selection:text-indigo-200">
+
 
       <BoardHeader
         board={board}

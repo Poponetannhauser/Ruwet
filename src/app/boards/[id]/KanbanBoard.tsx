@@ -84,7 +84,7 @@ function ColumnContainer({
   currentUserId: string
   staleThresholdHours?: number
 }) {
-  const { setNodeRef } = useDroppable({
+  const { setNodeRef, isOver } = useDroppable({
     id: column.id,
   })
 
@@ -93,41 +93,60 @@ function ColumnContainer({
   return (
     <div
       ref={setNodeRef}
-      className="w-72 flex-shrink-0 rounded-xl bg-zinc-200/70 p-4 dark:bg-zinc-900 border border-zinc-300/50 dark:border-zinc-800"
+      className={`w-80 flex-shrink-0 rounded-xl glass-panel p-4 flex flex-col justify-between transition-all duration-200 ${
+        isOver ? 'border-indigo-500/80 bg-indigo-950/20 shadow-xl' : ''
+      }`}
     >
-      <ColumnHeader column={column} />
 
-      <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
-        <div className="flex flex-col gap-2.5 min-h-[150px]">
-          {tasks.length > 0 ? (
-            tasks.map((task) => (
-              <TaskCard
-                key={task.id}
-                task={task}
-                columns={columns}
-                members={members}
-                currentUserId={currentUserId}
-                staleThresholdHours={staleThresholdHours}
-              />
-            ))
-          ) : (
-            <div className="min-h-[110px] flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-300/80 p-4 text-center text-xs text-zinc-400 dark:border-zinc-800">
-              <span className="text-xl opacity-60 mb-1">📋</span>
-              <span className="font-semibold text-zinc-500 dark:text-zinc-400">Kolom Kosong</span>
-              <span className="text-[10px] text-zinc-400 mt-0.5">Tarik task ke sini atau buat baru</span>
-            </div>
-          )}
+      <div>
+        <div className="flex items-center justify-between border-b border-white/5 pb-2.5 mb-3">
+          <div className="flex-1">
+            <ColumnHeader column={column} />
+          </div>
+          <span className="rounded-full bg-zinc-800/80 border border-white/10 px-2.5 py-0.5 text-[10px] font-extrabold text-zinc-300">
+            {tasks.length}
+          </span>
         </div>
-      </SortableContext>
-      <CreateTaskModal
-        boardId={column.board_id}
-        columnId={column.id}
-        columnName={column.name}
-        members={members}
-      />
+
+        <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
+          <div className="flex flex-col gap-3 min-h-[160px]">
+            {tasks.length > 0 ? (
+              tasks.map((task) => (
+                <TaskCard
+                  key={task.id}
+                  task={task}
+                  columns={columns}
+                  members={members}
+                  currentUserId={currentUserId}
+                  staleThresholdHours={staleThresholdHours}
+                />
+              ))
+            ) : (
+              <div className="min-h-[120px] flex flex-col items-center justify-center rounded-xl border border-dashed border-white/10 p-5 text-center text-xs text-zinc-500 bg-zinc-900/30">
+                <svg className="w-6 h-6 text-zinc-600 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m6 4.125l2.25 2.25m0 0l2.25-2.25M12 13.875V8.25M3.75 7.5h16.5M6 3.75h12" />
+                </svg>
+                <span className="font-bold text-zinc-400 text-xs">Kolom Kosong</span>
+                <span className="text-[10px] text-zinc-500 mt-0.5">Tarik task ke sini</span>
+              </div>
+            )}
+
+          </div>
+        </SortableContext>
+      </div>
+
+      <div className="mt-3 border-t border-white/5 pt-2">
+        <CreateTaskModal
+          boardId={column.board_id}
+          columnId={column.id}
+          columnName={column.name}
+          members={members}
+        />
+      </div>
     </div>
   )
 }
+
 
 const emptySubscribe = () => () => {}
 

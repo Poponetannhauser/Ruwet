@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useSyncExternalStore } from 'react'
+import { useState } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { assignSelf } from './taskActions'
 import { EditTaskModal } from './EditTaskModal'
 
-const emptySubscribe = () => () => {}
+
+
 
 type Member = {
   id: string
@@ -79,15 +80,11 @@ export function TaskCard({
   const isDoneColumn = currentColumn?.name.trim().toLowerCase() === 'done'
   const hasAssignee = !!task.assignee_id
 
-  const getSnapshot = () => Math.floor(Date.now() / 1000)
-  const nowSec = useSyncExternalStore(
-    emptySubscribe,
-    getSnapshot,
-    () => 0
-  )
-  const nowMs = nowSec * 1000
+  const [nowMs] = useState(() => Date.now())
 
   let staleStatus: 'green' | 'yellow' | 'red' | null = null
+
+
   let staleLabel = ''
 
   if (hasAssignee && !isDoneColumn && task.status_updated_at && nowMs > 0) {
@@ -180,9 +177,13 @@ export function TaskCard({
           <div>
             {task.due_date ? (
               <span className="flex items-center gap-1 font-medium text-amber-400 bg-amber-950/30 px-2 py-0.5 rounded-md border border-amber-800/30">
-                📅 {new Date(task.due_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                <svg className="w-3 h-3 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                </svg>
+                {new Date(task.due_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
               </span>
             ) : (
+
               <span className="text-zinc-500">Tanpa tenggat</span>
             )}
           </div>
