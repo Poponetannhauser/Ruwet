@@ -337,13 +337,13 @@
 
 ### Task M5-01 — Responsive & Aksesibilitas
 **Langkah:**
-- [ ] Test & perbaiki layout di 360px, tablet, desktop
-- [ ] Cek kontras warna WCAG AA (termasuk badge stale task)
-- [ ] Aksi utama (drag-drop alternatif, assign, comment) bisa diakses via keyboard
+- [x] Test & perbaiki layout di 360px, tablet, desktop
+- [x] Cek kontras warna WCAG AA (termasuk badge stale task)
+- [x] Aksi utama (drag-drop alternatif, assign, comment) bisa diakses via keyboard
 
 **DoD:**
-- [ ] Lolos cek manual di 3 breakpoint
-- [ ] Tab-navigation berfungsi untuk aksi utama
+- [x] Lolos cek manual di 3 breakpoint
+- [x] Tab-navigation berfungsi untuk aksi utama
 
 **Commit contoh:** `fix(a11y): perbaikan responsive & aksesibilitas`
 
