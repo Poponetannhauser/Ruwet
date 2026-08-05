@@ -353,12 +353,12 @@
 
 ### Task M5-02 — Empty State, Loading State, Error Handling
 **Langkah:**
-- [ ] Empty state untuk board kosong, kolom kosong, belum ada task
-- [ ] Loading skeleton saat fetch data
-- [ ] Error handling untuk gagal koneksi/realtime terputus
+- [x] Empty state untuk board kosong, kolom kosong, belum ada task
+- [x] Loading skeleton saat fetch data
+- [x] Error handling untuk gagal koneksi/realtime terputus
 
 **DoD:**
-- [ ] Semua state di atas punya tampilan yang jelas, tidak blank/crash
+- [x] Semua state di atas punya tampilan yang jelas, tidak blank/crash
 
 **Commit contoh:** `feat(ux): tambah empty state, loading state, error handling`
 
