@@ -1,4 +1,4 @@
 - UI terlalu basic, desainya cuma tombol, textbox, dan inputan form
 - Kurang user friendly, mislanya card task bisa di drag, tp ga ada indikator kalau bisa di drag, terus pas di drag mental lagi, pas drop juga mental lagi.
 - Di detail task komentar sama edit task jadi satu, jadi orang harus scroll buat liat komentar padahal edit task cuma butuh scroll dikit. Dan saat sudah selesai komen harus klik batal edit task untuk keluar
-- 
+- Kasih tanda mungkin warna atau apa untuk status task yang overdue, dsb.

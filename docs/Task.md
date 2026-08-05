@@ -318,12 +318,12 @@
 **Deskripsi:** User story #8.
 
 **Langkah:**
-- [ ] Hitung jumlah task per status
-- [ ] Hitung jumlah task overdue per anggota
-- [ ] Tampilkan dalam bentuk chart/summary sederhana
+- [x] Hitung jumlah task per status
+- [x] Hitung jumlah task overdue per anggota
+- [x] Tampilkan dalam bentuk chart/summary sederhana
 
 **DoD:**
-- [ ] Angka di dashboard sesuai dengan data aktual di board (cross-check manual)
+- [x] Angka di dashboard sesuai dengan data aktual di board (cross-check manual)
 
 **Commit contoh:** `feat(dashboard): dashboard ringkasan board`
 

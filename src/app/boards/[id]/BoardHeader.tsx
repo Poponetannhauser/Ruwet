@@ -5,6 +5,7 @@ import { updateBoard, deleteBoard, leaveBoard } from '../actions'
 import { InviteMemberModal } from './InviteMemberModal'
 import { MemberList } from './MemberList'
 import { NotificationBell } from '@/app/components/NotificationBell'
+import { BoardSummaryModal } from './BoardSummaryModal'
 
 type Member = {
   id: string
@@ -13,6 +14,25 @@ type Member = {
     full_name: string
     avatar_url: string | null
   } | null
+}
+
+type Task = {
+  id: string
+  board_id: string
+  column_id: string
+  title: string
+  assignee_id: string | null
+  due_date: string | null
+  status_updated_at?: string | null
+  profiles?: {
+    full_name: string
+    avatar_url: string | null
+  } | null
+}
+
+type Column = {
+  id: string
+  name: string
 }
 
 type BoardHeaderProps = {
@@ -24,11 +44,14 @@ type BoardHeaderProps = {
   }
   isOwner: boolean
   members: Member[]
+  columns?: Column[]
+  tasks?: Task[]
 }
 
-export function BoardHeader({ board, isOwner, members }: BoardHeaderProps) {
+export function BoardHeader({ board, isOwner, members, columns = [], tasks = [] }: BoardHeaderProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isSummaryOpen, setIsSummaryOpen] = useState(false)
   const [name, setName] = useState(board.name)
   const [staleThreshold, setStaleThreshold] = useState(board.stale_threshold_hours || 48)
   const [error, setError] = useState<string | null>(null)
@@ -142,9 +165,26 @@ export function BoardHeader({ board, isOwner, members }: BoardHeaderProps) {
       )}
 
       <div className="flex items-center gap-4">
+        <button
+          onClick={() => setIsSummaryOpen(true)}
+          className="rounded-md bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-950/40 dark:text-indigo-400 dark:hover:bg-indigo-900/50 transition flex items-center gap-1.5"
+        >
+          📊 Ringkasan Board
+        </button>
+
         <NotificationBell />
         <MemberList members={members} />
         {isOwner && <InviteMemberModal boardId={board.id} />}
+
+        <BoardSummaryModal
+          boardName={name}
+          staleThresholdHours={staleThreshold}
+          columns={columns}
+          tasks={tasks}
+          members={members}
+          isOpen={isSummaryOpen}
+          onClose={() => setIsSummaryOpen(false)}
+        />
 
         {isOwner ? (
           <div>
