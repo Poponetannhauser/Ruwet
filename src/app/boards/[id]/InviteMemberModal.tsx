@@ -54,8 +54,8 @@ export function InviteMemberModal({ boardId }: InviteMemberModalProps) {
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl dark:bg-zinc-900">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3 sm:p-4">
+          <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-xl bg-white p-4 sm:p-6 shadow-xl dark:bg-zinc-900">
             <h3 className="text-lg font-bold text-zinc-900 dark:text-white">
               Undang Anggota ke Board
             </h3>

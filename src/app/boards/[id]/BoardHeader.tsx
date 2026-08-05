@@ -98,7 +98,7 @@ export function BoardHeader({ board, isOwner, members, columns = [], tasks = [] 
   }
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-200 bg-white px-8 py-4 dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-200 bg-white px-4 sm:px-8 py-4 dark:border-zinc-800 dark:bg-zinc-900">
       {isEditing ? (
         <form onSubmit={handleUpdate} className="flex flex-wrap items-center gap-3">
           <div>
