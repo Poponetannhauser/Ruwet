@@ -67,7 +67,7 @@ export function TaskCard({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.4 : 1,
+    opacity: isDragging ? 0.35 : 1,
   }
 
   const isAssignedToMe = task.assignee_id === currentUserId
@@ -104,11 +104,11 @@ export function TaskCard({
 
     let elapsedText = ''
     if (diffDays > 0) {
-      elapsedText = `${diffDays} hari`
+      elapsedText = `${diffDays}h`
     } else if (diffHours > 0) {
-      elapsedText = `${diffHours} jam`
+      elapsedText = `${diffHours}j`
     } else {
-      elapsedText = `${diffMinutes} mnt`
+      elapsedText = `${diffMinutes}m`
     }
 
     if (ratio > 1) {
@@ -116,10 +116,10 @@ export function TaskCard({
       staleLabel = `Stale (${elapsedText})`
     } else if (ratio >= 0.7) {
       staleStatus = 'yellow'
-      staleLabel = `Perlu Perhatian (${elapsedText})`
+      staleLabel = `Warning (${elapsedText})`
     } else {
       staleStatus = 'green'
-      staleLabel = `Aktif (${elapsedText})`
+      staleLabel = `Active (${elapsedText})`
     }
   }
 
@@ -138,31 +138,31 @@ export function TaskCard({
         {...attributes}
         {...listeners}
         onClick={() => setIsEditOpen(true)}
-        className="group relative cursor-grab active:cursor-grabbing touch-manipulation rounded-lg border border-zinc-200 bg-white p-3 shadow-sm hover:border-indigo-400 hover:shadow focus:ring-2 focus:ring-indigo-500 focus:outline-none transition dark:border-zinc-800 dark:bg-zinc-900/90 dark:hover:border-indigo-600"
+        className="group relative cursor-grab active:cursor-grabbing touch-manipulation rounded-xl glass-card p-3.5 shadow-sm hover:shadow-md hover:-translate-y-0.5 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none transition-all duration-200"
       >
         <div className="flex items-start justify-between gap-2">
-          <h4 className="font-semibold text-xs text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">
+          <h4 className="font-semibold text-xs text-zinc-100 group-hover:text-indigo-300 transition-colors leading-snug">
             {task.title}
           </h4>
 
           {staleStatus && (
             <span
               title={`Status aktivitas: ${staleLabel}`}
-              className={`inline-flex flex-shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${
+              className={`inline-flex flex-shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-bold tracking-wide uppercase transition-all ${
                 staleStatus === 'red'
-                  ? 'bg-red-100 text-red-700 dark:bg-red-950/80 dark:text-red-400 animate-pulse'
+                  ? 'bg-rose-950/80 text-rose-300 border border-rose-800/60 glow-rose animate-pulse'
                   : staleStatus === 'yellow'
-                  ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-400'
-                  : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-400'
+                  ? 'bg-amber-950/80 text-amber-300 border border-amber-800/60 glow-amber'
+                  : 'bg-emerald-950/80 text-emerald-300 border border-emerald-800/60 glow-emerald'
               }`}
             >
               <span
                 className={`h-1.5 w-1.5 rounded-full ${
                   staleStatus === 'red'
-                    ? 'bg-red-600 dark:bg-red-400'
+                    ? 'bg-rose-400'
                     : staleStatus === 'yellow'
-                    ? 'bg-amber-500 dark:bg-amber-400'
-                    : 'bg-emerald-500 dark:bg-emerald-400'
+                    ? 'bg-amber-400'
+                    : 'bg-emerald-400'
                 }`}
               />
               {staleStatus === 'red' ? 'Stale' : staleStatus === 'yellow' ? 'Warning' : 'Fresh'}
@@ -171,19 +171,19 @@ export function TaskCard({
         </div>
 
         {task.description && (
-          <p className="mt-1 line-clamp-2 text-[11px] text-zinc-500 dark:text-zinc-400">
+          <p className="mt-1.5 line-clamp-2 text-[11px] text-zinc-400 leading-relaxed">
             {task.description}
           </p>
         )}
 
-        <div className="mt-3 flex items-center justify-between border-t border-zinc-100 pt-2 text-[10px] text-zinc-500 dark:border-zinc-800/80 dark:text-zinc-400">
+        <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-2.5 text-[10px] text-zinc-400">
           <div>
             {task.due_date ? (
-              <span className="flex items-center gap-1 font-medium text-amber-600 dark:text-amber-400">
+              <span className="flex items-center gap-1 font-medium text-amber-400 bg-amber-950/30 px-2 py-0.5 rounded-md border border-amber-800/30">
                 📅 {new Date(task.due_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
               </span>
             ) : (
-              <span>Tanpa tenggat</span>
+              <span className="text-zinc-500">Tanpa tenggat</span>
             )}
           </div>
 
@@ -192,7 +192,7 @@ export function TaskCard({
               <button
                 onClick={handleAssignSelf}
                 disabled={loading}
-                className="hidden rounded bg-indigo-50 px-1.5 py-0.5 font-medium text-indigo-600 hover:bg-indigo-100 group-hover:block dark:bg-indigo-950 dark:text-indigo-400 dark:hover:bg-indigo-900 transition"
+                className="hidden rounded-md bg-indigo-950/80 border border-indigo-700/50 px-2 py-0.5 text-[10px] font-semibold text-indigo-300 hover:bg-indigo-900 group-hover:block transition-all shadow-sm"
                 title="Assign task ini ke saya"
               >
                 +Saya
@@ -201,8 +201,10 @@ export function TaskCard({
 
             <div
               title={`Assignee: ${assigneeName}`}
-              className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white ${
-                task.assignee_id ? 'bg-indigo-600' : 'bg-zinc-300 dark:bg-zinc-700'
+              className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ring-2 ring-zinc-950 ${
+                task.assignee_id
+                  ? 'bg-gradient-to-tr from-indigo-600 to-violet-500 text-white shadow-indigo-500/20'
+                  : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
               }`}
             >
               {task.assignee_id ? assigneeInitial : '?'}
@@ -221,3 +223,4 @@ export function TaskCard({
     </>
   )
 }
+
