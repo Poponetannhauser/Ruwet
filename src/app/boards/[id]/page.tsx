@@ -20,45 +20,30 @@ export default async function BoardDetailPage({
     redirect('/login')
   }
 
-  // Fetch board details
-  const { data: board, error: boardError } = await supabase
-    .from('boards')
-    .select('*')
-    .eq('id', id)
-    .single()
+  // Fetch board details, members, columns, and tasks secara paralel (Promise.all)
+  const [boardRes, rawMembersRes, columnsRes, rawTasksRes] = await Promise.all([
+    supabase.from('boards').select('*').eq('id', id).single(),
+    supabase.from('board_members').select('id, user_id, role, profiles(full_name, avatar_url)').eq('board_id', id),
+    supabase.from('columns').select('*').eq('board_id', id).order('position', { ascending: true }),
+    supabase.from('tasks').select('*, profiles:assignee_id(full_name, avatar_url)').eq('board_id', id).order('position', { ascending: true }),
+  ])
+
+  const board = boardRes.data
+  const boardError = boardRes.error
 
   if (boardError || !board) {
     notFound()
   }
 
-  // Fetch board members with profiles
-  const { data: rawMembers } = await supabase
-    .from('board_members')
-    .select('id, user_id, role, profiles(full_name, avatar_url)')
-    .eq('board_id', id)
-
-  const members = (rawMembers || []).map((m) => ({
+  const members = (rawMembersRes.data || []).map((m) => ({
     id: m.id,
     user_id: m.user_id,
     role: m.role || 'member',
     profiles: Array.isArray(m.profiles) ? m.profiles[0] : m.profiles,
   }))
 
-  // Fetch board columns
-  const { data: columns } = await supabase
-    .from('columns')
-    .select('*')
-    .eq('board_id', id)
-    .order('position', { ascending: true })
-
-  // Fetch board tasks
-  const { data: rawTasks } = await supabase
-    .from('tasks')
-    .select('*, profiles:assignee_id(full_name, avatar_url)')
-    .eq('board_id', id)
-    .order('position', { ascending: true })
-
-  const tasks = (rawTasks || []).map((t) => ({
+  const columns = columnsRes.data || []
+  const tasks = (rawTasksRes.data || []).map((t) => ({
     ...t,
     profiles: Array.isArray(t.profiles) ? t.profiles[0] : t.profiles,
   }))
