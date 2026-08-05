@@ -94,14 +94,26 @@ export async function updateBoard(boardId: string, formData: FormData) {
   }
 
   const name = formData.get('name') as string
+  const staleThresholdRaw = formData.get('stale_threshold_hours') as string
 
   if (!name || name.trim() === '') {
     return { error: 'Nama board tidak boleh kosong' }
   }
 
+  const updateData: Record<string, unknown> = {
+    name: name.trim(),
+  }
+
+  if (staleThresholdRaw) {
+    const thresholdNum = parseFloat(staleThresholdRaw)
+    if (!isNaN(thresholdNum) && thresholdNum > 0) {
+      updateData.stale_threshold_hours = thresholdNum
+    }
+  }
+
   const { error } = await supabase
     .from('boards')
-    .update({ name: name.trim() })
+    .update(updateData)
     .eq('id', boardId)
 
   if (error) {

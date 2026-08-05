@@ -1,10 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useSyncExternalStore } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { assignSelf } from './taskActions'
 import { EditTaskModal } from './EditTaskModal'
+
+const emptySubscribe = () => () => {}
 
 type Member = {
   id: string
@@ -28,6 +30,7 @@ type Task = {
   description: string | null
   assignee_id: string | null
   due_date: string | null
+  status_updated_at?: string | null
   profiles: {
     full_name: string
     avatar_url: string | null
@@ -39,9 +42,16 @@ type TaskCardProps = {
   columns: Column[]
   members: Member[]
   currentUserId: string
+  staleThresholdHours?: number
 }
 
-export function TaskCard({ task, columns, members, currentUserId }: TaskCardProps) {
+export function TaskCard({
+  task,
+  columns,
+  members,
+  currentUserId,
+  staleThresholdHours = 48,
+}: TaskCardProps) {
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -64,6 +74,55 @@ export function TaskCard({ task, columns, members, currentUserId }: TaskCardProp
   const assigneeName = task.profiles?.full_name || 'Unassigned'
   const assigneeInitial = assigneeName.charAt(0).toUpperCase()
 
+  // Calculate Stale Status
+  const currentColumn = columns.find((c) => c.id === task.column_id)
+  const isDoneColumn = currentColumn?.name.trim().toLowerCase() === 'done'
+  const hasAssignee = !!task.assignee_id
+
+  const getSnapshot = () => Math.floor(Date.now() / 1000)
+  const nowSec = useSyncExternalStore(
+    emptySubscribe,
+    getSnapshot,
+    () => 0
+  )
+  const nowMs = nowSec * 1000
+
+  let staleStatus: 'green' | 'yellow' | 'red' | null = null
+  let staleLabel = ''
+
+  if (hasAssignee && !isDoneColumn && task.status_updated_at && nowMs > 0) {
+    const updatedMs = new Date(task.status_updated_at).getTime()
+    const diffMs = nowMs - updatedMs
+    const thresholdMs = staleThresholdHours * 60 * 60 * 1000
+
+    const ratio = diffMs / thresholdMs
+
+    // Calculate readable elapsed time
+    const diffMinutes = Math.floor(diffMs / (1000 * 60))
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+
+    let elapsedText = ''
+    if (diffDays > 0) {
+      elapsedText = `${diffDays} hari`
+    } else if (diffHours > 0) {
+      elapsedText = `${diffHours} jam`
+    } else {
+      elapsedText = `${diffMinutes} mnt`
+    }
+
+    if (ratio > 1) {
+      staleStatus = 'red'
+      staleLabel = `Stale (${elapsedText})`
+    } else if (ratio >= 0.7) {
+      staleStatus = 'yellow'
+      staleLabel = `Perlu Perhatian (${elapsedText})`
+    } else {
+      staleStatus = 'green'
+      staleLabel = `Aktif (${elapsedText})`
+    }
+  }
+
   async function handleAssignSelf(e: React.MouseEvent) {
     e.stopPropagation()
     setLoading(true)
@@ -81,9 +140,35 @@ export function TaskCard({ task, columns, members, currentUserId }: TaskCardProp
         onClick={() => setIsEditOpen(true)}
         className="group relative cursor-grab active:cursor-grabbing rounded-lg border border-zinc-200 bg-white p-3 shadow-sm hover:border-indigo-400 hover:shadow transition dark:border-zinc-800 dark:bg-zinc-900/90 dark:hover:border-indigo-600"
       >
-        <h4 className="font-semibold text-xs text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">
-          {task.title}
-        </h4>
+        <div className="flex items-start justify-between gap-2">
+          <h4 className="font-semibold text-xs text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">
+            {task.title}
+          </h4>
+
+          {staleStatus && (
+            <span
+              title={`Status aktivitas: ${staleLabel}`}
+              className={`inline-flex flex-shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${
+                staleStatus === 'red'
+                  ? 'bg-red-100 text-red-700 dark:bg-red-950/80 dark:text-red-400 animate-pulse'
+                  : staleStatus === 'yellow'
+                  ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-400'
+                  : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-400'
+              }`}
+            >
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${
+                  staleStatus === 'red'
+                    ? 'bg-red-600 dark:bg-red-400'
+                    : staleStatus === 'yellow'
+                    ? 'bg-amber-500 dark:bg-amber-400'
+                    : 'bg-emerald-500 dark:bg-emerald-400'
+                }`}
+              />
+              {staleStatus === 'red' ? 'Stale' : staleStatus === 'yellow' ? 'Warning' : 'Fresh'}
+            </span>
+          )}
+        </div>
 
         {task.description && (
           <p className="mt-1 line-clamp-2 text-[11px] text-zinc-500 dark:text-zinc-400">

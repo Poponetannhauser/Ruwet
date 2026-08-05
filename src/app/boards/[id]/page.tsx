@@ -78,6 +78,7 @@ export default async function BoardDetailPage({
       <main className="flex-1 p-8 overflow-x-auto">
         <KanbanBoard
           boardId={id}
+          staleThresholdHours={board.stale_threshold_hours ? Number(board.stale_threshold_hours) : 48}
           initialColumns={columns || []}
           initialTasks={tasks}
           members={members}
