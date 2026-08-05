@@ -282,6 +282,36 @@ create policy "Board members can insert comments"
   );
 
 
+-- 8. Notifications
+create table notifications (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references profiles(id) on delete cascade not null,
+  title text not null,
+  message text not null,
+  link text,
+  is_read boolean default false,
+  created_at timestamptz default now()
+);
+
+alter table notifications enable row level security;
+
+-- 8. Notifications Policies
+create policy "Users can view their own notifications"
+  on notifications for select
+  to authenticated
+  using (auth.uid() = user_id);
+
+create policy "Users can update their own notifications"
+  on notifications for update
+  to authenticated
+  using (auth.uid() = user_id);
+
+create policy "Authenticated users can insert notifications"
+  on notifications for insert
+  to authenticated
+  with check (true);
+
+
 -- Automatically create profile trigger on auth.users sign up
 create or replace function public.handle_new_user()
 returns trigger as $$
@@ -306,8 +336,9 @@ create trigger on_auth_user_created
 -- SUPABASE REALTIME PUBLICATION SETUP
 -------------------------------------------------------
 
--- Enable Realtime publication for tasks, columns, and comments
+-- Enable Realtime publication for tasks, columns, comments, and notifications
 alter publication supabase_realtime add table tasks;
 alter publication supabase_realtime add table columns;
 alter publication supabase_realtime add table comments;
+alter publication supabase_realtime add table notifications;
 alter table tasks replica identity full;

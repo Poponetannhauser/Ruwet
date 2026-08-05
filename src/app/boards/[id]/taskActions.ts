@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { logActivity } from './activityActions'
+import { createNotification } from '@/app/notificationActions'
 
 export async function createTask(boardId: string, columnId: string, formData: FormData) {
   const supabase = await createClient()
@@ -34,6 +35,8 @@ export async function createTask(boardId: string, columnId: string, formData: Fo
   const newPosition = (count || 0) + 1
   const now = new Date().toISOString()
 
+  const targetAssignee = assigneeId && assigneeId !== '' ? assigneeId : null
+
   const { data: newTask, error } = await supabase
     .from('tasks')
     .insert({
@@ -41,7 +44,7 @@ export async function createTask(boardId: string, columnId: string, formData: Fo
       column_id: columnId,
       title: title.trim(),
       description: description ? description.trim() : null,
-      assignee_id: assigneeId && assigneeId !== '' ? assigneeId : null,
+      assignee_id: targetAssignee,
       due_date: dueDate && dueDate !== '' ? dueDate : null,
       position: newPosition,
       created_by: user.id,
@@ -60,6 +63,16 @@ export async function createTask(boardId: string, columnId: string, formData: Fo
   await logActivity(newTask.id, boardId, user.id, 'task_created', {
     title: title.trim(),
   })
+
+  // Trigger notification if assigned to another user
+  if (targetAssignee && targetAssignee !== user.id) {
+    await createNotification(
+      targetAssignee,
+      'Penugasan Task Baru',
+      `Anda ditugaskan pada task "${title.trim()}"`,
+      `/boards/${boardId}`
+    )
+  }
 
   revalidatePath(`/boards/${boardId}`)
   return { success: true }
@@ -86,20 +99,22 @@ export async function updateTask(taskId: string, boardId: string, formData: Form
     return { error: 'Judul task tidak boleh kosong' }
   }
 
-  // Cek apakah column_id berubah untuk mengupdate status_updated_at
+  // Cek apakah column_id atau assignee_id berubah
   const { data: currentTask } = await supabase
     .from('tasks')
-    .select('column_id')
+    .select('column_id, assignee_id, title')
     .eq('id', taskId)
     .single()
 
   const now = new Date().toISOString()
   const isColumnChanged = columnId && currentTask && currentTask.column_id !== columnId
+  const targetAssignee = assigneeId && assigneeId !== '' ? assigneeId : null
+  const isAssigneeChanged = targetAssignee && currentTask && currentTask.assignee_id !== targetAssignee
 
   const updateData: Record<string, unknown> = {
     title: title.trim(),
     description: description ? description.trim() : null,
-    assignee_id: assigneeId && assigneeId !== '' ? assigneeId : null,
+    assignee_id: targetAssignee,
     due_date: dueDate && dueDate !== '' ? dueDate : null,
     updated_at: now,
   }
@@ -116,6 +131,16 @@ export async function updateTask(taskId: string, boardId: string, formData: Form
 
   if (error) {
     return { error: error.message }
+  }
+
+  // Trigger notification if newly assigned to another user
+  if (isAssigneeChanged && targetAssignee !== user.id) {
+    await createNotification(
+      targetAssignee,
+      'Penugasan Task',
+      `Anda ditugaskan pada task "${title.trim()}"`,
+      `/boards/${boardId}`
+    )
   }
 
   // Log Activity

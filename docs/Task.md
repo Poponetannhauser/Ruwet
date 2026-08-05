@@ -300,13 +300,13 @@
 **Deskripsi:** User story #7, saat di-assign task baru.
 
 **Langkah:**
-- [ ] Trigger notifikasi saat user di-assign ke task
-- [ ] UI badge/lonceng dengan counter unread
-- [ ] Tandai notifikasi sebagai "read" saat diklik
+- [x] Trigger notifikasi saat user di-assign ke task
+- [x] UI badge/lonceng dengan counter unread
+- [x] Tandai notifikasi sebagai "read" saat diklik
 
 **DoD:**
-- [ ] Notifikasi muncul real-time saat di-assign
-- [ ] Counter unread akurat
+- [x] Notifikasi muncul real-time saat di-assign
+- [x] Counter unread akurat
 
 **Commit contoh:** `feat(notification): notifikasi in-app saat assign task`
 
