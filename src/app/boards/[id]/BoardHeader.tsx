@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { updateBoard, deleteBoard, leaveBoard } from '../actions'
 import { InviteMemberModal } from './InviteMemberModal'
 import { MemberList } from './MemberList'
+import { NotificationBell } from '@/app/components/NotificationBell'
 
 type Member = {
   id: string
@@ -141,6 +142,7 @@ export function BoardHeader({ board, isOwner, members }: BoardHeaderProps) {
       )}
 
       <div className="flex items-center gap-4">
+        <NotificationBell />
         <MemberList members={members} />
         {isOwner && <InviteMemberModal boardId={board.id} />}
 
