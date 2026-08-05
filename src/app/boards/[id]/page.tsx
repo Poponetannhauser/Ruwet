@@ -67,7 +67,7 @@ export default async function BoardDetailPage({
 
   return (
     <div className="flex flex-col flex-1 min-h-screen bg-zinc-50 dark:bg-zinc-950">
-      <div className="bg-zinc-100 px-8 py-2 border-b border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800 text-xs">
+      <div className="bg-zinc-100 px-4 sm:px-8 py-2 border-b border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800 text-xs">
         <Link href="/" className="text-indigo-600 hover:underline dark:text-indigo-400">
           ← Kembali ke Dashboard Board
         </Link>
@@ -81,7 +81,7 @@ export default async function BoardDetailPage({
         tasks={tasks || []}
       />
 
-      <main className="flex-1 p-8 overflow-x-auto">
+      <main className="flex-1 p-4 sm:p-8 overflow-x-auto">
         <KanbanBoard
           boardId={id}
           staleThresholdHours={board.stale_threshold_hours ? Number(board.stale_threshold_hours) : 48}
