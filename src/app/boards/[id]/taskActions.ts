@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { logActivity } from './activityActions'
 import { createNotification } from '@/app/notificationActions'
+import { checkRateLimit } from '@/lib/rateLimit'
 
 export async function createTask(boardId: string, columnId: string, formData: FormData) {
   const supabase = await createClient()
@@ -15,6 +16,11 @@ export async function createTask(boardId: string, columnId: string, formData: Fo
 
   if (!user) {
     redirect('/login')
+  }
+
+  const rateLimit = checkRateLimit(`task_create:${user.id}`, { maxRequests: 20, intervalMs: 60000 })
+  if (!rateLimit.success) {
+    return { error: 'Terlalu banyak membuat task. Harap tunggu sebentar.' }
   }
 
   const title = formData.get('title') as string

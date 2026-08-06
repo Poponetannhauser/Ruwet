@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { checkRateLimit } from '@/lib/rateLimit'
 
 export async function addComment(taskId: string, boardId: string, content: string) {
   const supabase = await createClient()
@@ -12,6 +13,11 @@ export async function addComment(taskId: string, boardId: string, content: strin
 
   if (!user) {
     return { error: 'Anda harus login untuk mengirim komentar' }
+  }
+
+  const rateLimit = checkRateLimit(`comment:${user.id}`, { maxRequests: 15, intervalMs: 60000 })
+  if (!rateLimit.success) {
+    return { error: 'Terlalu banyak komentar. Harap tunggu sebentar.' }
   }
 
   if (!content || content.trim() === '') {

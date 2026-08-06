@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { checkRateLimit } from '@/lib/rateLimit'
 
 export async function createBoard(formData: FormData) {
   const supabase = await createClient()
@@ -13,6 +14,11 @@ export async function createBoard(formData: FormData) {
 
   if (!user) {
     redirect('/login')
+  }
+
+  const rateLimit = checkRateLimit(`board_create:${user.id}`, { maxRequests: 5, intervalMs: 60000 })
+  if (!rateLimit.success) {
+    return { error: 'Terlalu banyak membuat board. Harap tunggu sebentar.' }
   }
 
   const name = formData.get('name') as string
