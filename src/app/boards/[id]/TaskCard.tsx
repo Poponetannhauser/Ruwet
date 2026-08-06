@@ -193,10 +193,13 @@ export function TaskCard({
               <button
                 onClick={handleAssignSelf}
                 disabled={loading}
-                className="hidden rounded-md bg-indigo-950/80 border border-indigo-700/50 px-2 py-0.5 text-[10px] font-semibold text-indigo-300 hover:bg-indigo-900 group-hover:block transition-all shadow-sm"
+                className="hidden items-center gap-1 rounded-md bg-indigo-950/80 border border-indigo-700/50 px-2 py-0.5 text-[10px] font-semibold text-indigo-300 hover:bg-indigo-900 group-hover:inline-flex transition-all shadow-xs"
                 title="Assign task ini ke saya"
               >
-                +Saya
+                <svg className="w-2.5 h-2.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                <span>Saya</span>
               </button>
             )}
 
