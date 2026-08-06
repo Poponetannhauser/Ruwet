@@ -100,69 +100,83 @@ export function EditTaskModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 8 }}
             transition={{ duration: 0.2 }}
-            className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-xl bg-white p-4 sm:p-6 shadow-xl dark:bg-zinc-900"
+            className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-xl bg-white shadow-xl dark:bg-zinc-900 flex flex-col"
           >
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-bold text-zinc-900 dark:text-white">
-            Edit Task
-          </h3>
-          <button
-            onClick={() => setActiveTab('detail')}
-            className={`flex items-center gap-1.5 pb-2.5 pt-1 px-3 text-xs font-bold transition-all border-b-2 ${
-              activeTab === 'detail'
-                ? 'border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
-                : 'border-transparent text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200'
-            }`}
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-            Detail Task
-          </button>
+            {/* Header Title & Close Button */}
+            <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4 dark:border-zinc-800">
+              <h3 className="text-lg font-bold text-zinc-900 dark:text-white">
+                Edit Task
+              </h3>
+              <button
+                onClick={onClose}
+                className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 transition-colors"
+                title="Tutup Modal"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
 
-          <button
-            onClick={() => setActiveTab('comments')}
-            className={`flex items-center gap-1.5 pb-2.5 pt-1 px-3 text-xs font-bold transition-all border-b-2 ${
-              activeTab === 'comments'
-                ? 'border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
-                : 'border-transparent text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200'
-            }`}
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-              />
-            </svg>
-            Komentar
-          </button>
+            {/* Navigation Tabs */}
+            <div className="flex items-center gap-1 border-b border-zinc-200 px-5 dark:border-zinc-800">
+              <button
+                onClick={() => setActiveTab('detail')}
+                className={`flex items-center gap-1.5 py-3 px-3 text-xs font-bold transition-all border-b-2 ${
+                  activeTab === 'detail'
+                    ? 'border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
+                    : 'border-transparent text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200'
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+                Detail Task
+              </button>
 
-          <button
-            onClick={() => setActiveTab('activity')}
-            className={`flex items-center gap-1.5 pb-2.5 pt-1 px-3 text-xs font-bold transition-all border-b-2 ${
-              activeTab === 'activity'
-                ? 'border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
-                : 'border-transparent text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200'
-            }`}
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            Aktivitas
-          </button>
-        </div>
+              <button
+                onClick={() => setActiveTab('comments')}
+                className={`flex items-center gap-1.5 py-3 px-3 text-xs font-bold transition-all border-b-2 ${
+                  activeTab === 'comments'
+                    ? 'border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
+                    : 'border-transparent text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200'
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                  />
+                </svg>
+                Komentar
+              </button>
+
+              <button
+                onClick={() => setActiveTab('activity')}
+                className={`flex items-center gap-1.5 py-3 px-3 text-xs font-bold transition-all border-b-2 ${
+                  activeTab === 'activity'
+                    ? 'border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
+                    : 'border-transparent text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200'
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                Aktivitas
+              </button>
+            </div>
 
         {/* Dynamic Tab Content Area */}
         <div className="flex-1 overflow-y-auto p-5">
@@ -249,21 +263,31 @@ export function EditTaskModal({
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+              <div className="flex items-center justify-between pt-3 border-t border-zinc-100 dark:border-zinc-800">
                 <button
                   type="button"
-                  onClick={onClose}
-                  className="rounded-md border border-zinc-300 px-4 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800 transition-colors"
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
+                  onClick={handleDelete}
                   disabled={loading}
-                  className="rounded-md bg-indigo-600 px-4 py-2 text-xs font-medium text-white hover:bg-indigo-700 disabled:opacity-50 transition-colors shadow-xs"
+                  className="rounded-md bg-red-500/10 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-500/20 dark:text-red-400 transition-colors"
                 >
-                  {loading ? 'Menyimpan...' : 'Simpan Perubahan'}
+                  Hapus Task
                 </button>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="rounded-md border border-zinc-300 px-4 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800 transition-colors"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="rounded-md bg-indigo-600 px-4 py-2 text-xs font-medium text-white hover:bg-indigo-700 disabled:opacity-50 transition-colors shadow-xs"
+                  >
+                    {loading ? 'Menyimpan...' : 'Simpan Perubahan'}
+                  </button>
+                </div>
               </div>
             </form>
           )}
