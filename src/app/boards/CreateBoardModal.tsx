@@ -26,10 +26,14 @@ export function CreateBoardModal() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-indigo-700 transition"
+        className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-500 px-4 py-2.5 text-xs font-extrabold text-white shadow-lg shadow-indigo-500/20 hover:opacity-95 active:scale-[0.99] transition-all"
       >
-        + Buat Board Baru
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        Buat Board Baru
       </button>
+
 
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">

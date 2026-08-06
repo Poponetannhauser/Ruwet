@@ -88,32 +88,40 @@ export function NotificationBell() {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative rounded-full p-1.5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100 transition"
+        className="relative rounded-lg p-2 text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors"
         title="Notifikasi"
       >
-        <span className="text-base">🔔</span>
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
+          />
+        </svg>
         {unreadCount > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[9px] font-bold text-white shadow">
+          <span className="absolute 0 top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-rose-600 text-[9px] font-bold text-white shadow-md shadow-rose-600/40">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 rounded-xl border border-zinc-200 bg-white p-3 shadow-xl dark:border-zinc-800 dark:bg-zinc-900 z-50">
-          <div className="flex items-center justify-between border-b border-zinc-100 pb-2 dark:border-zinc-800">
-            <h4 className="font-semibold text-xs text-zinc-900 dark:text-white">
+        <div className="absolute right-0 mt-2 w-80 rounded-xl glass-modal p-4 shadow-2xl border border-white/10 z-50">
+          <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+            <h4 className="font-bold text-xs text-white">
               Notifikasi {unreadCount > 0 && `(${unreadCount})`}
             </h4>
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAll}
-                className="text-[10px] font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+                className="text-[10px] font-bold text-indigo-400 hover:text-indigo-300 transition-colors"
               >
                 Tandai semua dibaca
               </button>
             )}
           </div>
+
 
           <div className="mt-2 max-h-64 overflow-y-auto space-y-1.5">
             {loading ? (

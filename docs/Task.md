@@ -368,11 +368,11 @@
 
 ### Task M5-03 — Animasi & Micro-interaction
 **Langkah:**
-- [ ] Framer Motion untuk transisi drag-drop
-- [ ] Transisi halus perubahan status/badge stale
+- [x] Framer Motion untuk transisi drag-drop
+- [x] Transisi halus perubahan status/badge stale
 
 **DoD:**
-- [ ] Animasi tidak mengganggu performa (tetap smooth di board dengan banyak task)
+- [x] Animasi tidak mengganggu performa (tetap smooth di board dengan banyak task)
 
 **Commit contoh:** `style: tambah animasi framer motion untuk drag-drop & state changes`
 

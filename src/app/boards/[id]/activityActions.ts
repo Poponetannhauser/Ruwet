@@ -24,7 +24,7 @@ export async function logActivity(
   }
 }
 
-export async function getActivityLogs(taskId: string) {
+export async function getActivityLogs(taskId: string, limit = 10) {
   const supabase = await createClient()
 
   const { data: logs, error } = await supabase
@@ -32,6 +32,7 @@ export async function getActivityLogs(taskId: string) {
     .select('*, profiles:user_id(full_name, avatar_url)')
     .eq('task_id', taskId)
     .order('created_at', { ascending: false })
+    .limit(limit)
 
   if (error) {
     return { error: error.message, logs: [] }
