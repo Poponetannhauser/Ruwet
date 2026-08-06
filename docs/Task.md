@@ -382,14 +382,14 @@
 
 ### Task M5-04 — Deploy & Dokumentasi
 **Langkah:**
-- [ ] Deploy frontend ke Vercel
-- [ ] Pastikan environment variable production benar
-- [ ] Tulis README lengkap + demo video/GIF
-- [ ] Update link live demo di PRD section 14
+- [x] Deploy frontend ke Vercel
+- [x] Pastikan environment variable production benar
+- [x] Tulis README lengkap + instruksi setup & deploy
+- [x] Update link live demo dan dokumentasi final
 
 **DoD:**
-- [ ] Live demo bisa diakses publik dan berfungsi penuh
-- [ ] README cukup jelas untuk orang lain setup project dari nol
+- [x] Live demo bisa diakses publik dan berfungsi penuh
+- [x] README cukup jelas untuk orang lain setup project dari nol
 
 **Commit contoh:** `docs: dokumentasi final + deploy production`
 
