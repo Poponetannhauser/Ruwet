@@ -41,16 +41,34 @@ Aplikasi manajemen task / kanban board modern berbasis **Next.js 15 (App Router)
    bun install
    ```
 
-3. **Setup Environment Variables:**
-   Salin `.env.example` menjadi `.env.local` dan isi kredensial Supabase Anda:
+3. **Setup Proyek Supabase:**
+   - Buat proyek baru di [Supabase Dashboard](https://supabase.com/dashboard).
+   - Dapatkan **Project URL** dan **anon (public) key** dari menu `Project Settings > API`.
+
+4. **Setup Environment Variables:**
+   Salin `.env.example` menjadi `.env.local`:
    ```bash
    cp .env.example .env.local
    ```
+   Isi nilai variabel berikut dengan kredensial Supabase Anda:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+   ```
 
-4. **Setup Database Supabase:**
-   Jalankan query yang ada pada [schema.sql](file:///home/paundraexe/Project/ruwet/schema.sql) di Supabase SQL Editor untuk membuat tabel (`profiles`, `boards`, `board_members`, `columns`, `tasks`, `activity_log`, `comments`, `notifications`), RLS policies, trigger profile, serta publikasi realtime.
+5. **Eksekusi Skrip Database (schema.sql):**
+   - Buka menu **SQL Editor** pada Supabase Dashboard.
+   - Buka file [`schema.sql`](schema.sql) dari repositori ini, salin seluruh kodenya, lalu tempel dan jalankan (**Run**) di SQL Editor.
+   - Skrip ini otomatis mengonfigurasi:
+     - Tabel utama (`profiles`, `boards`, `board_members`, `columns`, `tasks`, `activity_log`, `comments`, `notifications`).
+     - Trigger otomatis pendaftaran user dari `auth.users` ke `public.profiles`.
+     - Kebijakan Keamanan RLS (Row Level Security).
 
-5. **Jalankan server pengembangan:**
+6. **Konfigurasi Auth & Redirect URL:**
+   - Di Supabase Dashboard, masuk ke **Authentication > Providers** dan pastikan **Email** aktif.
+   - Di **Authentication > URL Configuration**, tambahkan Redirect URL lokal (`http://localhost:3000`) dan domain deployment Vercel Anda.
+
+7. **Jalankan Server Pengembangan:**
    ```bash
    bun run dev
    ```

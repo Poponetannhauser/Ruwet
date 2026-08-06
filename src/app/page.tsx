@@ -52,7 +52,7 @@ export default async function Home() {
             </span>
 
             <span className="hidden sm:inline-block rounded-full bg-indigo-500/10 border border-indigo-500/20 px-2.5 py-0.5 text-[10px] font-semibold text-indigo-400">
-              v1.0 Realtime
+              v1.0
             </span>
           </div>
 
@@ -99,7 +99,7 @@ export default async function Home() {
                   Dashboard Board Kanban
                 </h2>
                 <p className="mt-1 text-sm text-zinc-400">
-                  Kelola tugas, pantau stale tasks, dan kolaborasi tim secara real-time.
+                  Kelola tugas, pantau stale tasks, dan tingkatkan akuntabilitas tim.
                 </p>
               </div>
               <CreateBoardModal />

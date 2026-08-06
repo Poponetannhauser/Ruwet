@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
 import {
   getNotifications,
   markAsRead,
@@ -49,25 +48,8 @@ export function NotificationBell() {
 
     load()
 
-    const supabase = createClient()
-    const channel = supabase
-      .channel('user-notifications')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications',
-        },
-        () => {
-          load()
-        }
-      )
-      .subscribe()
-
     return () => {
       isMounted = false
-      supabase.removeChannel(channel)
     }
   }, [])
 

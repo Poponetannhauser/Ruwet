@@ -52,30 +52,8 @@ export function CommentSection({
 
     initUserAndComments()
 
-    // Realtime subscription untuk komentar baru
-    const supabase = createClient()
-    const channel = supabase
-      .channel(`task-comments-${taskId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'comments',
-          filter: `task_id=eq.${taskId}`,
-        },
-        async () => {
-          const res = await getComments(taskId)
-          if (isMounted && res.comments) {
-            setComments(res.comments)
-          }
-        }
-      )
-      .subscribe()
-
     return () => {
       isMounted = false
-      supabase.removeChannel(channel)
     }
   }, [taskId])
 

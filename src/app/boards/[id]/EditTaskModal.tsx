@@ -47,6 +47,7 @@ export function EditTaskModal({
   onClose,
 }: EditTaskModalProps) {
   const [activeTab, setActiveTab] = useState<'detail' | 'comments' | 'activity'>('detail')
+  const [isDeletingConfirm, setIsDeletingConfirm] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -69,19 +70,17 @@ export function EditTaskModal({
     }
   }
 
-  async function handleDelete() {
-    if (!confirm(`Yakin ingin menghapus task "${task.title}"?`)) {
-      return
-    }
-
+  async function handleDeleteConfirm() {
     setLoading(true)
     const result = await deleteTask(task.id, task.board_id)
 
     if (result && result.error) {
       setError(result.error)
       setLoading(false)
+      setIsDeletingConfirm(false)
     } else {
       setLoading(false)
+      setIsDeletingConfirm(false)
       onClose()
     }
   }
@@ -266,7 +265,7 @@ export function EditTaskModal({
               <div className="flex items-center justify-between pt-3 border-t border-zinc-100 dark:border-zinc-800">
                 <button
                   type="button"
-                  onClick={handleDelete}
+                  onClick={() => setIsDeletingConfirm(true)}
                   disabled={loading}
                   className="rounded-md bg-red-500/10 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-500/20 dark:text-red-400 transition-colors"
                 >
@@ -305,6 +304,37 @@ export function EditTaskModal({
           )}
         </div>
       </motion.div>
+
+      {/* Custom Confirmation Modal Overlay */}
+      {isDeletingConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+          <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-2xl dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+            <h3 className="text-base font-bold text-zinc-900 dark:text-white">
+              Konfirmasi Hapus Task
+            </h3>
+            <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+              Apakah Anda yakin ingin menghapus task <strong className="text-zinc-900 dark:text-zinc-200">&quot;{task.title}&quot;</strong>? Tindakan ini tidak dapat dibatalkan.
+            </p>
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setIsDeletingConfirm(false)}
+                className="rounded-lg border border-zinc-300 dark:border-zinc-700 px-3.5 py-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteConfirm}
+                disabled={loading}
+                className="rounded-lg bg-rose-600 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-rose-700 disabled:opacity-50 transition shadow-xs"
+              >
+                {loading ? 'Menghapus...' : 'Ya, Hapus Task'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </motion.div>
   )}
 </AnimatePresence>
