@@ -1,12 +1,9 @@
-# Ruwet - Realtime Kanban Board & Task Accountability
+# Ruwet - Kanban Board & Task Accountability
 
-Aplikasi manajemen task / kanban board modern berbasis **Next.js 15 (App Router)**, **TypeScript**, **Tailwind CSS**, **Framer Motion**, dan **Supabase Realtime**.
-
-![Ruwet Logo](/public/ruwet-logo.png)
+Aplikasi manajemen task / kanban board modern berbasis **Next.js 15 (App Router)**, **TypeScript**, **Tailwind CSS**, **Framer Motion**, dan **Supabase**.
 
 ## Fitur Utama
 
-- ⚡ **Realtime Synchronization**: Perubahan task, kolom, komentar, dan notifikasi tersinkronisasi instan (< 2 detik) antar user via Supabase Realtime.
 - 🚦 **Stale Task Detection**: Indikator visual otomatis (Hijau, Kuning, Merah) untuk task yang berhenti/stagnan melebihi threshold jam yang dapat dikonfigurasi per board.
 - 📋 **Flexible Kanban Management**: Drag and drop task antar kolom (`dnd-kit`), tambah/edit/hapus kolom dan task dengan pergerakan posisi otomatis.
 - 💬 **Interactive Comment Section**: Fitur diskusi komentar per task dengan tampilan chat bubble intuitif.
@@ -60,20 +57,3 @@ Aplikasi manajemen task / kanban board modern berbasis **Next.js 15 (App Router)
    Buka [http://localhost:3000](http://localhost:3000) di browser.
 
 ---
-
-## Deployment (Vercel)
-
-1. Connect repository `Poponetannhauser/Ruwet` ke project Vercel baru.
-2. Tambahkan Environment Variable di Vercel:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-3. Build Command: `bun run build` atau `next build`.
-4. Deploy!
-
----
-
-## Dokumentasi Tambahan
-
-- **[PRD (Product Requirement Document)](file:///home/paundraexe/Project/ruwet/docs/PRD.md)**
-- **[Task Breakdown & Checklist](file:///home/paundraexe/Project/ruwet/docs/Task.md)**
-- **[Database Schema](file:///home/paundraexe/Project/ruwet/docs/schema.md)**
