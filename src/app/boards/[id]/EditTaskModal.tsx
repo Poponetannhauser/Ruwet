@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { updateTask, deleteTask } from './taskActions'
 import { ActivityFeed } from './ActivityFeed'
 import { CommentSection } from './CommentSection'
@@ -86,49 +87,25 @@ export function EditTaskModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3 sm:p-4 backdrop-blur-xs">
-      <div className="w-full max-w-lg h-[580px] max-h-[90vh] flex flex-col rounded-xl bg-white shadow-2xl dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 overflow-hidden">
-        {/* Header Modal */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-100 dark:border-zinc-800/80">
-          <div>
-            <h3 className="text-base font-bold text-zinc-900 dark:text-white truncate max-w-xs sm:max-w-sm">
-              {task.title}
-            </h3>
-            <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
-              Kelola detail, komentar, dan aktivitas task
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleDelete}
-              disabled={loading}
-              title="Hapus Task"
-              className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-950/30 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                />
-              </svg>
-              <span className="hidden sm:inline">Hapus</span>
-            </button>
-            <button
-              onClick={onClose}
-              className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 transition-colors"
-              title="Tutup Modal"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        {/* Tab Navigasi Top Bar */}
-        <div className="flex items-center gap-2 px-5 pt-2 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50">
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3 sm:p-4 backdrop-blur-xs"
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 8 }}
+            transition={{ duration: 0.2 }}
+            className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-xl bg-white p-4 sm:p-6 shadow-xl dark:bg-zinc-900"
+          >
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-bold text-zinc-900 dark:text-white">
+            Edit Task
+          </h3>
           <button
             onClick={() => setActiveTab('detail')}
             className={`flex items-center gap-1.5 pb-2.5 pt-1 px-3 text-xs font-bold transition-all border-b-2 ${
@@ -303,8 +280,10 @@ export function EditTaskModal({
             </div>
           )}
         </div>
-      </div>
-    </div>
-  )
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
+)
 }
 
