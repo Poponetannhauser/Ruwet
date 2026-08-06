@@ -18,6 +18,18 @@ export async function addComment(taskId: string, boardId: string, content: strin
     return { error: 'Komentar tidak boleh kosong' }
   }
 
+  // Validasi taskId terdaftar di boardId ini
+  const { data: task } = await supabase
+    .from('tasks')
+    .select('id')
+    .eq('id', taskId)
+    .eq('board_id', boardId)
+    .single()
+
+  if (!task) {
+    return { error: 'Task tidak ditemukan di board ini' }
+  }
+
   const { error } = await supabase.from('comments').insert({
     task_id: taskId,
     user_id: user.id,
