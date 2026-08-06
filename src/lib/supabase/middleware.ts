@@ -47,7 +47,10 @@ export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
   // Protected routes
-  const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/signup')
+  const isAuthRoute =
+    pathname.startsWith('/login') ||
+    pathname.startsWith('/signup') ||
+    pathname.startsWith('/auth')
   
   if (!user && !isAuthRoute && pathname !== '/') {
     // Redirect unauthenticated user to /login
@@ -56,7 +59,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  if (user && isAuthRoute) {
+  if (user && (pathname.startsWith('/login') || pathname.startsWith('/signup'))) {
     // Redirect authenticated user from /login or /signup to /
     const url = request.nextUrl.clone()
     url.pathname = '/'

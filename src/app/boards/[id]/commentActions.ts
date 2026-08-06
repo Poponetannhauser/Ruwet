@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { checkRateLimit } from '@/lib/rateLimit'
 
 export async function addComment(taskId: string, boardId: string, content: string) {
   const supabase = await createClient()
@@ -14,8 +15,25 @@ export async function addComment(taskId: string, boardId: string, content: strin
     return { error: 'Anda harus login untuk mengirim komentar' }
   }
 
+  const rateLimit = checkRateLimit(`comment:${user.id}`, { maxRequests: 15, intervalMs: 60000 })
+  if (!rateLimit.success) {
+    return { error: 'Terlalu banyak komentar. Harap tunggu sebentar.' }
+  }
+
   if (!content || content.trim() === '') {
     return { error: 'Komentar tidak boleh kosong' }
+  }
+
+  // Validasi taskId terdaftar di boardId ini
+  const { data: task } = await supabase
+    .from('tasks')
+    .select('id')
+    .eq('id', taskId)
+    .eq('board_id', boardId)
+    .single()
+
+  if (!task) {
+    return { error: 'Task tidak ditemukan di board ini' }
   }
 
   const { error } = await supabase.from('comments').insert({

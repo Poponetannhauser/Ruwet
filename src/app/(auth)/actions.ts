@@ -2,12 +2,22 @@
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { checkRateLimit } from '@/lib/rateLimit'
 
 export async function login(formData: FormData) {
   const supabase = await createClient()
 
   const email = formData.get('email') as string
   const password = formData.get('password') as string
+
+  if (!email) {
+    return redirect('/login?error=Email%20harus%20diisi')
+  }
+
+  const rateLimit = checkRateLimit(`login:${email.toLowerCase().trim()}`, { maxRequests: 5, intervalMs: 60000 })
+  if (!rateLimit.success) {
+    return redirect('/login?error=Terlalu%20banyak%20percobaan%20login.%20Harap%20tunggu%201%20menit.')
+  }
 
   const { error } = await supabase.auth.signInWithPassword({
     email,
@@ -27,6 +37,15 @@ export async function signup(formData: FormData) {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
   const fullName = formData.get('fullName') as string
+
+  if (!email) {
+    return redirect('/signup?error=Email%20harus%20diisi')
+  }
+
+  const rateLimit = checkRateLimit(`signup:${email.toLowerCase().trim()}`, { maxRequests: 3, intervalMs: 60000 })
+  if (!rateLimit.success) {
+    return redirect('/signup?error=Terlalu%20banyak%20percobaan%20pendaftaran.%20Harap%20tunggu%201%20menit.')
+  }
 
   const { error } = await supabase.auth.signUp({
     email,

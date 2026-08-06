@@ -64,6 +64,7 @@ export async function updateColumn(columnId: string, boardId: string, formData: 
     .from('columns')
     .update({ name: name.trim() })
     .eq('id', columnId)
+    .eq('board_id', boardId)
 
   if (error) {
     return { error: error.message }
@@ -84,7 +85,11 @@ export async function deleteColumn(columnId: string, boardId: string) {
     redirect('/login')
   }
 
-  const { error } = await supabase.from('columns').delete().eq('id', columnId)
+  const { error } = await supabase
+    .from('columns')
+    .delete()
+    .eq('id', columnId)
+    .eq('board_id', boardId)
 
   if (error) {
     return { error: error.message }

@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { logActivity } from './activityActions'
 import { createNotification } from '@/app/notificationActions'
+import { checkRateLimit } from '@/lib/rateLimit'
 
 export async function createTask(boardId: string, columnId: string, formData: FormData) {
   const supabase = await createClient()
@@ -17,6 +18,11 @@ export async function createTask(boardId: string, columnId: string, formData: Fo
     redirect('/login')
   }
 
+  const rateLimit = checkRateLimit(`task_create:${user.id}`, { maxRequests: 20, intervalMs: 60000 })
+  if (!rateLimit.success) {
+    return { error: 'Terlalu banyak membuat task. Harap tunggu sebentar.' }
+  }
+
   const title = formData.get('title') as string
   const description = (formData.get('description') as string) || null
   const assigneeId = (formData.get('assignee_id') as string) || null
@@ -24,6 +30,18 @@ export async function createTask(boardId: string, columnId: string, formData: Fo
 
   if (!title || title.trim() === '') {
     return { error: 'Judul task tidak boleh kosong' }
+  }
+
+  // Validasi kolom milik board ini
+  const { data: validCol } = await supabase
+    .from('columns')
+    .select('id')
+    .eq('id', columnId)
+    .eq('board_id', boardId)
+    .single()
+
+  if (!validCol) {
+    return { error: 'Kolom tidak valid untuk board ini' }
   }
 
   // Hitung jumlah task di kolom ini untuk menentukan posisi
@@ -111,6 +129,19 @@ export async function updateTask(taskId: string, boardId: string, formData: Form
   const targetAssignee = assigneeId && assigneeId !== '' ? assigneeId : null
   const isAssigneeChanged = targetAssignee && currentTask && currentTask.assignee_id !== targetAssignee
 
+  if (isColumnChanged && columnId) {
+    const { data: validCol } = await supabase
+      .from('columns')
+      .select('id')
+      .eq('id', columnId)
+      .eq('board_id', boardId)
+      .single()
+
+    if (!validCol) {
+      return { error: 'Kolom tujuan tidak valid untuk board ini' }
+    }
+  }
+
   const updateData: Record<string, unknown> = {
     title: title.trim(),
     description: description ? description.trim() : null,
@@ -128,6 +159,7 @@ export async function updateTask(taskId: string, boardId: string, formData: Form
     .from('tasks')
     .update(updateData)
     .eq('id', taskId)
+    .eq('board_id', boardId)
 
   if (error) {
     return { error: error.message }
@@ -175,7 +207,11 @@ export async function deleteTask(taskId: string, boardId: string) {
     redirect('/login')
   }
 
-  const { error } = await supabase.from('tasks').delete().eq('id', taskId)
+  const { error } = await supabase
+    .from('tasks')
+    .delete()
+    .eq('id', taskId)
+    .eq('board_id', boardId)
 
   if (error) {
     return { error: error.message }
@@ -205,6 +241,7 @@ export async function assignSelf(taskId: string, boardId: string) {
       updated_at: now,
     })
     .eq('id', taskId)
+    .eq('board_id', boardId)
 
   if (error) {
     return { error: error.message }
@@ -236,6 +273,18 @@ export async function moveTask(
     redirect('/login')
   }
 
+  // Validasi target column dan task belong to boardId
+  const { data: validCol } = await supabase
+    .from('columns')
+    .select('id')
+    .eq('id', targetColumnId)
+    .eq('board_id', boardId)
+    .single()
+
+  if (!validCol) {
+    return { error: 'Kolom tujuan tidak valid untuk board ini' }
+  }
+
   const now = new Date().toISOString()
 
   const updateData: Record<string, unknown> = {
@@ -252,6 +301,7 @@ export async function moveTask(
     .from('tasks')
     .update(updateData)
     .eq('id', taskId)
+    .eq('board_id', boardId)
 
   if (error) {
     return { error: error.message }
