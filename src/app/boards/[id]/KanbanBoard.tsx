@@ -20,7 +20,6 @@ import {
   arrayMove,
 } from '@dnd-kit/sortable'
 import { useDroppable } from '@dnd-kit/core'
-import { createClient } from '@/lib/supabase/client'
 import { ColumnHeader } from './ColumnHeader'
 import { AddColumnButton } from './AddColumnButton'
 import { CreateTaskModal } from './CreateTaskModal'
@@ -198,60 +197,6 @@ export function KanbanBoard({
     () => true,
     () => false
   )
-
-  // Realtime subscription untuk sync realtime (<2s) antar member board
-  useEffect(() => {
-    const supabase = createClient()
-
-    const fetchLatestTasks = async () => {
-      const { data: updatedTasks } = await supabase
-        .from('tasks')
-        .select('*, profiles:assignee_id(full_name, avatar_url)')
-        .eq('board_id', boardId)
-        .order('position', { ascending: true })
-
-      if (updatedTasks) {
-        const formatted = updatedTasks.map((t) => ({
-          ...t,
-          profiles: Array.isArray(t.profiles) ? t.profiles[0] : t.profiles,
-        }))
-        setTasks(formatted)
-      }
-    }
-
-    const channel = supabase
-      .channel(`board-realtime-${boardId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'tasks',
-        },
-        (payload) => {
-          // Hanya re-fetch jika payload task terkait dengan board_id saat ini
-          const newRecord = payload.new as { board_id?: string } | null
-          const oldRecord = payload.old as { board_id?: string } | null
-
-          if (
-            (newRecord && newRecord.board_id === boardId) ||
-            (oldRecord && oldRecord.board_id === boardId)
-          ) {
-            fetchLatestTasks()
-          }
-        }
-      )
-      .subscribe((status) => {
-        if (status === 'SUBSCRIBED') {
-          // Re-fetch sekali saat channel terhubung untuk memastikan data paling segar
-          fetchLatestTasks()
-        }
-      })
-
-    return () => {
-      supabase.removeChannel(channel)
-    }
-  }, [boardId])
 
   const sensors = useSensors(
     useSensor(MouseSensor, {
