@@ -55,23 +55,34 @@ export function ActivityFeed({ taskId }: { taskId: string }) {
   }
 
   if (loading) {
-    return <div className="text-xs text-zinc-400">Memuat riwayat aktivitas...</div>
+    return <div className="text-xs text-zinc-400 p-2">Memuat riwayat aktivitas...</div>
   }
 
   if (logs.length === 0) {
-    return <div className="text-xs text-zinc-400">Belum ada riwayat aktivitas</div>
+    return (
+      <div className="flex flex-col items-center justify-center p-8 text-center text-xs text-zinc-400">
+        <svg className="w-8 h-8 mb-2 text-zinc-400 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>Belum ada riwayat aktivitas untuk task ini</span>
+      </div>
+    )
   }
 
   return (
-    <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+    <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
       {logs.map((log) => (
-        <div key={log.id} className="flex items-start gap-2 text-xs">
-          <div className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-indigo-500" />
-          <div className="flex-1">
-            <p className="text-zinc-700 dark:text-zinc-300">
+        <div key={log.id} className="flex items-start gap-3 text-xs">
+          <div className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/50 text-indigo-600 dark:text-indigo-400">
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div className="flex-1 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 p-2.5 border border-zinc-200/50 dark:border-zinc-700/50">
+            <p className="text-zinc-800 dark:text-zinc-200 font-medium">
               {renderLogText(log)}
             </p>
-            <span className="text-[10px] text-zinc-400">
+            <span className="mt-0.5 block text-[10px] text-zinc-400">
               {new Date(log.created_at).toLocaleString('id-ID', {
                 day: 'numeric',
                 month: 'short',
