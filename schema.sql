@@ -151,11 +151,10 @@ create policy "Users can view members of boards they belong to"
     is_board_member(board_id, auth.uid())
   );
 
-create policy "Board owner or member or joining user can add board members"
+create policy "Board owner or member can add board members"
   on board_members for insert
   to authenticated
   with check (
-    user_id = auth.uid() or
     is_board_member(board_id, auth.uid()) or
     exists (select 1 from boards where id = board_id and owner_id = auth.uid())
   );
@@ -306,10 +305,17 @@ create policy "Users can update their own notifications"
   to authenticated
   using (auth.uid() = user_id);
 
-create policy "Authenticated users can insert notifications"
+create policy "Authenticated users can insert notifications for self or teammates"
   on notifications for insert
   to authenticated
-  with check (true);
+  with check (
+    user_id = auth.uid() or
+    exists (
+      select 1 from board_members bm1
+      join board_members bm2 on bm1.board_id = bm2.board_id
+      where bm1.user_id = auth.uid() and bm2.user_id = notifications.user_id
+    )
+  );
 
 
 -- Automatically create profile trigger on auth.users sign up
