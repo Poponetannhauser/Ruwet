@@ -43,4 +43,6 @@ next-env.d.ts
 # agent rules & temp docs
 .agents/
 docs/issues.md
+docs/ui_todo.md
+
 
