@@ -24,6 +24,7 @@ export function CommentSection({
   boardId: string
 }) {
   const [comments, setComments] = useState<Comment[]>([])
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [content, setContent] = useState('')
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -32,7 +33,13 @@ export function CommentSection({
   useEffect(() => {
     let isMounted = true
 
-    async function loadComments() {
+    async function initUserAndComments() {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (isMounted && user) {
+        setCurrentUserId(user.id)
+      }
+
       setLoading(true)
       const res = await getComments(taskId)
       if (isMounted && res.comments) {
@@ -43,7 +50,7 @@ export function CommentSection({
       }
     }
 
-    loadComments()
+    initUserAndComments()
 
     // Realtime subscription untuk komentar baru
     const supabase = createClient()
@@ -57,8 +64,11 @@ export function CommentSection({
           table: 'comments',
           filter: `task_id=eq.${taskId}`,
         },
-        () => {
-          loadComments()
+        async () => {
+          const res = await getComments(taskId)
+          if (isMounted && res.comments) {
+            setComments(res.comments)
+          }
         }
       )
       .subscribe()
@@ -88,9 +98,9 @@ export function CommentSection({
 
   return (
     <div className="flex flex-col h-full justify-between space-y-4">
-      <div className="flex-1 space-y-2.5 overflow-y-auto pr-1 max-h-[340px]">
+      <div className="flex-1 space-y-3 overflow-y-auto pr-1 max-h-[340px] py-1">
         {loading ? (
-          <div className="text-xs text-zinc-400 p-2">Memuat komentar...</div>
+          <div className="text-xs text-zinc-400 p-2 text-center">Memuat komentar...</div>
         ) : comments.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-8 text-center text-xs text-zinc-400">
             <svg className="w-8 h-8 mb-2 text-zinc-400 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -100,33 +110,51 @@ export function CommentSection({
           </div>
         ) : (
           comments.map((comment) => {
-            const authorName = comment.profiles?.full_name || 'User'
-            const authorInitial = authorName.charAt(0).toUpperCase()
+            const isMe = currentUserId ? comment.user_id === currentUserId : false
+            const authorName = isMe ? 'Anda' : (comment.profiles?.full_name || 'User')
+            const authorInitial = (comment.profiles?.full_name || 'User').charAt(0).toUpperCase()
 
             return (
-              <div key={comment.id} className="flex items-start gap-2.5 text-xs">
+              <div
+                key={comment.id}
+                className={`flex items-end gap-2 text-xs ${
+                  isMe ? 'flex-row-reverse' : 'flex-row'
+                }`}
+              >
                 <div
-                  title={authorName}
-                  className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-xs font-bold text-white shadow-xs"
+                  title={comment.profiles?.full_name || 'User'}
+                  className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white shadow-xs ${
+                    isMe
+                      ? 'bg-gradient-to-br from-indigo-600 to-violet-600'
+                      : 'bg-zinc-700 dark:bg-zinc-700'
+                  }`}
                 >
                   {authorInitial}
                 </div>
 
-                <div className="flex-1 rounded-xl bg-zinc-100 p-2.5 dark:bg-zinc-800/80 border border-zinc-200/50 dark:border-zinc-700/50">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">
-                      {authorName}
-                    </span>
-                    <span className="text-[10px] text-zinc-400">
+                <div
+                  className={`max-w-[80%] rounded-2xl p-3 shadow-xs ${
+                    isMe
+                      ? 'rounded-br-xs bg-indigo-600 text-white'
+                      : 'rounded-bl-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200/60 dark:border-zinc-700/60'
+                  }`}
+                >
+                  <div
+                    className={`flex items-center gap-2 mb-1 text-[11px] ${
+                      isMe ? 'justify-end text-indigo-200' : 'justify-between text-zinc-500 dark:text-zinc-400'
+                    }`}
+                  >
+                    <span className="font-bold">{authorName}</span>
+                    <span className="text-[9px] opacity-80">
                       {new Date(comment.created_at).toLocaleString('id-ID', {
-                        day: 'numeric',
-                        month: 'short',
                         hour: '2-digit',
                         minute: '2-digit',
+                        day: 'numeric',
+                        month: 'short',
                       })}
                     </span>
                   </div>
-                  <p className="mt-1 whitespace-pre-wrap text-zinc-700 dark:text-zinc-300 leading-relaxed">
+                  <p className="whitespace-pre-wrap leading-relaxed text-xs">
                     {comment.content}
                   </p>
                 </div>
