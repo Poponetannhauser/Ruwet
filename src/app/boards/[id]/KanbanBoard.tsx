@@ -205,12 +205,17 @@ export function KanbanBoard({
               return [...prev, taskWithProfile]
             })
           } else if (payload.eventType === 'UPDATE') {
-            const updated = payload.new as Task
-            const assigneeMember = members.find((m) => m.user_id === updated.assignee_id)
+            const updated = payload.new as Partial<Task> & { id: string }
+            const assigneeId = updated.assignee_id
+            const assigneeMember = assigneeId ? members.find((m) => m.user_id === assigneeId) : undefined
             setTasks((prev) =>
               prev.map((t) =>
                 t.id === updated.id
-                  ? { ...updated, profiles: assigneeMember?.profiles || t.profiles }
+                  ? {
+                      ...t,
+                      ...updated,
+                      profiles: assigneeMember !== undefined ? (assigneeMember?.profiles || null) : t.profiles,
+                    }
                   : t
               )
             )
