@@ -248,7 +248,9 @@ export function KanbanBoard({
           }
         }
       )
-      .subscribe()
+      .subscribe((status, err) => {
+        console.log(`[Realtime Board ${boardId}] Status:`, status, err || '')
+      })
 
     return () => {
       supabase.removeChannel(channel)
