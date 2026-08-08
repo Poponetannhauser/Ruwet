@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useSyncExternalStore } from 'react'
+import { createClient } from '@/lib/supabase/client'
 import {
   DndContext,
   DragOverlay,
@@ -20,7 +21,6 @@ import {
   arrayMove,
 } from '@dnd-kit/sortable'
 import { useDroppable } from '@dnd-kit/core'
-import { createClient } from '@/lib/supabase/client'
 import { ColumnHeader } from './ColumnHeader'
 import { AddColumnButton } from './AddColumnButton'
 import { CreateTaskModal } from './CreateTaskModal'
@@ -158,10 +158,18 @@ export function KanbanBoard({
   members,
   currentUserId,
 }: KanbanBoardProps) {
+  const [columns, setColumns] = useState<Column[]>(initialColumns)
   const [tasks, setTasks] = useState<Task[]>(initialTasks)
   const [activeTask, setActiveTask] = useState<Task | null>(null)
   const [previousTasksState, setPreviousTasksState] = useState<Task[]>(initialTasks)
   const [, setTick] = useState(0)
+
+  // Track props update for initialColumns
+  const [prevInitialColumns, setPrevInitialColumns] = useState(initialColumns)
+  if (prevInitialColumns !== initialColumns) {
+    setPrevInitialColumns(initialColumns)
+    setColumns(initialColumns)
+  }
 
   // Interval timer (setiap 30 detik) untuk update badge stale secara otomatis
   useEffect(() => {
@@ -170,6 +178,82 @@ export function KanbanBoard({
     }, 30000)
     return () => clearInterval(timer)
   }, [])
+
+  // Realtime subscription for board tasks & columns
+  useEffect(() => {
+    const supabase = createClient()
+    const channel = supabase
+      .channel(`board-realtime:${boardId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'tasks',
+          filter: `board_id=eq.${boardId}`,
+        },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            const newTask = payload.new as Task
+            const assigneeMember = members.find((m) => m.user_id === newTask.assignee_id)
+            const taskWithProfile: Task = {
+              ...newTask,
+              profiles: assigneeMember?.profiles || null,
+            }
+            setTasks((prev) => {
+              if (prev.some((t) => t.id === newTask.id)) return prev
+              return [...prev, taskWithProfile]
+            })
+          } else if (payload.eventType === 'UPDATE') {
+            const updated = payload.new as Task
+            const assigneeMember = members.find((m) => m.user_id === updated.assignee_id)
+            setTasks((prev) =>
+              prev.map((t) =>
+                t.id === updated.id
+                  ? { ...updated, profiles: assigneeMember?.profiles || t.profiles }
+                  : t
+              )
+            )
+          } else if (payload.eventType === 'DELETE') {
+            const oldId = payload.old.id
+            setTasks((prev) => prev.filter((t) => t.id !== oldId))
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'columns',
+          filter: `board_id=eq.${boardId}`,
+        },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            const newCol = payload.new as Column
+            setColumns((prev) => {
+              if (prev.some((c) => c.id === newCol.id)) return prev
+              return [...prev, newCol].sort((a, b) => a.position - b.position)
+            })
+          } else if (payload.eventType === 'UPDATE') {
+            const updatedCol = payload.new as Column
+            setColumns((prev) =>
+              prev
+                .map((c) => (c.id === updatedCol.id ? updatedCol : c))
+                .sort((a, b) => a.position - b.position)
+            )
+          } else if (payload.eventType === 'DELETE') {
+            const oldId = payload.old.id
+            setColumns((prev) => prev.filter((c) => c.id !== oldId))
+          }
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [boardId, members])
   // Track online/offline status via useSyncExternalStore
   const isOnline = useSyncExternalStore(
     (callback) => {
@@ -301,7 +385,7 @@ export function KanbanBoard({
 
     const activeColumnId = findColumnOfTask(activeId)
     // `over` bisa berupa task id lain atau column id
-    const overColumnId = initialColumns.some((c) => c.id === overId)
+    const overColumnId = columns.some((c) => c.id === overId)
       ? overId
       : findColumnOfTask(overId)
 
@@ -342,7 +426,7 @@ export function KanbanBoard({
 
     if (!currentTaskState || !originalTask) return
 
-    const targetColumnId = initialColumns.some((c) => c.id === overId)
+    const targetColumnId = columns.some((c) => c.id === overId)
       ? overId
       : findColumnOfTask(overId) || currentTaskState.column_id
 
@@ -429,14 +513,14 @@ export function KanbanBoard({
         onDragEnd={handleDragEnd}
       >
         <div className="flex gap-6 items-start">
-        {initialColumns.map((col) => {
+        {columns.map((col) => {
           const colTasks = tasks.filter((t) => t.column_id === col.id)
           return (
             <ColumnContainer
               key={col.id}
               column={col}
               tasks={colTasks}
-              columns={initialColumns}
+              columns={columns}
               members={members}
               currentUserId={currentUserId}
               staleThresholdHours={staleThresholdHours}
@@ -451,7 +535,7 @@ export function KanbanBoard({
           <div className="opacity-80 rotate-2 scale-105 shadow-2xl">
             <TaskCard
               task={activeTask}
-              columns={initialColumns}
+              columns={columns}
               members={members}
               currentUserId={currentUserId}
             />

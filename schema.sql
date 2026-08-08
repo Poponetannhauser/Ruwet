@@ -348,3 +348,6 @@ alter publication supabase_realtime add table columns;
 alter publication supabase_realtime add table comments;
 alter publication supabase_realtime add table notifications;
 alter table tasks replica identity full;
+alter table columns replica identity full;
+alter table comments replica identity full;
+alter table notifications replica identity full;
