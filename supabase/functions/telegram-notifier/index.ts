@@ -1,6 +1,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import {
   sendTelegramMessage,
+  escapeHtml,
   formatAssignNotification,
   formatStaleNotification,
 } from '../_shared/telegram.ts'
@@ -34,12 +35,12 @@ Deno.serve(async (req: Request) => {
 
   try {
     const payload = await req.json()
-    const { type, record, old_record, event_type } = payload
+    const { type, table, record, old_record, event_type } = payload
 
     // Event 1: Task Assignment (via Database Webhook or direct trigger)
     if (
       event_type === 'assign' ||
-      (type === 'UPDATE' && record?.assignee_id && record.assignee_id !== old_record?.assignee_id)
+      (table === 'tasks' && type === 'UPDATE' && record?.assignee_id && record.assignee_id !== old_record?.assignee_id)
     ) {
       const assigneeId = record?.assignee_id || payload.assignee_id
       const taskId = record?.id || payload.task_id
@@ -47,7 +48,6 @@ Deno.serve(async (req: Request) => {
       const taskTitle = record?.title || payload.task_title || 'Tugas Baru'
 
       if (assigneeId && taskId && boardId) {
-        // Fetch assignee profile
         const { data: profile } = await supabase
           .from('profiles')
           .select('telegram_chat_id')
@@ -55,7 +55,6 @@ Deno.serve(async (req: Request) => {
           .single()
 
         if (profile?.telegram_chat_id) {
-          // Fetch board name
           const { data: board } = await supabase
             .from('boards')
             .select('name')
@@ -121,10 +120,61 @@ Deno.serve(async (req: Request) => {
       }
     }
 
+    // Event 3: Comment Notification (No-content for privacy, per PRD 1.1)
+    if (
+      event_type === 'comment' ||
+      (table === 'comments' && type === 'INSERT')
+    ) {
+      const taskId = record?.task_id || payload.task_id
+      const commenterId = record?.user_id || payload.commenter_id
+
+      if (taskId && commenterId) {
+        // Fetch task details
+        const { data: task } = await supabase
+          .from('tasks')
+          .select('id, task_number, title, board_id, assignee_id, boards(name)')
+          .eq('id', taskId)
+          .single()
+
+        // Only notify if task is assigned and commenter is NOT the assignee
+        if (task && task.assignee_id && task.assignee_id !== commenterId) {
+          const { data: assigneeProfile } = await supabase
+            .from('profiles')
+            .select('telegram_chat_id')
+            .eq('id', task.assignee_id)
+            .single()
+
+          if (assigneeProfile?.telegram_chat_id) {
+            const { data: commenterProfile } = await supabase
+              .from('profiles')
+              .select('full_name')
+              .eq('id', commenterId)
+              .single()
+
+            const commenterName = commenterProfile?.full_name || 'Seseorang'
+            const boardName = task.boards?.name || 'Board'
+            const numStr = task.task_number !== null && task.task_number !== undefined ? `#${task.task_number} ` : ''
+            const taskLink = `${appBaseUrl}/boards/${task.board_id}`
+
+            // Activity-only notification, EXCLUDING comment text content for privacy
+            const commentMsg =
+              `💬 <b>Komentar Baru pada Task</b>\n\n` +
+              `<b>${escapeHtml(commenterName)}</b> menambahkan komentar pada task <b>${numStr}${escapeHtml(task.title)}</b> di board <b>${escapeHtml(boardName)}</b>.\n\n` +
+              `🔗 <a href="${taskLink}">Buka Task di Ruwet</a>`
+
+            await sendTelegramMessage(botToken, {
+              chat_id: assigneeProfile.telegram_chat_id,
+              text: commentMsg,
+              parse_mode: 'HTML',
+            })
+          }
+        }
+      }
+    }
+
     return new Response('OK', { status: 200 })
   } catch (err) {
     console.error('Notifier processing error:', err)
-    // Return 200 OK so failed notification side-effects don't break main DB transactions
     return new Response('OK', { status: 200 })
   }
 })
