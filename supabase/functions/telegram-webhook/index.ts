@@ -1,5 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { sendTelegramMessage, escapeHtml, formatBoardLink } from '../_shared/telegram.ts'
+import { sendTelegramMessage, escapeHtml, formatBoardLink, logTelegramMetric } from '../_shared/telegram.ts'
 
 Deno.serve(async (req: Request) => {
   if (req.method !== 'POST') {
@@ -42,15 +42,19 @@ Deno.serve(async (req: Request) => {
         await handleStartCommand(chatId, text, botToken, supabase)
         break
       case '/mytasks':
+        await logTelegramMetric(supabase, 'command_mytasks', chatId)
         await handleMyTasksCommand(chatId, botToken, supabase)
         break
       case '/stale':
+        await logTelegramMetric(supabase, 'command_stale', chatId)
         await handleStaleCommand(chatId, botToken, supabase)
         break
       case '/task':
+        await logTelegramMetric(supabase, 'command_task', chatId, { text })
         await handleTaskCommand(chatId, text, botToken, supabase)
         break
       case '/help':
+        await logTelegramMetric(supabase, 'command_help', chatId)
         await handleHelpCommand(chatId, botToken)
         break
       default:

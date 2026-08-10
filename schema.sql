@@ -397,3 +397,23 @@ alter table tasks replica identity full;
 alter table columns replica identity full;
 alter table comments replica identity full;
 alter table notifications replica identity full;
+
+-------------------------------------------------------
+-- TELEGRAM BOT METRICS
+-------------------------------------------------------
+
+create table if not exists telegram_metrics (
+  id uuid primary key default gen_random_uuid(),
+  event_type text not null,
+  chat_id text,
+  metadata jsonb default '{}'::jsonb,
+  created_at timestamptz default now()
+);
+
+alter table telegram_metrics enable row level security;
+
+create policy "Allow service role full access to telegram_metrics"
+  on telegram_metrics for all
+  to service_role
+  using (true)
+  with check (true);

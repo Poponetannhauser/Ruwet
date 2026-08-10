@@ -4,6 +4,7 @@ import {
   escapeHtml,
   formatAssignNotification,
   formatStaleNotification,
+  logTelegramMetric,
 } from '../_shared/telegram.ts'
 
 Deno.serve(async (req: Request) => {
@@ -75,6 +76,7 @@ Deno.serve(async (req: Request) => {
             text: messageText,
             parse_mode: 'HTML',
           })
+          await logTelegramMetric(supabase, 'push_assign', profile.telegram_chat_id, { taskId, boardId })
         }
       }
     }
@@ -116,6 +118,7 @@ Deno.serve(async (req: Request) => {
             text: messageText,
             parse_mode: 'HTML',
           })
+          await logTelegramMetric(supabase, 'push_stale', profile.telegram_chat_id, { taskId, boardId })
         }
       }
     }
@@ -167,6 +170,7 @@ Deno.serve(async (req: Request) => {
               text: commentMsg,
               parse_mode: 'HTML',
             })
+            await logTelegramMetric(supabase, 'push_comment', assigneeProfile.telegram_chat_id, { taskId, commenterId })
           }
         }
       }
