@@ -12,6 +12,9 @@ create table profiles (
   id uuid references auth.users on delete cascade primary key,
   full_name text not null,
   avatar_url text,
+  telegram_chat_id text unique,
+  telegram_link_token text,
+  telegram_link_expires_at timestamptz,
   created_at timestamptz default now()
 );
 
@@ -117,6 +120,30 @@ create policy "Allow users to insert their own profile"
   on profiles for insert
   to authenticated
   with check (auth.uid() = id);
+
+-- Protect telegram fields from being modified directly by authenticated client
+create or replace function protect_profile_telegram_fields()
+returns trigger as $$
+begin
+  if (auth.role() = 'authenticated') then
+    if (new.telegram_chat_id is distinct from old.telegram_chat_id) then
+      raise exception 'telegram_chat_id cannot be modified directly from client';
+    end if;
+    if (new.telegram_link_token is distinct from old.telegram_link_token) then
+      raise exception 'telegram_link_token cannot be modified directly from client';
+    end if;
+    if (new.telegram_link_expires_at is distinct from old.telegram_link_expires_at) then
+      raise exception 'telegram_link_expires_at cannot be modified directly from client';
+    end if;
+  end if;
+  return new;
+end;
+$$ language plpgsql security definer;
+
+drop trigger if exists tr_protect_profile_telegram_fields on profiles;
+create trigger tr_protect_profile_telegram_fields
+  before update on profiles
+  for each row execute function protect_profile_telegram_fields();
 
 -- 2. Boards Policies
 create policy "Users can view boards they are members of"
