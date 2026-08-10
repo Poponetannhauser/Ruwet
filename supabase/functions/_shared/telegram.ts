@@ -38,6 +38,11 @@ export function escapeHtml(str: string): string {
     .replace(/"/g, '&quot;')
 }
 
+export function formatBoardLink(boardId: string): string {
+  const appBaseUrl = Deno.env.get('APP_BASE_URL') || 'http://localhost:3000'
+  return `${appBaseUrl}/boards/${boardId}`
+}
+
 export function formatAssignNotification(params: {
   taskTitle: string
   boardName: string
