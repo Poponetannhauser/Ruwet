@@ -15,6 +15,7 @@ create table profiles (
   telegram_chat_id text unique,
   telegram_link_token text,
   telegram_link_expires_at timestamptz,
+  onboarding_dismissed boolean default false,
   created_at timestamptz default now()
 );
 
