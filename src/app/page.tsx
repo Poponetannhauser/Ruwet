@@ -4,7 +4,6 @@ import { createClient } from '@/lib/supabase/server'
 import { logout } from './(auth)/actions'
 import { CreateBoardModal } from './boards/CreateBoardModal'
 
-
 export default async function Home() {
   const supabase = await createClient()
   const {
@@ -46,11 +45,9 @@ export default async function Home() {
               height={36}
               className="h-9 w-9 rounded-xl object-cover border border-white/10 shadow-md"
             />
-
             <span className="text-xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-zinc-200 to-zinc-400">
               Ruwet
             </span>
-
             <span className="hidden sm:inline-block rounded-full bg-indigo-500/10 border border-indigo-500/20 px-2.5 py-0.5 text-[10px] font-semibold text-indigo-400">
               v1.0
             </span>
@@ -79,9 +76,15 @@ export default async function Home() {
             <div className="flex items-center gap-3">
               <Link
                 href="/login"
-                className="rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-indigo-500/20 hover:opacity-95 transition"
+                className="rounded-lg bg-zinc-800/80 border border-white/10 px-3.5 py-1.5 text-xs font-medium text-zinc-300 hover:bg-zinc-700 hover:text-white transition"
               >
                 Masuk
+              </Link>
+              <Link
+                href="/signup"
+                className="rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-indigo-500/20 hover:opacity-95 transition"
+              >
+                Daftar Gratis
               </Link>
             </div>
           )}
@@ -92,7 +95,7 @@ export default async function Home() {
       <main className="flex flex-1 w-full max-w-7xl flex-col p-6 sm:p-10 mx-auto space-y-8">
         {user ? (
           <div className="space-y-8">
-            {/* Hero / Header Section */}
+            {/* Dashboard Header Section */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-panel p-6 sm:p-8 rounded-2xl">
               <div>
                 <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
@@ -172,23 +175,110 @@ export default async function Home() {
             </div>
           </div>
         ) : (
-          <div className="flex flex-1 flex-col items-center justify-center text-center my-auto py-20 px-4">
-            <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 px-4 py-1.5 text-xs font-semibold text-indigo-300 mb-6">
-              ✨ Modern Task Accountability Platform
+          /* Public Landing Page Section */
+          <div className="flex flex-col items-center space-y-16 py-12">
+            {/* G2: Hero Section */}
+            <div className="flex flex-col items-center text-center max-w-3xl space-y-6">
+              <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 px-4 py-1.5 text-xs font-semibold text-indigo-300">
+                ✨ Platform Kanban &amp; Akuntabilitas Tugas Tim
+              </div>
+
+              <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white leading-tight">
+                Kelola Tugas Tim dengan{' '}
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-violet-400 to-pink-400">
+                  Akuntabilitas Realtime
+                </span>
+              </h1>
+
+              <p className="text-base sm:text-lg text-zinc-400 max-w-2xl leading-relaxed">
+                Ruwet membantu tim kecil bekerja lebih fokus: deteksi otomatis tugas macet (stale tasks), kolaborasi realtime, dan asisten bot Telegram personal.
+              </p>
+
+              {/* G5: Wired CTA Buttons */}
+              <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
+                <Link
+                  href="/signup"
+                  className="w-full sm:w-auto rounded-xl bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-500 px-8 py-3.5 text-sm font-extrabold text-white shadow-xl shadow-indigo-500/25 hover:opacity-95 transition text-center"
+                >
+                  Daftar Gratis Sekarang →
+                </Link>
+                <Link
+                  href="/login"
+                  className="w-full sm:w-auto rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-white/10 px-8 py-3.5 text-sm font-bold text-zinc-300 hover:text-white transition text-center"
+                >
+                  Masuk ke Akun
+                </Link>
+              </div>
             </div>
-            <h2 className="text-4xl sm:text-6xl font-black tracking-tight text-white max-w-3xl leading-tight">
-              Kelola Tugas Tim dengan <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-violet-400 to-pink-400">Akuntabilitas Realtime</span>
-            </h2>
-            <p className="mt-6 text-base sm:text-lg text-zinc-400 max-w-xl">
-              Deteksi tugas macet (stale tasks) secara otomatis, berkolaborasi tanpa delay, dan tingkatkan produktivitas tim Anda.
-            </p>
-            <div className="mt-10 flex items-center gap-4">
-              <Link
-                href="/login"
-                className="rounded-xl bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-500 px-8 py-3.5 text-sm font-extrabold text-white shadow-xl shadow-indigo-500/25 hover:opacity-95 transition"
-              >
-                Mulai Sekarang →
-              </Link>
+
+            {/* G3: Feature Highlights Section */}
+            <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
+              <div className="rounded-2xl glass-card p-6 flex flex-col justify-between border border-white/10 hover:border-indigo-500/30 transition">
+                <div>
+                  <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-2xl mb-4 text-indigo-400">
+                    ⚡
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-2">Real-time Sync</h3>
+                  <p className="text-xs text-zinc-400 leading-relaxed">
+                    Pergerakan kartu task, perubahan status, dan diskusi komentar tersinkronisasi secara instan ke seluruh anggota tim tanpa perlu reload.
+                  </p>
+                </div>
+              </div>
+
+              <div className="rounded-2xl glass-card p-6 flex flex-col justify-between border border-white/10 hover:border-amber-500/30 transition">
+                <div>
+                  <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-2xl mb-4 text-amber-400">
+                    🚦
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-2">Stale Task Detection</h3>
+                  <p className="text-xs text-zinc-400 leading-relaxed">
+                    Indikator otomatis (Hijau, Kuning, Merah) menandai tugas yang stagnan/berhenti melebihi threshold jam agar cepat ditindaklanjuti.
+                  </p>
+                </div>
+              </div>
+
+              <div className="rounded-2xl glass-card p-6 flex flex-col justify-between border border-white/10 hover:border-sky-500/30 transition">
+                <div>
+                  <div className="w-12 h-12 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-2xl mb-4 text-sky-400">
+                    🤖
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-2">Telegram Bot Companion</h3>
+                  <p className="text-xs text-zinc-400 leading-relaxed">
+                    Dapatkan notifikasi penugasan &amp; komentar langsung di Telegram personal Anda, serta query ringkasan tugas lewat perintah `/mytasks`.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* G4: Static Board Screenshot Container */}
+            <div className="w-full flex flex-col items-center pt-8">
+              <div className="w-full rounded-2xl glass-panel p-2 sm:p-4 border border-white/10 shadow-2xl overflow-hidden relative">
+                <div className="flex items-center gap-2 px-3 py-2 border-b border-white/5 mb-3 bg-zinc-950/60 rounded-t-xl">
+                  <div className="w-3 h-3 rounded-full bg-rose-500/80" />
+                  <div className="w-3 h-3 rounded-full bg-amber-500/80" />
+                  <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
+                  <span className="text-[11px] text-zinc-400 font-mono ml-2">ruwet.app/boards/demo</span>
+                </div>
+                <div className="relative w-full aspect-[16/9] min-h-[280px] bg-zinc-900 rounded-xl overflow-hidden flex items-center justify-center">
+                  <Image
+                    src="/screenshot-board.png"
+                    alt="Preview Kanban Board Ruwet"
+                    fill
+                    className="object-cover rounded-xl"
+                    onError={(e) => {
+                      // Fallback visual if screenshot file doesn't exist yet
+                      e.currentTarget.style.display = 'none'
+                    }}
+                  />
+                  <div className="p-8 text-center space-y-3 max-w-md">
+                    <div className="text-4xl">📋</div>
+                    <h4 className="text-base font-bold text-white">Preview Kanban Board Ruwet</h4>
+                    <p className="text-xs text-zinc-400 leading-relaxed">
+                      Tampilan workspace modern dengan kolom interaktif, badge stale real-time, dan manajemen tim terpadu.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -196,4 +286,3 @@ export default async function Home() {
     </div>
   )
 }
-
