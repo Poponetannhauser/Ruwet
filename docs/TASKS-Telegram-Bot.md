@@ -182,17 +182,17 @@ Belum ada sebelumnya, jadi ini draft awal berdasarkan titik rawan yang disebut d
 
 ## 3. Milestone C — Evaluasi & Lanjutan
 
-- [ ] **C1 — Instrumentasi metrik command vs push**
+- [x] **C1 — Instrumentasi metrik command vs push**
   Commit: `feat(telegram-notify): log command and notification response metrics`
   - Sesuai PRD Bagian 11 (rasio command pull vs push yang direspons)
   - Review: automated saja
 
-- [ ] **C2 — Review pemakaian nyata**
+- [x] **C2 — Review pemakaian nyata**
   Commit: `docs: summarize real usage review for milestone C`
   - Bukan kode — dokumentasi hasil evaluasi
   - Review: 🔒 manual (baca datanya sendiri dengan jujur)
 
-- [ ] **C3 — Decision doc P1/P2 lanjutan**
+- [x] **C3 — Decision doc P1/P2 lanjutan**
   Commit: `docs: decide on P1/P2 continuation based on usage data`
   - Putuskan lanjut/tidak `/board`, reply-comment dari Telegram, dll — berdasar data, bukan asumsi (PRD Bagian 12)
   - Review: 🔒 manual

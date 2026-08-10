@@ -63,3 +63,20 @@ export function formatStaleNotification(params: {
   return `⚠️ <b>Tugas Stale (Perlu Perhatian)!</b>\n\n` +
          `Task <b>${escapeHtml(params.taskTitle)}</b> di board <b>${escapeHtml(params.boardName)}</b> belum mengalami pembaruan status selama &gt;${params.hoursStale} jam.${link}`
 }
+
+export async function logTelegramMetric(
+  supabase: any,
+  eventType: string,
+  chatId?: string | number,
+  metadata: Record<string, unknown> = {}
+): Promise<void> {
+  try {
+    await supabase.from('telegram_metrics').insert({
+      event_type: eventType,
+      chat_id: chatId ? String(chatId) : null,
+      metadata,
+    })
+  } catch (err) {
+    console.error('Failed to log telegram metric:', err)
+  }
+}
