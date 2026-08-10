@@ -63,6 +63,8 @@ export function LandingScreenshot() {
             src={current.src}
             alt={current.alt}
             fill
+            sizes="(max-width: 1200px) 100vw, 1200px"
+            quality={85}
             className="object-cover object-top rounded-xl transition-all duration-300"
             onError={() =>
               setErrorTabs((prev) => ({ ...prev, [activeTab]: true }))
