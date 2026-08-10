@@ -7,8 +7,18 @@ Deno.serve(async (req: Request) => {
   }
 
   const botToken = Deno.env.get('TELEGRAM_BOT_TOKEN')
+  const webhookSecret = Deno.env.get('TELEGRAM_WEBHOOK_SECRET')
   const supabaseUrl = Deno.env.get('SUPABASE_URL')
   const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+
+  // Validate secret token header if TELEGRAM_WEBHOOK_SECRET is configured
+  if (webhookSecret) {
+    const receivedSecret = req.headers.get('X-Telegram-Bot-Api-Secret-Token')
+    if (receivedSecret !== webhookSecret) {
+      console.warn('Unauthorized webhook call: missing or invalid secret token header')
+      return new Response('Unauthorized', { status: 401 })
+    }
+  }
 
   if (!botToken || !supabaseUrl || !supabaseServiceKey) {
     console.error('Missing environment variables for telegram-webhook')
