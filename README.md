@@ -21,7 +21,6 @@ Aplikasi manajemen task / kanban board modern berbasis **Next.js 15 (App Router)
 - **Drag and Drop:** `@dnd-kit/core` & `@dnd-kit/sortable`
 - **Database & Auth:** Supabase PostgreSQL + Auth + Realtime
 - **Edge Functions:** Supabase Edge Functions (Deno) — Telegram bot handler & notifier
-- **Proxy Tooling:** RTK (Rust Token Killer)
 
 ---
 
