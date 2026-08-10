@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
@@ -82,7 +82,14 @@ export function TaskCard({
   const isDoneColumn = currentColumn?.name.trim().toLowerCase() === 'done'
   const hasAssignee = !!task.assignee_id
 
-  const [nowMs] = useState(() => Date.now())
+  const [nowMs, setNowMs] = useState(() => Date.now())
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNowMs(Date.now())
+    }, 5000)
+    return () => clearInterval(timer)
+  }, [])
 
   let staleStatus: 'green' | 'yellow' | 'red' | null = null
 
