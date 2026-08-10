@@ -17,14 +17,7 @@ export function TelegramSettingsModal({ isOpen, onClose }: TelegramSettingsModal
   const [copied, setCopied] = useState(false)
   const [showUnlinkConfirm, setShowUnlinkConfirm] = useState(false)
 
-  useEffect(() => {
-    if (isOpen) {
-      fetchStatus()
-      setShowUnlinkConfirm(false)
-    }
-  }, [isOpen])
-
-  async function fetchStatus() {
+  const fetchStatus = async () => {
     try {
       setLoading(true)
       setError(null)
@@ -45,6 +38,15 @@ export function TelegramSettingsModal({ isOpen, onClose }: TelegramSettingsModal
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchStatus()
+    } else {
+      setShowUnlinkConfirm(false)
+    }
+  }, [isOpen])
+
 
   async function handleGenerateLink() {
     try {
