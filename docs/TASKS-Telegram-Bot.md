@@ -135,46 +135,46 @@ Belum ada sebelumnya, jadi ini draft awal berdasarkan titik rawan yang disebut d
 
 ## 2. Milestone B — Command Pull
 
-- [ ] **B1 — Command dispatcher/routing**
+- [x] **B1 — Command dispatcher/routing**
   Commit: `feat(telegram-command): add command router in edge function`
   - Parse incoming update, route berdasar command (`/mytasks`, `/stale`, `/task`) ke handler masing-masing
   - Review: automated saja
 
-- [ ] **B2 — Migrasi `tasks.task_number`**
+- [x] **B2 — Migrasi `tasks.task_number`**
   Commit: `migration(schema): add sequential task_number per board`
   - Kolom `task_number` (integer, not null), auto-increment per `board_id` (trigger atau logic di app)
   - Backfill task_number untuk task existing
   - Tampilkan `#<task_number>` di card web app (kecil, konsisten dgn bot)
   - Review: 🔒 manual — backfill di data existing rawan salah, cek dulu di staging
 
-- [ ] **B3 — Command `/mytasks`**
+- [x] **B3 — Command `/mytasks`**
   Commit: `feat(telegram-command): implement /mytasks command`
   - Query task assigned ke user (by `telegram_chat_id` → `profiles.id`), tunduk RLS yang sama seperti web
   - Review: automated saja
 
-- [ ] **B4 — Command `/stale`**
+- [x] **B4 — Command `/stale`**
   Commit: `feat(telegram-command): implement /stale command`
   - List task stale di board yang diikuti user
   - Review: automated saja
 
-- [ ] **B5 — Command `/task` + disambiguation**
+- [x] **B5 — Command `/task` + disambiguation**
   Commit: `feat(telegram-command): implement /task lookup by number or keyword`
   - Angka → exact match `task_number`; bukan angka → partial match nama
   - >1 hasil → balas daftar pilihan (lihat PRD Bagian 6 Flow 3)
   - Ikuti rtk-rules #5 (murni query, tanpa cache state)
   - Review: automated saja, tapi coba manual sekali untuk kasus ambigu
 
-- [ ] **B6 — Helper link balik ke web app**
+- [x] **B6 — Helper link balik ke web app**
   Commit: `refactor(telegram-command): extract shared task-link helper`
   - Satu fungsi dipakai semua command/notifier biar formatnya konsisten
   - Review: automated saja
 
-- [ ] **B7 — Notifikasi komentar (no-content)**
+- [x] **B7 — Notifikasi komentar (no-content)**
   Commit: `feat(telegram-notify): send activity-only notification on new comment`
   - Format sesuai PRD 1.1 — nama commenter + link, tanpa isi komentar
   - Review: 🔒 manual — pastikan isi komentar benar-benar tidak ikut terkirim (privacy-sensitive kalau lupa)
 
-- [ ] **B8 — Testing command end-to-end**
+- [x] **B8 — Testing command end-to-end**
   Commit: `test(telegram-command): manual e2e verification for all commands`
   - Review: 🔒 manual
 
