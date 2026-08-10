@@ -15,10 +15,12 @@ export function TelegramSettingsModal({ isOpen, onClose }: TelegramSettingsModal
   const [expiresAt, setExpiresAt] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [showUnlinkConfirm, setShowUnlinkConfirm] = useState(false)
 
   useEffect(() => {
     if (isOpen) {
       fetchStatus()
+      setShowUnlinkConfirm(false)
     }
   }, [isOpen])
 
@@ -65,9 +67,7 @@ export function TelegramSettingsModal({ isOpen, onClose }: TelegramSettingsModal
     }
   }
 
-  async function handleUnlink() {
-    if (!confirm('Apakah Anda yakin ingin memutuskan koneksi Telegram?')) return
-
+  async function executeUnlink() {
     try {
       setLoading(true)
       setError(null)
@@ -81,6 +81,7 @@ export function TelegramSettingsModal({ isOpen, onClose }: TelegramSettingsModal
       setChatId(null)
       setDeepLink(null)
       setExpiresAt(null)
+      setShowUnlinkConfirm(false)
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Terjadi kesalahan'
       setError(msg)
@@ -103,7 +104,10 @@ export function TelegramSettingsModal({ isOpen, onClose }: TelegramSettingsModal
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
       <div className="w-full max-w-md rounded-2xl glass-modal p-6 shadow-2xl border border-white/10 text-white relative">
         <button
-          onClick={onClose}
+          onClick={() => {
+            setShowUnlinkConfirm(false)
+            onClose()
+          }}
           className="absolute top-4 right-4 text-zinc-400 hover:text-white transition"
         >
           ✕
@@ -154,16 +158,45 @@ export function TelegramSettingsModal({ isOpen, onClose }: TelegramSettingsModal
         {/* Actions section */}
         {chatId ? (
           <div className="flex flex-col gap-3">
-            <p className="text-xs text-zinc-400 leading-relaxed">
-              Akun Anda sudah terhubung. Jika ingin mengganti akun Telegram atau memutuskan notifikasi, silakan klik tombol di bawah.
-            </p>
-            <button
-              onClick={handleUnlink}
-              disabled={loading}
-              className="w-full rounded-xl bg-rose-950/50 hover:bg-rose-900/60 border border-rose-800/50 py-2.5 text-xs font-bold text-rose-300 transition"
-            >
-              {loading ? 'Memproses...' : 'Putuskan Koneksi Telegram'}
-            </button>
+            {!showUnlinkConfirm ? (
+              <>
+                <p className="text-xs text-zinc-400 leading-relaxed">
+                  Akun Anda sudah terhubung. Jika ingin mengganti akun Telegram atau memutuskan notifikasi, silakan klik tombol di bawah.
+                </p>
+                <button
+                  onClick={() => setShowUnlinkConfirm(true)}
+                  disabled={loading}
+                  className="w-full rounded-xl bg-rose-950/50 hover:bg-rose-900/60 border border-rose-800/50 py-2.5 text-xs font-bold text-rose-300 transition"
+                >
+                  Putuskan Koneksi Telegram
+                </button>
+              </>
+            ) : (
+              <div className="rounded-xl bg-rose-950/40 border border-rose-800/40 p-4 space-y-3">
+                <div>
+                  <h3 className="text-xs font-bold text-rose-300">Yakin ingin memutuskan koneksi?</h3>
+                  <p className="text-[11px] text-zinc-400 mt-1 leading-relaxed">
+                    Anda tidak akan lagi menerima notifikasi tugas & tidak dapat menggunakan bot Telegram.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 pt-1">
+                  <button
+                    onClick={() => setShowUnlinkConfirm(false)}
+                    disabled={loading}
+                    className="flex-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 py-2 text-xs font-bold text-zinc-300 transition"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    onClick={executeUnlink}
+                    disabled={loading}
+                    className="flex-1 rounded-lg bg-rose-600 hover:bg-rose-500 py-2 text-xs font-bold text-white transition disabled:opacity-50"
+                  >
+                    {loading ? 'Memproses...' : 'Ya, Putuskan'}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <div className="flex flex-col gap-4">
