@@ -1,5 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { sendTelegramMessage, escapeHtml, formatBoardLink, logTelegramMetric } from '../_shared/telegram.ts'
+import { sendTelegramMessage, escapeHtml, formatBoardLink, logTelegramMetric, formatPriorityBadge } from '../_shared/telegram.ts'
+
 
 Deno.serve(async (req: Request) => {
   if (req.method !== 'POST') {
@@ -186,7 +187,7 @@ async function handleMyTasksCommand(chatId: number, botToken: string, supabase: 
 
   const { data: tasks } = await supabase
     .from('tasks')
-    .select('id, task_number, title, due_date, board_id, boards(name), column_id, columns(name)')
+    .select('id, task_number, title, due_date, priority, board_id, boards(name), column_id, columns(name)')
     .eq('assignee_id', profile.id)
     .order('created_at', { ascending: false })
 
@@ -197,23 +198,25 @@ async function handleMyTasksCommand(chatId: number, botToken: string, supabase: 
   if (activeTasks.length === 0) {
     await sendTelegramMessage(botToken, {
       chat_id: chatId,
-      text: `🎉 <b>Tidak ada tugas aktif yang ditugaskan kepada Anda saat ini.</b>`,
+      text: `<b>Tidak ada tugas aktif yang ditugaskan kepada Anda saat ini.</b>`,
       parse_mode: 'HTML',
     })
     return
   }
 
-  let text = `📋 <b>Tugas Anda (${activeTasks.length}):</b>\n\n`
+  let text = `<b>Tugas Anda (${activeTasks.length}):</b>\n\n`
   activeTasks.forEach((t: any) => {
     const num = t.task_number !== null && t.task_number !== undefined ? `#${t.task_number} ` : ''
     const boardName = t.boards?.name ? escapeHtml(t.boards.name) : 'Board'
     const colName = t.columns?.name ? escapeHtml(t.columns.name) : 'Status'
     const link = formatBoardLink(t.board_id)
+    const priorityTag = formatPriorityBadge(t.priority)
 
-    text += `• <b>${num}${escapeHtml(t.title)}</b>\n`
+    text += `• ${priorityTag}<b>${num}${escapeHtml(t.title)}</b>\n`
     text += `  └ Board: <i>${boardName}</i> | Status: <i>${colName}</i>\n`
     text += `  🔗 <a href="${link}">Buka Board</a>\n\n`
   })
+
 
   await sendTelegramMessage(botToken, {
     chat_id: chatId,
@@ -351,7 +354,7 @@ async function handleTaskCommand(chatId: number, text: string, botToken: string,
     const taskNum = parseInt(numMatch[1], 10)
     const { data } = await supabase
       .from('tasks')
-      .select('id, task_number, title, description, due_date, board_id, boards(name), column_id, columns(name), assignee_id, profiles:assignee_id(full_name)')
+      .select('id, task_number, title, description, due_date, priority, board_id, boards(name), column_id, columns(name), assignee_id, profiles:assignee_id(full_name)')
       .in('board_id', boardIds)
       .eq('task_number', taskNum)
 
@@ -359,7 +362,7 @@ async function handleTaskCommand(chatId: number, text: string, botToken: string,
   } else {
     const { data } = await supabase
       .from('tasks')
-      .select('id, task_number, title, description, due_date, board_id, boards(name), column_id, columns(name), assignee_id, profiles:assignee_id(full_name)')
+      .select('id, task_number, title, description, due_date, priority, board_id, boards(name), column_id, columns(name), assignee_id, profiles:assignee_id(full_name)')
       .in('board_id', boardIds)
       .ilike('title', `%${query}%`)
       .limit(10)
@@ -370,7 +373,7 @@ async function handleTaskCommand(chatId: number, text: string, botToken: string,
   if (results.length === 0) {
     await sendTelegramMessage(botToken, {
       chat_id: chatId,
-      text: `❌ <b>Tugas tidak ditemukan</b> untuk pencarian "<code>${escapeHtml(query)}</code>".`,
+      text: `<b>Tugas tidak ditemukan</b> untuk pencarian "<code>${escapeHtml(query)}</code>".`,
       parse_mode: 'HTML',
     })
     return
@@ -378,13 +381,14 @@ async function handleTaskCommand(chatId: number, text: string, botToken: string,
 
   // Disambiguation (>1 results)
   if (results.length > 1) {
-    let text = `🔍 <b>Ditemukan (${results.length}) tugas yang cocok:</b>\n\n`
+    let text = `<b>Ditemukan (${results.length}) tugas yang cocok:</b>\n\n`
     results.forEach((t: any) => {
       const num = t.task_number !== null && t.task_number !== undefined ? `#${t.task_number} ` : ''
       const boardName = t.boards?.name ? escapeHtml(t.boards.name) : 'Board'
-      text += `• <b>${num}${escapeHtml(t.title)}</b> (Board: <i>${boardName}</i>)\n`
+      const priorityTag = formatPriorityBadge(t.priority)
+      text += `• ${priorityTag}<b>${num}${escapeHtml(t.title)}</b> (Board: <i>${boardName}</i>)\n`
     })
-    text += `\n💡 Ketik <code>/task #nomor</code> untuk melihat detail tugas spesifik.`
+    text += `\nKetik <code>/task #nomor</code> untuk melihat detail tugas spesifik.`
 
     await sendTelegramMessage(botToken, {
       chat_id: chatId,
@@ -402,16 +406,19 @@ async function handleTaskCommand(chatId: number, text: string, botToken: string,
   const assigneeName = t.profiles?.full_name ? escapeHtml(t.profiles.full_name) : 'Belum ditugaskan'
   const dueDateStr = t.due_date ? new Date(t.due_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Tanpa tenggat'
   const descStr = t.description ? escapeHtml(t.description) : '<i>Tidak ada deskripsi</i>'
+  const priorityBadge = formatPriorityBadge(t.priority)
   const link = formatBoardLink(t.board_id)
 
   const cardText =
-    `📌 <b>${numStr}${escapeHtml(t.title)}</b>\n\n` +
+    `<b>${numStr}${escapeHtml(t.title)}</b>\n\n` +
+    `⚡ <b>Prioritas:</b> ${priorityBadge.trim()}\n` +
     `🏢 <b>Board:</b> ${boardName}\n` +
     `📊 <b>Status:</b> ${colName}\n` +
     `👤 <b>Assignee:</b> ${assigneeName}\n` +
     `📅 <b>Tenggat:</b> ${dueDateStr}\n\n` +
     `📝 <b>Deskripsi:</b>\n${descStr}\n\n` +
     `🔗 <a href="${link}">Buka Task di Board</a>`
+
 
   await sendTelegramMessage(botToken, {
     chat_id: chatId,

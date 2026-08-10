@@ -29,7 +29,9 @@ type Task = {
   description: string | null
   assignee_id: string | null
   due_date: string | null
+  priority?: string
 }
+
 
 type EditTaskModalProps = {
   task: Task
@@ -250,17 +252,36 @@ export function EditTaskModal({
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-                  Tenggat Waktu (Due Date)
-                </label>
-                <input
-                  name="due_date"
-                  type="date"
-                  defaultValue={task.due_date ? task.due_date.split('T')[0] : ''}
-                  className="w-full rounded-md border border-zinc-300 px-3 py-2 text-xs text-zinc-900 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
-                />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                    Tenggat Waktu (Due Date)
+                  </label>
+                  <input
+                    name="due_date"
+                    type="date"
+                    defaultValue={task.due_date ? task.due_date.split('T')[0] : ''}
+                    className="w-full rounded-md border border-zinc-300 px-3 py-2 text-xs text-zinc-900 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                    Prioritas Task
+                  </label>
+                  <select
+                    name="priority"
+                    defaultValue={task.priority || 'medium'}
+                    className="w-full rounded-md border border-zinc-300 px-3 py-2 text-xs text-zinc-900 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white font-medium"
+                  >
+                    <option value="low">Low (Rendah)</option>
+                    <option value="medium">Medium (Sedang)</option>
+                    <option value="high">High (Tinggi)</option>
+                    <option value="urgent">Urgent (Mendesak)</option>
+                  </select>
+                </div>
               </div>
+
 
               <div className="flex items-center justify-between pt-3 border-t border-zinc-100 dark:border-zinc-800">
                 <button

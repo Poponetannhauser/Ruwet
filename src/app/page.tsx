@@ -223,7 +223,10 @@ export default async function Home() {
             {/* Hero Section */}
             <div className="flex flex-col items-center text-center max-w-3xl space-y-6">
               <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 px-4 py-1.5 text-xs font-semibold text-indigo-300">
-                ✨ Platform Kanban &amp; Akuntabilitas Tugas Tim
+                <svg className="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                </svg>
+                <span>Platform Kanban &amp; Akuntabilitas Tugas Tim</span>
               </div>
 
               <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white leading-tight">
@@ -257,8 +260,10 @@ export default async function Home() {
             <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
               <div className="rounded-2xl glass-card p-6 flex flex-col justify-between border border-white/10 hover:border-indigo-500/30 transition">
                 <div>
-                  <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-2xl mb-4 text-indigo-400">
-                    ⚡
+                  <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mb-4 text-indigo-400">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                    </svg>
                   </div>
                   <h3 className="text-lg font-bold text-white mb-2">Real-time Sync</h3>
                   <p className="text-xs text-zinc-400 leading-relaxed">
@@ -269,8 +274,10 @@ export default async function Home() {
 
               <div className="rounded-2xl glass-card p-6 flex flex-col justify-between border border-white/10 hover:border-amber-500/30 transition">
                 <div>
-                  <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-2xl mb-4 text-amber-400">
-                    🚦
+                  <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-4 text-amber-400">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                    </svg>
                   </div>
                   <h3 className="text-lg font-bold text-white mb-2">Stale Task Detection</h3>
                   <p className="text-xs text-zinc-400 leading-relaxed">
@@ -281,8 +288,10 @@ export default async function Home() {
 
               <div className="rounded-2xl glass-card p-6 flex flex-col justify-between border border-white/10 hover:border-sky-500/30 transition">
                 <div>
-                  <div className="w-12 h-12 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-2xl mb-4 text-sky-400">
-                    🤖
+                  <div className="w-12 h-12 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center mb-4 text-sky-400">
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z" />
+                    </svg>
                   </div>
                   <h3 className="text-lg font-bold text-white mb-2">Telegram Bot Companion</h3>
                   <p className="text-xs text-zinc-400 leading-relaxed">
@@ -291,6 +300,7 @@ export default async function Home() {
                 </div>
               </div>
             </div>
+
 
             {/* Static Board Screenshot Container */}
             <div className="w-full flex flex-col items-center pt-8">

@@ -29,6 +29,7 @@ type Task = {
   board_id: string
   column_id: string
   task_number?: number
+  priority?: string
   title: string
   description: string | null
   assignee_id: string | null
@@ -39,6 +40,7 @@ type Task = {
     avatar_url: string | null
   } | null
 }
+
 
 type TaskCardProps = {
   task: Task
@@ -154,14 +156,30 @@ export function TaskCard({
         className="group relative cursor-grab active:cursor-grabbing touch-manipulation rounded-lg border border-zinc-200 bg-white p-3 shadow-sm hover:border-indigo-400 hover:shadow focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-colors dark:border-zinc-800 dark:bg-zinc-900/90 dark:hover:border-indigo-600"
       >
         <div className="flex items-start justify-between gap-2">
-          <h4 className="font-semibold text-xs text-zinc-100 group-hover:text-indigo-300 transition-colors leading-snug flex items-center gap-1.5">
+          <h4 className="font-semibold text-xs text-zinc-100 group-hover:text-indigo-300 transition-colors leading-snug flex flex-wrap items-center gap-1.5">
             {task.task_number !== undefined && (
               <span className="inline-block text-[10px] font-mono font-bold text-zinc-500 bg-zinc-800/80 border border-zinc-700/60 px-1.5 py-0.2 rounded">
                 #{task.task_number}
               </span>
             )}
+            {task.priority && (
+              <span
+                className={`inline-block text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded border ${
+                  task.priority === 'urgent'
+                    ? 'bg-rose-950/80 border-rose-700/60 text-rose-300 animate-pulse'
+                    : task.priority === 'high'
+                    ? 'bg-amber-950/80 border-amber-700/60 text-amber-300'
+                    : task.priority === 'low'
+                    ? 'bg-zinc-800 border-zinc-700 text-zinc-400'
+                    : 'bg-sky-950/80 border-sky-700/60 text-sky-300'
+                }`}
+              >
+                {task.priority}
+              </span>
+            )}
             <span>{task.title}</span>
           </h4>
+
 
           {staleStatus && (
             <span

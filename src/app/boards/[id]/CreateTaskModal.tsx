@@ -142,6 +142,23 @@ export function CreateTaskModal({
                   </div>
                 </div>
 
+                <div>
+                  <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                    Prioritas Task
+                  </label>
+                  <select
+                    name="priority"
+                    defaultValue="medium"
+                    className="w-full rounded-md border border-zinc-300 px-3 py-2 text-xs text-zinc-900 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white font-medium"
+                  >
+                    <option value="low">Low (Rendah)</option>
+                    <option value="medium">Medium (Sedang)</option>
+                    <option value="high">High (Tinggi)</option>
+                    <option value="urgent">Urgent (Mendesak)</option>
+                  </select>
+                </div>
+
+
                 <div className="flex justify-end gap-2 pt-2">
                   <button
                     type="button"

@@ -27,6 +27,11 @@ export async function createTask(boardId: string, columnId: string, formData: Fo
   const description = (formData.get('description') as string) || null
   const assigneeId = (formData.get('assignee_id') as string) || null
   const dueDate = (formData.get('due_date') as string) || null
+  const priorityRaw = (formData.get('priority') as string) || 'medium'
+
+  const priority = ['low', 'medium', 'high', 'urgent'].includes(priorityRaw.toLowerCase())
+    ? priorityRaw.toLowerCase()
+    : 'medium'
 
   if (!title || title.trim() === '') {
     return { error: 'Judul task tidak boleh kosong' }
@@ -64,6 +69,7 @@ export async function createTask(boardId: string, columnId: string, formData: Fo
       description: description ? description.trim() : null,
       assignee_id: targetAssignee,
       due_date: dueDate && dueDate !== '' ? dueDate : null,
+      priority,
       position: newPosition,
       created_by: user.id,
       status_updated_at: now,
@@ -112,6 +118,7 @@ export async function updateTask(taskId: string, boardId: string, formData: Form
   const assigneeId = (formData.get('assignee_id') as string) || null
   const dueDate = (formData.get('due_date') as string) || null
   const columnId = (formData.get('column_id') as string) || null
+  const priorityRaw = (formData.get('priority') as string) || null
 
   if (!title || title.trim() === '') {
     return { error: 'Judul task tidak boleh kosong' }
@@ -148,6 +155,10 @@ export async function updateTask(taskId: string, boardId: string, formData: Form
     assignee_id: targetAssignee,
     due_date: dueDate && dueDate !== '' ? dueDate : null,
     updated_at: now,
+  }
+
+  if (priorityRaw && ['low', 'medium', 'high', 'urgent'].includes(priorityRaw.toLowerCase())) {
+    updateData.priority = priorityRaw.toLowerCase()
   }
 
   if (isColumnChanged) {

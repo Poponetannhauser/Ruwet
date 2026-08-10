@@ -56,11 +56,13 @@ create table tasks (
   assignee_id uuid references profiles(id) on delete set null,
   due_date date,
   task_number integer,
+  priority text default 'medium' check (priority in ('low', 'medium', 'high', 'urgent')),
   status_updated_at timestamptz default now(),
   created_by uuid references profiles(id) on delete set null,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
+
 
 -- Trigger to auto-assign task_number per board_id
 create or replace function set_task_number()
