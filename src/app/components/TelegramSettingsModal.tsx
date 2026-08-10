@@ -17,35 +17,48 @@ export function TelegramSettingsModal({ isOpen, onClose }: TelegramSettingsModal
   const [copied, setCopied] = useState(false)
   const [showUnlinkConfirm, setShowUnlinkConfirm] = useState(false)
 
-  const fetchStatus = async () => {
-    try {
+  useEffect(() => {
+    if (!isOpen) {
+      setShowUnlinkConfirm(false)
+      return
+    }
+
+    let isMounted = true
+
+    async function loadStatus() {
       setLoading(true)
       setError(null)
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
+      try {
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!isMounted || !user) return
 
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('telegram_chat_id')
-        .eq('id', user.id)
-        .single()
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('telegram_chat_id')
+          .eq('id', user.id)
+          .single()
 
-      setChatId(profile?.telegram_chat_id || null)
-    } catch (err: unknown) {
-      console.error('Error fetching Telegram status:', err)
-    } finally {
-      setLoading(false)
+        if (isMounted) {
+          setChatId(profile?.telegram_chat_id || null)
+        }
+      } catch (err: unknown) {
+        console.error('Error fetching Telegram status:', err)
+      } finally {
+        if (isMounted) {
+          setLoading(false)
+        }
+      }
     }
-  }
 
-  useEffect(() => {
-    if (isOpen) {
-      fetchStatus()
-    } else {
-      setShowUnlinkConfirm(false)
+    loadStatus()
+
+    return () => {
+      isMounted = false
     }
   }, [isOpen])
+
+
 
 
   async function handleGenerateLink() {
