@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { addComment, getComments } from './commentActions'
 
@@ -29,12 +29,18 @@ export function CommentSection({
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const commentsEndRef = useRef<HTMLDivElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  const scrollToBottom = () => {
+    commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
 
   useEffect(() => {
     let isMounted = true
+    const supabase = createClient()
 
     async function initUserAndComments() {
-      const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (isMounted && user) {
         setCurrentUserId(user.id)
@@ -47,18 +53,61 @@ export function CommentSection({
       }
       if (isMounted) {
         setLoading(false)
+        setTimeout(scrollToBottom, 100)
       }
     }
 
     initUserAndComments()
 
+    // Realtime subscription for comments on this task
+    const channel = supabase
+      .channel(`task-comments:${taskId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'comments',
+          filter: `task_id=eq.${taskId}`,
+        },
+        async (payload) => {
+          const newCommentPayload = payload.new as {
+            id: string
+            task_id: string
+            user_id: string
+            content: string
+            created_at: string
+          }
+
+          // Fetch profile of commenter if not already present
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('full_name, avatar_url')
+            .eq('id', newCommentPayload.user_id)
+            .maybeSingle()
+
+          const newComment: Comment = {
+            ...newCommentPayload,
+            profiles: profile || null,
+          }
+
+          setComments((prev) => {
+            if (prev.some((c) => c.id === newComment.id)) return prev
+            return [...prev, newComment]
+          })
+          setTimeout(scrollToBottom, 100)
+        }
+      )
+      .subscribe()
+
     return () => {
       isMounted = false
+      supabase.removeChannel(channel)
     }
   }, [taskId])
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
+  async function handleSubmit(e?: React.FormEvent) {
+    if (e) e.preventDefault()
     if (!content.trim()) return
 
     setError(null)
@@ -71,6 +120,24 @@ export function CommentSection({
     } else {
       setContent('')
       setSubmitting(false)
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto'
+      }
+    }
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSubmit()
+    }
+  }
+
+  function handleInput(e: React.ChangeEvent<HTMLTextAreaElement>) {
+    setContent(e.target.value)
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`
     }
   }
 
@@ -89,8 +156,14 @@ export function CommentSection({
         ) : (
           comments.map((comment) => {
             const isMe = currentUserId ? comment.user_id === currentUserId : false
-            const authorName = isMe ? 'Anda' : (comment.profiles?.full_name || 'User')
-            const authorInitial = (comment.profiles?.full_name || 'User').charAt(0).toUpperCase()
+            const authorName = comment.profiles?.full_name || 'User'
+            const authorInitial = authorName.charAt(0).toUpperCase()
+            const timeFormatted = new Date(comment.created_at).toLocaleString('id-ID', {
+              hour: '2-digit',
+              minute: '2-digit',
+              day: 'numeric',
+              month: 'short',
+            })
 
             return (
               <div
@@ -100,7 +173,7 @@ export function CommentSection({
                 }`}
               >
                 <div
-                  title={comment.profiles?.full_name || 'User'}
+                  title={authorName}
                   className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white shadow-xs ${
                     isMe
                       ? 'bg-gradient-to-br from-indigo-600 to-violet-600'
@@ -111,28 +184,23 @@ export function CommentSection({
                 </div>
 
                 <div
-                  className={`max-w-[80%] rounded-2xl p-3 shadow-xs ${
+                  className={`max-w-[85%] rounded-2xl px-3 py-2 shadow-xs ${
                     isMe
                       ? 'rounded-br-xs bg-indigo-600 text-white'
                       : 'rounded-bl-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200/60 dark:border-zinc-700/60'
                   }`}
                 >
-                  <div
-                    className={`flex items-center gap-2 mb-1 text-[11px] ${
-                      isMe ? 'justify-end text-indigo-200' : 'justify-between text-zinc-500 dark:text-zinc-400'
-                    }`}
-                  >
-                    <span className="font-bold">{authorName}</span>
-                    <span className="text-[9px] opacity-80">
-                      {new Date(comment.created_at).toLocaleString('id-ID', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        day: 'numeric',
-                        month: 'short',
-                      })}
-                    </span>
-                  </div>
-                  <p className="whitespace-pre-wrap leading-relaxed text-xs">
+                  {isMe ? (
+                    <div className="flex justify-end text-[9px] opacity-70 mb-0.5">
+                      <span>{timeFormatted}</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between gap-2 mb-1 text-[11px] text-zinc-500 dark:text-zinc-400">
+                      <span className="font-bold">{authorName}</span>
+                      <span className="text-[9px] opacity-80">{timeFormatted}</span>
+                    </div>
+                  )}
+                  <p className="whitespace-pre-wrap leading-relaxed text-xs break-words">
                     {comment.content}
                   </p>
                 </div>
@@ -140,24 +208,28 @@ export function CommentSection({
             )
           })
         )}
+        <div ref={commentsEndRef} />
       </div>
 
       <form onSubmit={handleSubmit} className="pt-2 border-t border-zinc-100 dark:border-zinc-800 space-y-2">
         {error && <div className="text-xs text-red-500">{error}</div>}
-        <div className="flex gap-2">
-          <input
-            type="text"
+        <div className="flex gap-2 items-end">
+          <textarea
+            ref={textareaRef}
             value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Tulis komentar..."
-            className="flex-1 rounded-lg border border-zinc-300 px-3 py-2 text-xs text-zinc-900 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+            onChange={handleInput}
+            onKeyDown={handleKeyDown}
+            maxLength={2000}
+            rows={1}
+            placeholder="Tulis komentar... (Enter untuk kirim, Shift+Enter baris baru)"
+            className="flex-1 rounded-lg border border-zinc-300 px-3 py-2 text-xs text-zinc-900 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white resize-none min-h-[36px] max-h-[120px]"
           />
           <button
             type="submit"
             disabled={submitting || !content.trim()}
-            className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-700 disabled:opacity-50 transition-all shadow-xs"
+            className="flex h-9 items-center gap-1.5 rounded-lg bg-indigo-600 px-4 text-xs font-semibold text-white hover:bg-indigo-700 disabled:opacity-50 transition-all shadow-xs shrink-0"
           >
-            <span>{submitting ? 'Kirim...' : 'Kirim'}</span>
+            <span>{submitting ? '...' : 'Kirim'}</span>
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9-7-9-7-9 7 9 7zm0 0v-8" />
             </svg>
@@ -167,3 +239,4 @@ export function CommentSection({
     </div>
   )
 }
+
