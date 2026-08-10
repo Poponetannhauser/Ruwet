@@ -54,12 +54,31 @@ create table tasks (
   description text,
   assignee_id uuid references profiles(id) on delete set null,
   due_date date,
-  position int not null,
+  task_number integer,
   status_updated_at timestamptz default now(),
   created_by uuid references profiles(id) on delete set null,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
+
+-- Trigger to auto-assign task_number per board_id
+create or replace function set_task_number()
+returns trigger as $$
+begin
+  if new.task_number is null then
+    select coalesce(max(task_number), 0) + 1
+    into new.task_number
+    from tasks
+    where board_id = new.board_id;
+  end if;
+  return new;
+end;
+$$ language plpgsql;
+
+drop trigger if exists tr_set_task_number on tasks;
+create trigger tr_set_task_number
+  before insert on tasks
+  for each row execute function set_task_number();
 
 -- 6. Task activity log
 create table activity_log (
