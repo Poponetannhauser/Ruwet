@@ -130,7 +130,7 @@ export default async function Home() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-panel p-6 sm:p-8 rounded-2xl">
               <div>
                 <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-                  Dashboard Board Kanban
+                  Dashboard Kanban
                 </h2>
                 <p className="mt-1 text-sm text-zinc-400">
                   Kelola tugas, pantau stale tasks, dan tingkatkan akuntabilitas tim.
