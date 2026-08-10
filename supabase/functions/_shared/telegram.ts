@@ -29,3 +29,32 @@ export async function sendTelegramMessage(botToken: string, options: TelegramMes
     return false
   }
 }
+
+export function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
+
+export function formatAssignNotification(params: {
+  taskTitle: string
+  boardName: string
+  taskLink?: string
+}): string {
+  const link = params.taskLink ? `\n\n🔗 <a href="${params.taskLink}">Buka Task di Ruwet</a>` : ''
+  return `📌 <b>Tugas Baru Diberikan!</b>\n\n` +
+         `Anda telah ditugaskan pada task <b>${escapeHtml(params.taskTitle)}</b> di board <b>${escapeHtml(params.boardName)}</b>.${link}`
+}
+
+export function formatStaleNotification(params: {
+  taskTitle: string
+  boardName: string
+  hoursStale: number
+  taskLink?: string
+}): string {
+  const link = params.taskLink ? `\n\n🔗 <a href="${params.taskLink}">Buka Task di Ruwet</a>` : ''
+  return `⚠️ <b>Tugas Stale (Perlu Perhatian)!</b>\n\n` +
+         `Task <b>${escapeHtml(params.taskTitle)}</b> di board <b>${escapeHtml(params.boardName)}</b> belum mengalami pembaruan status selama &gt;${params.hoursStale} jam.${link}`
+}
