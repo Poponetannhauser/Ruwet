@@ -30,7 +30,8 @@ export function InviteMemberModal({ boardId }: InviteMemberModalProps) {
     setSuccessMessage(null)
     setLoading(true)
 
-    const formData = new FormData(event.currentTarget)
+    const form = event.currentTarget
+    const formData = new FormData(form)
     const email = formData.get('email') as string
 
     const result = await addBoardMemberByEmail(boardId, email)
@@ -39,8 +40,9 @@ export function InviteMemberModal({ boardId }: InviteMemberModalProps) {
       setError(result.error)
     } else {
       setSuccessMessage('Anggota berhasil ditambahkan ke board!')
-      event.currentTarget.reset()
+      form.reset()
     }
+
     setLoading(false)
   }
 

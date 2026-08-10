@@ -316,3 +316,27 @@ export async function joinBoard(boardId: string) {
   revalidatePath('/')
   redirect(`/boards/${boardId}`)
 }
+
+export async function dismissOnboarding() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Unauthorized' }
+  }
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({ onboarding_dismissed: true })
+    .eq('id', user.id)
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  revalidatePath('/')
+  return { success: true }
+}
+
