@@ -43,7 +43,12 @@ next-env.d.ts
 
 # agent rules & temp docs
 .agents/
-docs/issues.md
-docs/ui_todo.md
+docs/*
+
+# supabase temp
+supabase/.temp/
+
+# Windows Zone.Identifier files
+*.Zone.Identifier
 
 
