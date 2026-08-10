@@ -82,9 +82,6 @@ export default async function Home() {
             <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-indigo-500/15 via-purple-500/15 to-pink-500/15 border border-indigo-500/30 px-2.5 py-0.5 text-[10px] font-bold text-indigo-300 shadow-sm shadow-indigo-500/10">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span>v2.4.0</span>
-              <span className="bg-gradient-to-r from-indigo-400 to-pink-400 bg-clip-text text-transparent uppercase tracking-wider text-[9px] font-black">
-                PRO
-              </span>
             </span>
           </div>
 
