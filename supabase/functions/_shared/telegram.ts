@@ -43,6 +43,20 @@ export function formatBoardLink(boardId: string): string {
   return `${appBaseUrl}/boards/${boardId}`
 }
 
+export function formatPriorityBadge(priority?: string): string {
+  const p = (priority || 'medium').toLowerCase()
+  switch (p) {
+    case 'urgent':
+      return '[🔴 URGENT] '
+    case 'high':
+      return '[🟠 HIGH] '
+    case 'low':
+      return '[⚪ LOW] '
+    default:
+      return '[🔵 MED] '
+  }
+}
+
 export function formatAssignNotification(params: {
   taskTitle: string
   boardName: string
