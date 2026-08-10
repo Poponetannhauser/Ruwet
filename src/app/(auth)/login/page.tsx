@@ -40,16 +40,23 @@ export default async function LoginPage({
         </div>
 
         {error && (
-          <div className="rounded-xl bg-rose-950/80 border border-rose-800/60 p-4 text-xs font-semibold text-rose-300 shadow-sm">
-            ⚠️ {error}
+          <div className="flex items-center gap-2 rounded-xl bg-rose-950/80 border border-rose-800/60 p-4 text-xs font-semibold text-rose-300 shadow-sm">
+            <svg className="w-4 h-4 text-rose-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+            </svg>
+            <span>{error}</span>
           </div>
         )}
 
         {message && (
-          <div className="rounded-xl bg-emerald-950/80 border border-emerald-800/60 p-4 text-xs font-semibold text-emerald-300 shadow-sm">
-            ✅ {message}
+          <div className="flex items-center gap-2 rounded-xl bg-emerald-950/80 border border-emerald-800/60 p-4 text-xs font-semibold text-emerald-300 shadow-sm">
+            <svg className="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{message}</span>
           </div>
         )}
+
 
         <form className="mt-8 space-y-5" action={login}>
           <div className="space-y-4">

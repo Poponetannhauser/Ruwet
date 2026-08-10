@@ -40,10 +40,14 @@ export default async function SignupPage({
         </div>
 
         {error && (
-          <div className="rounded-xl bg-rose-950/80 border border-rose-800/60 p-4 text-xs font-semibold text-rose-300 shadow-sm">
-            ⚠️ {error}
+          <div className="flex items-center gap-2 rounded-xl bg-rose-950/80 border border-rose-800/60 p-4 text-xs font-semibold text-rose-300 shadow-sm">
+            <svg className="w-4 h-4 text-rose-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+            </svg>
+            <span>{error}</span>
           </div>
         )}
+
 
         <form className="mt-8 space-y-5" action={signup}>
           <div className="space-y-4">

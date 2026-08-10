@@ -48,7 +48,7 @@ export function ColumnHeader({ column }: ColumnHeaderProps) {
   }
 
   return (
-    <div className="mb-3">
+    <div>
       {isEditing ? (
         <form onSubmit={handleUpdate} className="flex items-center gap-1.5">
           <input
@@ -56,24 +56,29 @@ export function ColumnHeader({ column }: ColumnHeaderProps) {
             defaultValue={name}
             required
             autoFocus
-            className="w-full rounded-xl bg-zinc-900 border border-indigo-500/60 px-3 py-1.5 text-xs font-bold text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+            className="w-full rounded-xl bg-zinc-900 border border-indigo-500/60 px-3 py-1 text-xs font-bold text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
           />
           <button
             type="submit"
             disabled={loading}
-            className="rounded-lg bg-indigo-600 px-2.5 py-1.5 text-xs font-bold text-white hover:bg-indigo-500 disabled:opacity-50 transition"
+            className="rounded-lg bg-indigo-600 px-2 py-1 text-xs font-bold text-white hover:bg-indigo-500 disabled:opacity-50 transition"
           >
-            ✓
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4.5 12.75l6 6 9-13.5" />
+            </svg>
           </button>
           <button
             type="button"
             onClick={() => setIsEditing(false)}
-            className="rounded-lg bg-zinc-800 border border-white/10 px-2.5 py-1.5 text-xs font-bold text-zinc-400 hover:bg-zinc-700 hover:text-white transition"
+            className="rounded-lg bg-zinc-800 border border-white/10 px-2 py-1 text-xs font-bold text-zinc-400 hover:bg-zinc-700 hover:text-white transition"
           >
-            ✕
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
         </form>
       ) : (
+
         <div className="flex items-center justify-between group py-1">
           <div className="flex items-center gap-2">
             <span
