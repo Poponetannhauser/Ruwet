@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 import { logout } from './(auth)/actions'
 import { CreateBoardModal } from './boards/CreateBoardModal'
+import { OnboardingChecklist } from './components/OnboardingChecklist'
 
 export default async function Home() {
   const supabase = await createClient()
@@ -10,9 +11,21 @@ export default async function Home() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Fetch boards if user is logged in
   let boards: { id: string; name: string; created_at: string; owner_id: string }[] = []
+  let onboardingDismissed = false
+  let hasMembers = false
+  let hasTask = false
+
   if (user) {
+    // Fetch profile onboarding_dismissed status
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('onboarding_dismissed')
+      .eq('id', user.id)
+      .single()
+
+    onboardingDismissed = profile?.onboarding_dismissed || false
+
     const { data: memberBoards } = await supabase
       .from('board_members')
       .select('board_id')
@@ -29,6 +42,22 @@ export default async function Home() {
       if (data) {
         boards = data
       }
+
+      // Check if any of user's boards have > 1 member (team member joined)
+      const { count: totalMemberRows } = await supabase
+        .from('board_members')
+        .select('id', { count: 'exact', head: true })
+        .in('board_id', boardIds)
+
+      hasMembers = (totalMemberRows || 0) > boardIds.length
+
+      // Check if any tasks exist on user's boards
+      const { count: taskCount } = await supabase
+        .from('tasks')
+        .select('id', { count: 'exact', head: true })
+        .in('board_id', boardIds)
+
+      hasTask = (taskCount || 0) > 0
     }
   }
 
@@ -108,6 +137,15 @@ export default async function Home() {
               <CreateBoardModal />
             </div>
 
+            {/* Onboarding Checklist Component */}
+            {!onboardingDismissed && (
+              <OnboardingChecklist
+                hasBoard={boards.length > 0}
+                hasMembers={hasMembers}
+                hasTask={hasTask}
+              />
+            )}
+
             {/* Board Cards Grid */}
             <div>
               <div className="flex items-center justify-between mb-4">
@@ -157,16 +195,19 @@ export default async function Home() {
                   })}
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center rounded-2xl glass-panel p-12 text-center space-y-4">
+                /* Improved Empty State (Task G9) */
+                <div className="flex flex-col items-center justify-center rounded-2xl glass-panel p-12 text-center space-y-5 border border-indigo-500/20 shadow-2xl">
                   <div className="h-16 w-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-3xl">
-                    ⚡
+                    🚀
                   </div>
-                  <h3 className="text-lg font-bold text-white">
-                    Belum Ada Board Kanban
-                  </h3>
-                  <p className="text-xs text-zinc-400 max-w-sm">
-                    Anda belum terhubung ke board kanban mana pun. Buat board baru untuk mulai mengelola task tim Anda.
-                  </p>
+                  <div className="space-y-1 max-w-md">
+                    <h3 className="text-xl font-extrabold text-white">
+                      Selamat Datang! Mari Buat Board Pertama Anda
+                    </h3>
+                    <p className="text-xs text-zinc-400 leading-relaxed">
+                      Anda belum memiliki workspace kanban. Klik tombol di bawah untuk membuat board baru dan mulai berkolaborasi dengan tim Anda.
+                    </p>
+                  </div>
                   <div className="pt-2">
                     <CreateBoardModal />
                   </div>
@@ -177,7 +218,7 @@ export default async function Home() {
         ) : (
           /* Public Landing Page Section */
           <div className="flex flex-col items-center space-y-16 py-12">
-            {/* G2: Hero Section */}
+            {/* Hero Section */}
             <div className="flex flex-col items-center text-center max-w-3xl space-y-6">
               <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 px-4 py-1.5 text-xs font-semibold text-indigo-300">
                 ✨ Platform Kanban &amp; Akuntabilitas Tugas Tim
@@ -194,7 +235,6 @@ export default async function Home() {
                 Ruwet membantu tim kecil bekerja lebih fokus: deteksi otomatis tugas macet (stale tasks), kolaborasi realtime, dan asisten bot Telegram personal.
               </p>
 
-              {/* G5: Wired CTA Buttons */}
               <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
                 <Link
                   href="/signup"
@@ -211,7 +251,7 @@ export default async function Home() {
               </div>
             </div>
 
-            {/* G3: Feature Highlights Section */}
+            {/* Feature Highlights Section */}
             <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
               <div className="rounded-2xl glass-card p-6 flex flex-col justify-between border border-white/10 hover:border-indigo-500/30 transition">
                 <div>
@@ -250,7 +290,7 @@ export default async function Home() {
               </div>
             </div>
 
-            {/* G4: Static Board Screenshot Container */}
+            {/* Static Board Screenshot Container */}
             <div className="w-full flex flex-col items-center pt-8">
               <div className="w-full rounded-2xl glass-panel p-2 sm:p-4 border border-white/10 shadow-2xl overflow-hidden relative">
                 <div className="flex items-center gap-2 px-3 py-2 border-b border-white/5 mb-3 bg-zinc-950/60 rounded-t-xl">
@@ -266,7 +306,6 @@ export default async function Home() {
                     fill
                     className="object-cover rounded-xl"
                     onError={(e) => {
-                      // Fallback visual if screenshot file doesn't exist yet
                       e.currentTarget.style.display = 'none'
                     }}
                   />
