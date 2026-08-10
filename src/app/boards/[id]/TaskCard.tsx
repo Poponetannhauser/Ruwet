@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
@@ -28,6 +28,7 @@ type Task = {
   id: string
   board_id: string
   column_id: string
+  task_number?: number
   title: string
   description: string | null
   assignee_id: string | null
@@ -81,7 +82,14 @@ export function TaskCard({
   const isDoneColumn = currentColumn?.name.trim().toLowerCase() === 'done'
   const hasAssignee = !!task.assignee_id
 
-  const [nowMs] = useState(() => Date.now())
+  const [nowMs, setNowMs] = useState(() => Date.now())
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNowMs(Date.now())
+    }, 5000)
+    return () => clearInterval(timer)
+  }, [])
 
   let staleStatus: 'green' | 'yellow' | 'red' | null = null
 
@@ -146,8 +154,13 @@ export function TaskCard({
         className="group relative cursor-grab active:cursor-grabbing touch-manipulation rounded-lg border border-zinc-200 bg-white p-3 shadow-sm hover:border-indigo-400 hover:shadow focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-colors dark:border-zinc-800 dark:bg-zinc-900/90 dark:hover:border-indigo-600"
       >
         <div className="flex items-start justify-between gap-2">
-          <h4 className="font-semibold text-xs text-zinc-100 group-hover:text-indigo-300 transition-colors leading-snug">
-            {task.title}
+          <h4 className="font-semibold text-xs text-zinc-100 group-hover:text-indigo-300 transition-colors leading-snug flex items-center gap-1.5">
+            {task.task_number !== undefined && (
+              <span className="inline-block text-[10px] font-mono font-bold text-zinc-500 bg-zinc-800/80 border border-zinc-700/60 px-1.5 py-0.2 rounded">
+                #{task.task_number}
+              </span>
+            )}
+            <span>{task.title}</span>
           </h4>
 
           {staleStatus && (

@@ -12,6 +12,9 @@ create table profiles (
   id uuid references auth.users on delete cascade primary key,
   full_name text not null,
   avatar_url text,
+  telegram_chat_id text unique,
+  telegram_link_token text,
+  telegram_link_expires_at timestamptz,
   created_at timestamptz default now()
 );
 
@@ -51,12 +54,31 @@ create table tasks (
   description text,
   assignee_id uuid references profiles(id) on delete set null,
   due_date date,
-  position int not null,
+  task_number integer,
   status_updated_at timestamptz default now(),
   created_by uuid references profiles(id) on delete set null,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
+
+-- Trigger to auto-assign task_number per board_id
+create or replace function set_task_number()
+returns trigger as $$
+begin
+  if new.task_number is null then
+    select coalesce(max(task_number), 0) + 1
+    into new.task_number
+    from tasks
+    where board_id = new.board_id;
+  end if;
+  return new;
+end;
+$$ language plpgsql;
+
+drop trigger if exists tr_set_task_number on tasks;
+create trigger tr_set_task_number
+  before insert on tasks
+  for each row execute function set_task_number();
 
 -- 6. Task activity log
 create table activity_log (
@@ -117,6 +139,30 @@ create policy "Allow users to insert their own profile"
   on profiles for insert
   to authenticated
   with check (auth.uid() = id);
+
+-- Protect telegram fields from being modified directly by authenticated client
+create or replace function protect_profile_telegram_fields()
+returns trigger as $$
+begin
+  if (auth.role() = 'authenticated') then
+    if (new.telegram_chat_id is distinct from old.telegram_chat_id) then
+      raise exception 'telegram_chat_id cannot be modified directly from client';
+    end if;
+    if (new.telegram_link_token is distinct from old.telegram_link_token) then
+      raise exception 'telegram_link_token cannot be modified directly from client';
+    end if;
+    if (new.telegram_link_expires_at is distinct from old.telegram_link_expires_at) then
+      raise exception 'telegram_link_expires_at cannot be modified directly from client';
+    end if;
+  end if;
+  return new;
+end;
+$$ language plpgsql security definer;
+
+drop trigger if exists tr_protect_profile_telegram_fields on profiles;
+create trigger tr_protect_profile_telegram_fields
+  before update on profiles
+  for each row execute function protect_profile_telegram_fields();
 
 -- 2. Boards Policies
 create policy "Users can view boards they are members of"
@@ -351,3 +397,23 @@ alter table tasks replica identity full;
 alter table columns replica identity full;
 alter table comments replica identity full;
 alter table notifications replica identity full;
+
+-------------------------------------------------------
+-- TELEGRAM BOT METRICS
+-------------------------------------------------------
+
+create table if not exists telegram_metrics (
+  id uuid primary key default gen_random_uuid(),
+  event_type text not null,
+  chat_id text,
+  metadata jsonb default '{}'::jsonb,
+  created_at timestamptz default now()
+);
+
+alter table telegram_metrics enable row level security;
+
+create policy "Allow service role full access to telegram_metrics"
+  on telegram_metrics for all
+  to service_role
+  using (true)
+  with check (true);

@@ -9,6 +9,7 @@ Aplikasi manajemen task / kanban board modern berbasis **Next.js 15 (App Router)
 - 💬 **Interactive Comment Section**: Fitur diskusi komentar per task dengan tampilan chat bubble intuitif.
 - 📜 **Automatic Activity Log**: Pencatatan riwayat aktivitas task otomatis (dibuat, dipindah, di-assign, diubah).
 - 🔔 **In-App Notifications**: Notifikasi lonceng realtime saat user ditugaskan (assigned) pada task baru.
+- 🤖 **Telegram Bot Companion**: Bot Telegram personal ("sekretaris pribadi") yang mengirim notifikasi penting dan mendukung command pull untuk ringkasan status task langsung dari chat.
 - 🔒 **Security Hardened**: Proteksi RLS (Row Level Security) Supabase, verifikasi IDOR/cross-board di Server Actions, serta in-memory Rate Limiting.
 
 ## Tech Stack
@@ -19,6 +20,7 @@ Aplikasi manajemen task / kanban board modern berbasis **Next.js 15 (App Router)
 - **Animations:** Framer Motion
 - **Drag and Drop:** `@dnd-kit/core` & `@dnd-kit/sortable`
 - **Database & Auth:** Supabase PostgreSQL + Auth + Realtime
+- **Edge Functions:** Supabase Edge Functions (Deno) — Telegram bot handler & notifier
 - **Proxy Tooling:** RTK (Rust Token Killer)
 
 ---
@@ -60,18 +62,61 @@ Aplikasi manajemen task / kanban board modern berbasis **Next.js 15 (App Router)
    - Buka menu **SQL Editor** pada Supabase Dashboard.
    - Buka file [`schema.sql`](schema.sql) dari repositori ini, salin seluruh kodenya, lalu tempel dan jalankan (**Run**) di SQL Editor.
    - Skrip ini otomatis mengonfigurasi:
-     - Tabel utama (`profiles`, `boards`, `board_members`, `columns`, `tasks`, `activity_log`, `comments`, `notifications`).
+     - Tabel utama (`profiles`, `boards`, `board_members`, `columns`, `tasks`, `activity_log`, `comments`, `notifications`, `telegram_metrics`).
      - Trigger otomatis pendaftaran user dari `auth.users` ke `public.profiles`.
+     - Trigger `task_number` sekuensial per board.
      - Kebijakan Keamanan RLS (Row Level Security).
 
 6. **Konfigurasi Auth & Redirect URL:**
    - Di Supabase Dashboard, masuk ke **Authentication > Providers** dan pastikan **Email** aktif.
-   - Di **Authentication > URL Configuration**, tambahkan Redirect URL lokal (`http://localhost:3000`) dan domain deployment Vercel Anda.
+   - Di **Authentication > URL Configuration**, tambahkan Redirect URL lokal (`http://localhost:3000`) dan domain deployment Anda.
 
 7. **Jalankan Server Pengembangan:**
    ```bash
    bun run dev
    ```
    Buka [http://localhost:3000](http://localhost:3000) di browser.
+
+---
+
+## Fitur Telegram Bot
+
+Bot Telegram terintegrasi berfungsi sebagai *sekretaris pribadi* tiap anggota tim — memberikan notifikasi dan akses ringkasan status task langsung dari Telegram tanpa harus membuka web app.
+
+### Cara Menghubungkan Akun
+1. Buka web app → **Settings / Profile**
+2. Klik tombol **"Connect Telegram"**
+3. Ikuti instruksi yang muncul — kamu akan diarahkan ke bot Telegram
+4. Kirim perintah yang tertera ke bot, akun langsung terhubung
+
+### Command yang Tersedia
+| Command | Fungsi |
+|---|---|
+| `/mytasks` | Tampilkan daftar task aktif yang di-assign ke kamu |
+| `/stale` | Tampilkan task yang belum diperbarui melebihi threshold di board kamu |
+| `/task <nomor atau kata kunci>` | Lihat detail singkat satu task (cari by nomor `#1` atau kata kunci judul) |
+| `/help` | Tampilkan daftar perintah yang tersedia |
+
+### Notifikasi Push Otomatis
+Bot secara otomatis mengirim notifikasi saat:
+- 📌 Kamu **di-assign** ke task baru
+- ⚠️ Task yang kamu pegang menjadi **stale** (melewati threshold waktu tanpa update)
+- 💬 Ada **komentar baru** pada task yang kamu handle *(notifikasi aktivitas saja — isi komentar tidak dikirim)*
+
+### Setup Bot untuk Self-Host
+Untuk menjalankan fitur bot di environment sendiri, diperlukan:
+1. Buat bot Telegram via `@BotFather` → dapatkan **Bot Token**
+2. Set Supabase Secrets:
+   ```bash
+   supabase secrets set TELEGRAM_BOT_TOKEN="..."
+   supabase secrets set TELEGRAM_WEBHOOK_SECRET="..."
+   supabase secrets set APP_BASE_URL="https://your-domain.com"
+   ```
+3. Deploy Edge Functions:
+   ```bash
+   supabase functions deploy telegram-webhook
+   supabase functions deploy telegram-notifier
+   ```
+4. Daftarkan webhook Telegram ke URL Edge Function Anda
 
 ---
