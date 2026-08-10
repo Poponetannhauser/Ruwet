@@ -4,6 +4,8 @@ import { createClient } from '@/lib/supabase/server'
 import { logout } from './(auth)/actions'
 import { CreateBoardModal } from './boards/CreateBoardModal'
 import { OnboardingChecklist } from './components/OnboardingChecklist'
+import { LandingScreenshot } from './components/LandingScreenshot'
+
 
 export default async function Home() {
   const supabase = await createClient()
@@ -299,26 +301,10 @@ export default async function Home() {
                   <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
                   <span className="text-[11px] text-zinc-400 font-mono ml-2">ruwet.app/boards/demo</span>
                 </div>
-                <div className="relative w-full aspect-[16/9] min-h-[280px] bg-zinc-900 rounded-xl overflow-hidden flex items-center justify-center">
-                  <Image
-                    src="/screenshot-board.png"
-                    alt="Preview Kanban Board Ruwet"
-                    fill
-                    className="object-cover rounded-xl"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none'
-                    }}
-                  />
-                  <div className="p-8 text-center space-y-3 max-w-md">
-                    <div className="text-4xl">📋</div>
-                    <h4 className="text-base font-bold text-white">Preview Kanban Board Ruwet</h4>
-                    <p className="text-xs text-zinc-400 leading-relaxed">
-                      Tampilan workspace modern dengan kolom interaktif, badge stale real-time, dan manajemen tim terpadu.
-                    </p>
-                  </div>
-                </div>
+                <LandingScreenshot />
               </div>
             </div>
+
           </div>
         )}
       </main>
