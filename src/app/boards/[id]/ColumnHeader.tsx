@@ -90,7 +90,8 @@ export function ColumnHeader({ column }: ColumnHeaderProps) {
             </span>
           </div>
 
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity mr-3">
+
             <button
               onClick={() => setIsEditing(true)}
               className="rounded-md p-1 text-zinc-400 hover:bg-zinc-800 hover:text-indigo-300 transition-colors"
