@@ -19,15 +19,32 @@ export default async function JoinBoardPage({
     redirect(`/login?next=/boards/join/${id}`)
   }
 
-  // Fetch board details (menggunakan query yang mengizinkan nama board diambil untuk invite page)
-  const { data: board } = await supabase
-    .from('boards')
-    .select('id, name')
-    .eq('id', id)
-    .maybeSingle()
+  // Fetch board details (menggunakan admin client agar non-member yang diundang tetap dapat membaca nama board)
+  let boardName = 'Board'
+  try {
+    const { createAdminClient } = await import('@/lib/supabase/admin')
+    const adminSupabase = createAdminClient()
+    const { data: board } = await adminSupabase
+      .from('boards')
+      .select('name')
+      .eq('id', id)
+      .maybeSingle()
 
-  // Jika RLS memblokir SELECT board untuk non-member, kita bisa berikan fallback info undangan
-  const boardName = board?.name || 'Board Tim'
+    if (board?.name) {
+      boardName = board.name
+    }
+  } catch {
+    const { data: board } = await supabase
+      .from('boards')
+      .select('name')
+      .eq('id', id)
+      .maybeSingle()
+
+    if (board?.name) {
+      boardName = board.name
+    }
+  }
+
 
   // Check if already a member
   const { data: isMember } = await supabase
