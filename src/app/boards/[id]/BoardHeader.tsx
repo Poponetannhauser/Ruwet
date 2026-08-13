@@ -104,12 +104,12 @@ export function BoardHeader({ board, isOwner, members, columns = [], tasks = [] 
   }
 
   return (
-    <div className="sticky top-0 z-30 border-b border-white/10 glass-panel px-4 sm:px-6 py-3 shadow-md w-full">
+    <div className="sticky top-0 z-30 border-b border-zinc-800 bg-zinc-950/90 backdrop-blur-md px-4 sm:px-6 py-3 shadow-xs w-full">
       <div className="flex flex-wrap items-center justify-between gap-4 w-full">
         <div className="flex items-center gap-3">
           <Link
             href="/"
-            className="flex items-center gap-2 rounded-lg bg-zinc-800/80 border border-white/10 px-3 py-1.5 text-xs font-bold text-zinc-300 hover:bg-zinc-700 hover:text-white transition shadow-xs"
+            className="flex items-center gap-2 rounded-lg bg-zinc-900 border border-zinc-800 px-3 py-1.5 text-xs font-bold text-zinc-300 hover:bg-zinc-800 hover:text-white transition shadow-xs"
             title="Kembali ke Dashboard"
           >
             <Image

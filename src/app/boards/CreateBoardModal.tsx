@@ -26,7 +26,7 @@ export function CreateBoardModal() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-500 px-4 py-2.5 text-xs font-extrabold text-white shadow-lg shadow-indigo-500/20 hover:opacity-95 active:scale-[0.99] transition-all"
+        className="flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-indigo-500 active:scale-[0.99] transition-all"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4.5v15m7.5-7.5h-15" />

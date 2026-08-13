@@ -116,8 +116,8 @@ export function TelegramSettingsModal({ isOpen, onClose }: TelegramSettingsModal
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
-      <div className="w-full max-w-md rounded-2xl glass-modal p-6 shadow-2xl border border-white/10 text-white relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-xs">
+      <div className="w-full max-w-md rounded-2xl bg-zinc-900 p-6 shadow-xl border border-zinc-800 text-white relative">
         <button
           onClick={() => {
             setShowUnlinkConfirm(false)
@@ -223,7 +223,7 @@ export function TelegramSettingsModal({ isOpen, onClose }: TelegramSettingsModal
                 <button
                   onClick={handleGenerateLink}
                   disabled={loading}
-                  className="w-full rounded-xl bg-sky-600 hover:bg-sky-500 py-2.5 text-xs font-bold text-white shadow-lg shadow-sky-600/30 transition disabled:opacity-50"
+                  className="w-full rounded-xl bg-sky-600 hover:bg-sky-500 py-2.5 text-xs font-bold text-white transition disabled:opacity-50"
                 >
                   {loading ? 'Membuat Tautan...' : 'Hubungkan Telegram'}
                 </button>
@@ -234,7 +234,7 @@ export function TelegramSettingsModal({ isOpen, onClose }: TelegramSettingsModal
                   <p className="text-xs font-bold text-sky-300 mb-2">
                     1. Klik tombol &quot;Buka Telegram&quot; atau salin tautan di bawah:
                   </p>
-                  <div className="flex items-center gap-2 bg-zinc-950 p-2 rounded-lg border border-white/10">
+                  <div className="flex items-center gap-2 bg-zinc-950 p-2 rounded-lg border border-zinc-800">
                     <input
                       readOnly
                       value={deepLink}
@@ -258,14 +258,13 @@ export function TelegramSettingsModal({ isOpen, onClose }: TelegramSettingsModal
                       <span>Tautan ini kadaluarsa pada {new Date(expiresAt).toLocaleTimeString()}.</span>
                     </p>
                   )}
-
                 </div>
 
                 <a
                   href={deepLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-sky-600 hover:bg-sky-500 py-2.5 text-xs font-bold text-white shadow-lg shadow-sky-600/30 transition text-center"
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-sky-600 hover:bg-sky-500 py-2.5 text-xs font-bold text-white transition text-center"
                 >
                   Buka Aplikasi Telegram ↗
                 </a>

@@ -52,7 +52,7 @@ export function CreateTaskModal({
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-white/10 glass-card py-2 text-xs font-bold text-zinc-400 hover:border-indigo-500/50 hover:text-indigo-300 hover:bg-indigo-950/30 transition-all"
+        className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-zinc-800 bg-zinc-900/50 py-2 text-xs font-bold text-zinc-400 hover:border-zinc-700 hover:text-zinc-200 hover:bg-zinc-850 transition-all"
       >
         <svg className="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4.5v15m7.5-7.5h-15" />
@@ -85,7 +85,7 @@ export function CreateTaskModal({
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+              <form noValidate onSubmit={handleSubmit} className="mt-4 space-y-4">
                 <div>
                   <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
                     Judul Task <span className="text-red-500">*</span>

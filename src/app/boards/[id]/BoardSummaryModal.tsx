@@ -156,7 +156,7 @@ export function BoardSummaryModal({
         <div className="mt-4 space-y-6">
           {/* Card Statistik Utama */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="rounded-xl border border-white/10 glass-card p-3.5 text-center">
+            <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-3.5 text-center">
               <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Total Task</span>
               <p className="text-2xl font-black text-white mt-1">{totalTasks}</p>
             </div>

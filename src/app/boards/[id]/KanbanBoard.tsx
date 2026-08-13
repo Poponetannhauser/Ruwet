@@ -93,13 +93,12 @@ function ColumnContainer({
   return (
     <div
       ref={setNodeRef}
-      className={`w-80 flex-shrink-0 rounded-xl glass-panel p-4 flex flex-col justify-between transition-all duration-200 ${
-        isOver ? 'border-indigo-500/80 bg-indigo-950/20 shadow-xl' : ''
+      className={`w-80 flex-shrink-0 rounded-xl bg-zinc-900/90 border border-zinc-800 p-4 flex flex-col justify-between transition-all duration-200 ${
+        isOver ? 'border-indigo-500 bg-indigo-950/30' : ''
       }`}
     >
-
       <div>
-        <div className="flex items-center justify-between border-b border-white/5 pb-2.5 mb-3">
+        <div className="flex items-center justify-between border-b border-zinc-800/80 pb-2.5 mb-3">
           <div className="flex-1">
             <ColumnHeader column={column} />
           </div>
