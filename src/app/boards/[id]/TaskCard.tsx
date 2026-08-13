@@ -1,17 +1,21 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { motion } from 'framer-motion'
 import { assignSelf } from './taskActions'
 import { EditTaskModal } from './EditTaskModal'
+import { CommentDrawer } from '@/app/components/CommentDrawer'
 
-
-
+type Column = {
+  id: string
+  name: string
+}
 
 type Member = {
   id: string
+  user_id?: string
   role: string
   profiles: {
     full_name: string
@@ -19,28 +23,22 @@ type Member = {
   } | null
 }
 
-type Column = {
-  id: string
-  name: string
-}
-
 type Task = {
   id: string
   board_id: string
   column_id: string
-  task_number?: number
-  priority?: string
   title: string
   description: string | null
   assignee_id: string | null
   due_date: string | null
   status_updated_at?: string | null
+  task_number?: number
+  priority?: string
   profiles: {
     full_name: string
     avatar_url: string | null
   } | null
 }
-
 
 type TaskCardProps = {
   task: Task
@@ -58,6 +56,7 @@ export function TaskCard({
   staleThresholdHours = 48,
 }: TaskCardProps) {
   const [isEditOpen, setIsEditOpen] = useState(false)
+  const [isCommentOpen, setIsCommentOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const {
@@ -75,7 +74,6 @@ export function TaskCard({
     opacity: isDragging ? 0.35 : 1,
   }
 
-  const isAssignedToMe = task.assignee_id === currentUserId
   const assigneeName = task.profiles?.full_name || 'Unassigned'
   const assigneeInitial = assigneeName.charAt(0).toUpperCase()
 
@@ -94,7 +92,6 @@ export function TaskCard({
   }, [])
 
   let staleStatus: 'green' | 'yellow' | 'red' | null = null
-
 
   let staleLabel = ''
 
@@ -119,10 +116,10 @@ export function TaskCard({
       elapsedText = `${diffMinutes}m`
     }
 
-    if (ratio > 1) {
+    if (ratio >= 1.0) {
       staleStatus = 'red'
       staleLabel = `Stale (${elapsedText})`
-    } else if (ratio >= 0.7) {
+    } else if (ratio >= 0.75) {
       staleStatus = 'yellow'
       staleLabel = `Warning (${elapsedText})`
     } else {
@@ -228,6 +225,21 @@ export function TaskCard({
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Direct Right Comment Drawer Trigger Button */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                setIsCommentOpen(true)
+              }}
+              className="flex items-center gap-1 rounded px-1.5 py-0.5 text-zinc-400 hover:bg-zinc-800 hover:text-sky-400 transition"
+              title="Buka Komentar"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+            </button>
+
             {!task.assignee_id && (
               <button
                 type="button"
@@ -262,8 +274,17 @@ export function TaskCard({
         members={members}
         isOpen={isEditOpen}
         onClose={() => setIsEditOpen(false)}
+        onOpenComments={() => setIsCommentOpen(true)}
+      />
+
+      <CommentDrawer
+        isOpen={isCommentOpen}
+        onClose={() => setIsCommentOpen(false)}
+        taskId={task.id}
+        taskTitle={task.title}
+        taskNumber={task.task_number}
+        boardId={task.board_id}
       />
     </>
   )
 }
-
