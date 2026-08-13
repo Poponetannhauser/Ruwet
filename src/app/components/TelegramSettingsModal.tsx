@@ -20,11 +20,13 @@ export function TelegramSettingsModal({ isOpen, onClose }: TelegramSettingsModal
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true)
   }, [])
 
   useEffect(() => {
     if (!isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowUnlinkConfirm(false)
       return
     }
