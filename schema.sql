@@ -62,6 +62,7 @@ create table tasks (
   due_date date,
   task_number integer,
   priority text default 'medium' check (priority in ('low', 'medium', 'high', 'urgent')),
+  position integer default 1,
   status_updated_at timestamptz default now(),
   created_by uuid references profiles(id) on delete set null,
   created_at timestamptz default now(),
