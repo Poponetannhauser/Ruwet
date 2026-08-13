@@ -1,6 +1,6 @@
 # Ruwet - Kanban Board & Task Accountability
 
-Aplikasi manajemen task / kanban board modern berbasis **Next.js 15 (App Router)**, **TypeScript**, **Tailwind CSS**, **Framer Motion**, dan **Supabase**.
+Aplikasi manajemen task / kanban board modern berbasis **Next.js 16 (App Router)**, **TypeScript**, **Tailwind CSS**, **Framer Motion**, dan **Supabase**.
 
 ## Fitur Utama
 
@@ -10,17 +10,20 @@ Aplikasi manajemen task / kanban board modern berbasis **Next.js 15 (App Router)
 - 📜 **Automatic Activity Log**: Pencatatan riwayat aktivitas task otomatis (dibuat, dipindah, di-assign, diubah).
 - 🔔 **In-App Notifications**: Notifikasi lonceng realtime saat user ditugaskan (assigned) pada task baru.
 - 🤖 **Telegram Bot Companion**: Bot Telegram personal ("sekretaris pribadi") yang mengirim notifikasi penting dan mendukung command pull untuk ringkasan status task langsung dari chat.
-- 🔒 **Security Hardened**: Proteksi RLS (Row Level Security) Supabase, verifikasi IDOR/cross-board di Server Actions, serta in-memory Rate Limiting.
+- 🔒 **Security & Production Hardened**: Proteksi RLS Supabase, Security Headers di Next.js, Upstash Redis Rate Limiting, Zod Env Validation, CI/CD via GitHub Actions, serta Containerization (Docker).
 
 ## Tech Stack
 
-- **Framework:** Next.js 15 (App Router)
+- **Framework:** Next.js 16 (App Router)
 - **Runtime & Package Manager:** Bun
 - **Styling:** Tailwind CSS
 - **Animations:** Framer Motion
 - **Drag and Drop:** `@dnd-kit/core` & `@dnd-kit/sortable`
 - **Database & Auth:** Supabase PostgreSQL + Auth + Realtime
 - **Edge Functions:** Supabase Edge Functions (Deno) — Telegram bot handler & notifier
+- **Testing:** Vitest + React Testing Library
+- **Containerization:** Docker & Docker Compose (Standalone Output)
+- **CI/CD:** GitHub Actions (Lint, Typecheck, Build)
 
 ---
 
