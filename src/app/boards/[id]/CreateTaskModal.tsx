@@ -59,7 +59,12 @@ export function CreateTaskModal({
     <>
       <button
         type="button"
-        onClick={() => setIsOpen(true)}
+        onClick={() => {
+          setError(null)
+          setIsOpen(true)
+        }}
+        onPointerDown={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
         className="w-full flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-bold text-zinc-400 hover:text-white hover:bg-[#34343a] transition-all cursor-pointer pointer-events-auto relative z-10"
       >
         <svg className="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -102,6 +107,7 @@ export function CreateTaskModal({
                     name="title"
                     type="text"
                     required
+                    maxLength={50}
                     placeholder="Contoh: Buat halaman login"
                     className="w-full rounded-md border border-zinc-300 px-3 py-2 text-xs text-zinc-900 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
                   />
