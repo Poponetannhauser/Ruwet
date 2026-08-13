@@ -150,26 +150,26 @@ export function TaskCard({
         {...attributes}
         {...listeners}
         onClick={() => setIsEditOpen(true)}
-        className="group relative cursor-grab active:cursor-grabbing touch-manipulation rounded-lg border border-zinc-200 bg-white p-3 shadow-xs hover:border-indigo-400 hover:shadow focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-colors dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-700"
+        className="group relative cursor-grab active:cursor-grabbing touch-manipulation rounded-xl bg-zinc-950 p-3 hover:bg-zinc-950/80 transition-all"
       >
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 space-y-1.5 min-w-0">
             <div className="flex items-center gap-1.5 flex-wrap">
               {task.task_number !== undefined && (
-                <span className="inline-block text-[10px] font-mono font-bold text-zinc-500 bg-zinc-800/80 border border-zinc-700/60 px-1.5 py-0.2 rounded">
+                <span className="inline-block text-[10px] font-mono font-bold text-zinc-500 bg-zinc-900 px-1.5 py-0.2 rounded">
                   #{task.task_number}
                 </span>
               )}
               {task.priority && (
                 <span
-                  className={`inline-block text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded border ${
+                  className={`inline-block text-[9px] font-bold uppercase px-1.5 py-0.2 rounded ${
                     task.priority === 'urgent'
-                      ? 'bg-rose-950/80 border-rose-700/60 text-rose-300 animate-pulse'
+                      ? 'bg-rose-950/60 text-rose-300'
                       : task.priority === 'high'
-                      ? 'bg-amber-950/80 border-amber-700/60 text-amber-300'
+                      ? 'bg-amber-950/60 text-amber-300'
                       : task.priority === 'low'
-                      ? 'bg-zinc-800 border-zinc-700 text-zinc-400'
-                      : 'bg-sky-950/80 border-sky-700/60 text-sky-300'
+                      ? 'bg-zinc-850 text-zinc-400'
+                      : 'bg-sky-950/60 text-sky-300'
                   }`}
                 >
                   {task.priority}

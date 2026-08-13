@@ -93,16 +93,16 @@ function ColumnContainer({
   return (
     <div
       ref={setNodeRef}
-      className={`w-80 flex-shrink-0 rounded-xl bg-zinc-900/90 border border-zinc-800 p-4 flex flex-col justify-between transition-all duration-200 ${
-        isOver ? 'border-indigo-500 bg-indigo-950/30' : ''
+      className={`w-72 sm:w-80 flex-shrink-0 rounded-xl bg-zinc-900 p-3 sm:p-3.5 flex flex-col justify-between transition-all duration-200 ${
+        isOver ? 'bg-zinc-850' : ''
       }`}
     >
       <div>
-        <div className="flex items-center justify-between border-b border-zinc-800/80 pb-2.5 mb-3">
+        <div className="flex items-center justify-between pb-2 mb-2.5">
           <div className="flex-1">
             <ColumnHeader column={column} />
           </div>
-          <span className="rounded-full bg-zinc-800/80 border border-white/10 px-2.5 py-0.5 text-[10px] font-extrabold text-zinc-300">
+          <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[10px] font-bold text-zinc-400">
             {tasks.length}
           </span>
         </div>
