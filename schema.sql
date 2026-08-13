@@ -1,3 +1,8 @@
+-- REFERENCE ONLY — bukan yang diapply ke database.
+-- Source of truth ada di supabase/migrations/ (timestamp-versioned).
+-- File ini adalah snapshot awal dari skema, dipertahankan untuk referensi cepat.
+-- Update jika ada migrasi besar, tapi apply SELALU lewat supabase/migrations/.
+
 -- Clear existing definitions for idempotent execution
 drop table if exists comments cascade;
 drop table if exists activity_log cascade;

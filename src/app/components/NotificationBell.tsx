@@ -89,8 +89,8 @@ export function NotificationBell() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 rounded-xl glass-modal p-4 shadow-2xl border border-white/10 z-50">
-          <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+        <div className="absolute right-0 mt-2 w-80 rounded-xl bg-zinc-900 p-4 shadow-xl border border-zinc-800 z-50">
+          <div className="flex items-center justify-between border-b border-zinc-800 pb-2.5">
             <h4 className="font-bold text-xs text-white">
               Notifikasi {unreadCount > 0 && `(${unreadCount})`}
             </h4>

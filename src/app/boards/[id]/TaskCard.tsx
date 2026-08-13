@@ -1,17 +1,21 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { motion } from 'framer-motion'
 import { assignSelf } from './taskActions'
 import { EditTaskModal } from './EditTaskModal'
+import { CommentDrawer } from '@/app/components/CommentDrawer'
 
-
-
+type Column = {
+  id: string
+  name: string
+}
 
 type Member = {
   id: string
+  user_id?: string
   role: string
   profiles: {
     full_name: string
@@ -19,28 +23,22 @@ type Member = {
   } | null
 }
 
-type Column = {
-  id: string
-  name: string
-}
-
 type Task = {
   id: string
   board_id: string
   column_id: string
-  task_number?: number
-  priority?: string
   title: string
   description: string | null
   assignee_id: string | null
   due_date: string | null
   status_updated_at?: string | null
+  task_number?: number
+  priority?: string
   profiles: {
     full_name: string
     avatar_url: string | null
   } | null
 }
-
 
 type TaskCardProps = {
   task: Task
@@ -54,10 +52,11 @@ export function TaskCard({
   task,
   columns,
   members,
-  currentUserId,
+  currentUserId: _currentUserId,
   staleThresholdHours = 48,
 }: TaskCardProps) {
   const [isEditOpen, setIsEditOpen] = useState(false)
+  const [isCommentOpen, setIsCommentOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const {
@@ -75,7 +74,6 @@ export function TaskCard({
     opacity: isDragging ? 0.35 : 1,
   }
 
-  const isAssignedToMe = task.assignee_id === currentUserId
   const assigneeName = task.profiles?.full_name || 'Unassigned'
   const assigneeInitial = assigneeName.charAt(0).toUpperCase()
 
@@ -94,7 +92,6 @@ export function TaskCard({
   }, [])
 
   let staleStatus: 'green' | 'yellow' | 'red' | null = null
-
 
   let staleLabel = ''
 
@@ -119,10 +116,10 @@ export function TaskCard({
       elapsedText = `${diffMinutes}m`
     }
 
-    if (ratio > 1) {
+    if (ratio >= 1.0) {
       staleStatus = 'red'
       staleLabel = `Stale (${elapsedText})`
-    } else if (ratio >= 0.7) {
+    } else if (ratio >= 0.75) {
       staleStatus = 'yellow'
       staleLabel = `Warning (${elapsedText})`
     } else {
@@ -153,95 +150,104 @@ export function TaskCard({
         {...attributes}
         {...listeners}
         onClick={() => setIsEditOpen(true)}
-        className="group relative cursor-grab active:cursor-grabbing touch-manipulation rounded-lg border border-zinc-200 bg-white p-3 shadow-sm hover:border-indigo-400 hover:shadow focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-colors dark:border-zinc-800 dark:bg-zinc-900/90 dark:hover:border-indigo-600"
+        className="group relative cursor-grab active:cursor-grabbing touch-manipulation rounded-xl bg-[#1A1A1E] p-3 hover:bg-[#232328] transition-all"
       >
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 space-y-1.5 min-w-0">
             <div className="flex items-center gap-1.5 flex-wrap">
               {task.task_number !== undefined && (
-                <span className="inline-block text-[10px] font-mono font-bold text-zinc-500 bg-zinc-800/80 border border-zinc-700/60 px-1.5 py-0.2 rounded">
+                <span className="inline-block text-[10px] font-mono font-bold text-zinc-500 bg-zinc-900/90 px-1.5 py-0.2 rounded">
                   #{task.task_number}
                 </span>
               )}
               {task.priority && (
                 <span
-                  className={`inline-block text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded border ${
+                  className={`inline-block text-[9px] font-bold uppercase px-1.5 py-0.2 rounded border ${
                     task.priority === 'urgent'
-                      ? 'bg-rose-950/80 border-rose-700/60 text-rose-300 animate-pulse'
+                      ? 'bg-rose-950/60 border-rose-800/40 text-rose-300'
                       : task.priority === 'high'
-                      ? 'bg-amber-950/80 border-amber-700/60 text-amber-300'
+                      ? 'bg-amber-950/60 border-amber-800/40 text-amber-300'
                       : task.priority === 'low'
-                      ? 'bg-zinc-800 border-zinc-700 text-zinc-400'
-                      : 'bg-sky-950/80 border-sky-700/60 text-sky-300'
+                      ? 'bg-zinc-850 border-zinc-700/40 text-zinc-400'
+                      : 'bg-indigo-950/60 border-indigo-800/40 text-indigo-300'
                   }`}
                 >
                   {task.priority}
                 </span>
               )}
+              <h4 className="text-xs font-bold text-zinc-100 group-hover:text-indigo-400 transition-colors leading-snug">
+                {task.title}
+              </h4>
             </div>
 
-            <h4 className="font-semibold text-xs text-zinc-100 group-hover:text-indigo-300 transition-colors leading-snug break-words">
-              {task.title}
-            </h4>
+            {task.description && (
+              <p className="text-[11px] text-zinc-600 dark:text-zinc-400 line-clamp-2 leading-snug">
+                {task.description}
+              </p>
+            )}
           </div>
-
-
-
-          {staleStatus && (
-            <span
-              title={`Status aktivitas: ${staleLabel}`}
-              className={`inline-flex flex-shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-bold tracking-wide uppercase transition-all ${
-                staleStatus === 'red'
-                  ? 'bg-rose-950/80 text-rose-300 border border-rose-800/60 glow-rose animate-pulse'
-                  : staleStatus === 'yellow'
-                  ? 'bg-amber-950/80 text-amber-300 border border-amber-800/60 glow-amber'
-                  : 'bg-emerald-950/80 text-emerald-300 border border-emerald-800/60 glow-emerald'
-              }`}
-            >
-              <span
-                className={`h-1.5 w-1.5 rounded-full ${
-                  staleStatus === 'red'
-                    ? 'bg-rose-400'
-                    : staleStatus === 'yellow'
-                    ? 'bg-amber-400'
-                    : 'bg-emerald-400'
-                }`}
-              />
-              {staleStatus === 'red' ? 'Stale' : staleStatus === 'yellow' ? 'Warning' : 'Fresh'}
-            </span>
-          )}
         </div>
 
-        {task.description && (
-          <p className="mt-1.5 line-clamp-2 text-[11px] text-zinc-400 leading-relaxed">
-            {task.description}
-          </p>
-        )}
+        <div className="mt-3 flex items-center justify-between border-t border-zinc-100 pt-2 text-[10px] text-zinc-500 dark:border-zinc-800/80 dark:text-zinc-400">
+          <div className="flex items-center gap-2">
+            {staleStatus && (
+              <span
+                className={`inline-flex items-center gap-1 font-semibold rounded px-1.5 py-0.5 text-[10px] ${
+                  staleStatus === 'red'
+                    ? 'bg-rose-950/50 text-rose-400'
+                    : staleStatus === 'yellow'
+                    ? 'bg-amber-950/50 text-amber-400'
+                    : 'bg-emerald-950/50 text-emerald-400'
+                }`}
+                title={`Stale status: ${staleStatus}`}
+              >
+                <span
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    staleStatus === 'red'
+                      ? 'bg-rose-400'
+                      : staleStatus === 'yellow'
+                      ? 'bg-amber-400'
+                      : 'bg-emerald-400'
+                  }`}
+                />
+                <span>{staleLabel}</span>
+              </span>
+            )}
 
-        <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-2.5 text-[10px] text-zinc-400">
-          <div>
-            {task.due_date ? (
-              <span className="flex items-center gap-1 font-medium text-amber-400 bg-amber-950/30 px-2 py-0.5 rounded-md border border-amber-800/30">
-                <svg className="w-3 h-3 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {task.due_date && (
+              <span className="flex items-center gap-1 text-[10px] text-zinc-400">
+                <svg className="w-3 h-3 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
                 </svg>
-                {new Date(task.due_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                {new Date(task.due_date).toLocaleDateString('id-ID', { month: 'short', day: 'numeric' })}
               </span>
-            ) : (
-
-              <span className="text-zinc-500">Tanpa tenggat</span>
             )}
           </div>
 
-          <div className="flex items-center gap-1.5">
-            {!isAssignedToMe && (
+          <div className="flex items-center gap-2">
+            {/* Direct Right Comment Drawer Trigger Button */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                setIsCommentOpen(true)
+              }}
+              className="flex items-center gap-1 rounded px-1.5 py-0.5 text-zinc-400 hover:bg-zinc-800 hover:text-sky-400 transition"
+              title="Buka Komentar"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+            </button>
+
+            {!task.assignee_id && (
               <button
+                type="button"
                 onClick={handleAssignSelf}
                 disabled={loading}
                 className="hidden items-center gap-1 rounded-md bg-indigo-950/80 border border-indigo-700/50 px-2 py-0.5 text-[10px] font-semibold text-indigo-300 hover:bg-indigo-900 group-hover:inline-flex transition-all shadow-xs"
-                title="Assign task ini ke saya"
               >
-                <svg className="w-2.5 h-2.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3 h-3 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>
                 <span>Saya</span>
@@ -250,9 +256,9 @@ export function TaskCard({
 
             <div
               title={`Assignee: ${assigneeName}`}
-              className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ring-2 ring-zinc-950 ${
+              className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ring-1 ring-zinc-800 ${
                 task.assignee_id
-                  ? 'bg-gradient-to-tr from-indigo-600 to-violet-500 text-white shadow-indigo-500/20'
+                  ? 'bg-indigo-600 text-white'
                   : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
               }`}
             >
@@ -268,8 +274,17 @@ export function TaskCard({
         members={members}
         isOpen={isEditOpen}
         onClose={() => setIsEditOpen(false)}
+        onOpenComments={() => setIsCommentOpen(true)}
+      />
+
+      <CommentDrawer
+        isOpen={isCommentOpen}
+        onClose={() => setIsCommentOpen(false)}
+        taskId={task.id}
+        taskTitle={task.title}
+        taskNumber={task.task_number}
+        boardId={task.board_id}
       />
     </>
   )
 }
-

@@ -1,9 +1,49 @@
+import { Ratelimit } from "@upstash/ratelimit"
+import { Redis } from "@upstash/redis"
+
 type RateLimitOptions = {
   intervalMs?: number
   maxRequests?: number
 }
 
 const tracker = new Map<string, { count: number; expiresAt: number }>()
+
+let upstashRatelimit: Ratelimit | null = null
+
+if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+  try {
+    const redis = new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN,
+    })
+    upstashRatelimit = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(30, "60 s"),
+      analytics: true,
+    })
+  } catch (err) {
+    console.error("Failed to initialize Upstash Redis ratelimit, falling back to in-memory:", err)
+  }
+}
+
+export async function checkRateLimitAsync(
+  identifier: string
+): Promise<{ success: boolean; remaining: number; resetMs: number }> {
+  if (upstashRatelimit) {
+    try {
+      const res = await upstashRatelimit.limit(identifier)
+      return {
+        success: res.success,
+        remaining: res.remaining,
+        resetMs: Math.max(0, res.reset - Date.now()),
+      }
+    } catch (err) {
+      console.error("Upstash ratelimit check failed, falling back to in-memory:", err)
+    }
+  }
+
+  return checkRateLimit(identifier)
+}
 
 export function checkRateLimit(
   identifier: string,

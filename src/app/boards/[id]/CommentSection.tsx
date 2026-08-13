@@ -142,8 +142,8 @@ export function CommentSection({
   }
 
   return (
-    <div className="flex flex-col h-full justify-between space-y-4">
-      <div className="flex-1 space-y-3 overflow-y-auto pr-1 max-h-[340px] py-1">
+    <div className="flex flex-col h-full min-h-0 justify-between gap-3">
+      <div className="flex-1 overflow-y-auto min-h-0 space-y-3 pr-1 py-1">
         {loading ? (
           <div className="text-xs text-zinc-400 p-2 text-center">Memuat komentar...</div>
         ) : comments.length === 0 ? (
@@ -184,25 +184,27 @@ export function CommentSection({
                 </div>
 
                 <div
-                  className={`max-w-[85%] rounded-2xl px-3 py-2 shadow-xs ${
+                  className={`max-w-[85%] rounded-2xl px-3.5 py-2 shadow-xs flex flex-col ${
                     isMe
                       ? 'rounded-br-xs bg-indigo-600 text-white'
-                      : 'rounded-bl-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200/60 dark:border-zinc-700/60'
+                      : 'rounded-bl-xs bg-[#1a1a22] text-zinc-100 border border-zinc-800/80'
                   }`}
                 >
-                  {isMe ? (
-                    <div className="flex justify-end text-[9px] opacity-70 mb-0.5">
-                      <span>{timeFormatted}</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-between gap-2 mb-1 text-[11px] text-zinc-500 dark:text-zinc-400">
-                      <span className="font-bold">{authorName}</span>
-                      <span className="text-[9px] opacity-80">{timeFormatted}</span>
-                    </div>
+                  {!isMe && (
+                    <span className="text-[11px] font-bold text-indigo-400 mb-0.5">
+                      {authorName}
+                    </span>
                   )}
                   <p className="whitespace-pre-wrap leading-relaxed text-xs break-words">
                     {comment.content}
                   </p>
+                  <span
+                    className={`self-end text-[9px] font-mono mt-0.5 select-none ${
+                      isMe ? 'text-indigo-200/80' : 'text-zinc-500'
+                    }`}
+                  >
+                    {timeFormatted}
+                  </span>
                 </div>
               </div>
             )

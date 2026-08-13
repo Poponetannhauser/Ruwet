@@ -58,10 +58,10 @@ export function OnboardingChecklist({
   }
 
   return (
-    <div className="rounded-2xl glass-panel p-6 border border-indigo-500/20 shadow-xl space-y-4">
+    <div className="rounded-2xl bg-zinc-900 p-6 border border-zinc-800 shadow-xs space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold text-sm">
+          <div className="w-9 h-9 rounded-xl bg-zinc-800 border border-zinc-700 flex items-center justify-center text-indigo-400 font-bold text-sm">
             <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.24a4.5 4.5 0 00-6.364 6.364M12 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
             </svg>

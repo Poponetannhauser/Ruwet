@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 type Member = {
-
   id: string
   user_id?: string
   role: string
@@ -52,13 +52,16 @@ export function BoardSummaryModal({
   onClose,
 }: BoardSummaryModalProps) {
   const [nowMs] = useState(() => Date.now())
+  const [mounted, setMounted] = useState(false)
 
-  if (!isOpen) return null
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true)
+  }, [])
+
+  if (!isOpen || !mounted) return null
 
   const todayStr = new Date().toISOString().split('T')[0]
-
-
-
 
   // 1. Total & Overdue Overall
   const totalTasks = tasks.length
@@ -130,9 +133,9 @@ export function BoardSummaryModal({
   // Unassigned tasks
   const unassignedCount = tasks.filter((t) => !t.assignee_id).length
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl bg-white p-6 shadow-xl dark:bg-zinc-900">
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
+      <div className="w-full max-w-2xl my-auto max-h-[85vh] overflow-y-auto rounded-xl bg-[#22222a] p-5 sm:p-6 shadow-2xl border border-zinc-800/80">
         <div className="flex items-center justify-between border-b border-white/10 pb-3">
           <div>
             <h3 className="text-lg font-extrabold text-white flex items-center gap-2">
@@ -156,7 +159,7 @@ export function BoardSummaryModal({
         <div className="mt-4 space-y-6">
           {/* Card Statistik Utama */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="rounded-xl border border-white/10 glass-card p-3.5 text-center">
+            <div className="rounded-xl border border-zinc-500 bg-[#22222a] p-3.5 text-center">
               <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Total Task</span>
               <p className="text-2xl font-black text-white mt-1">{totalTasks}</p>
             </div>
@@ -275,6 +278,7 @@ export function BoardSummaryModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
