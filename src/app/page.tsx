@@ -5,6 +5,7 @@ import { logout } from './(auth)/actions'
 import { CreateBoardModal } from './boards/CreateBoardModal'
 import { OnboardingChecklist } from './components/OnboardingChecklist'
 import { LandingScreenshot } from './components/LandingScreenshot'
+import { AppSidebar } from './components/AppSidebar'
 
 
 export default async function Home() {
@@ -17,46 +18,50 @@ export default async function Home() {
   let onboardingDismissed = false
   let hasMembers = false
   let hasTask = false
+  let hasTelegramLinked = false
 
   if (user) {
     // Fetch profile onboarding_dismissed status
     const { data: profile } = await supabase
       .from('profiles')
-      .select('onboarding_dismissed')
+      .select('onboarding_dismissed, telegram_chat_id')
       .eq('id', user.id)
       .single()
 
-    onboardingDismissed = profile?.onboarding_dismissed || false
+    onboardingDismissed = profile?.onboarding_dismissed ?? false
+    hasTelegramLinked = !!profile?.telegram_chat_id
 
+    // Fetch boards where user is owner OR member via board_members table
     const { data: memberBoards } = await supabase
       .from('board_members')
       .select('board_id')
       .eq('user_id', user.id)
 
-    const boardIds = memberBoards?.map((mb) => mb.board_id) || []
+    const boardIds = memberBoards ? memberBoards.map((m) => m.board_id) : []
 
     if (boardIds.length > 0) {
-      const { data } = await supabase
+      const { data: bData } = await supabase
         .from('boards')
-        .select('*')
+        .select('id, name, created_at, owner_id')
         .in('id', boardIds)
         .order('created_at', { ascending: false })
-      if (data) {
-        boards = data
+
+      if (bData) {
+        boards = bData
       }
 
-      // Check if any of user's boards have > 1 member (team member joined)
-      const { count: totalMemberRows } = await supabase
+      // Check onboarding criteria: members count > 1 on any board
+      const { count: memberCount } = await supabase
         .from('board_members')
-        .select('id', { count: 'exact', head: true })
+        .select('*', { count: 'exact', head: true })
         .in('board_id', boardIds)
 
-      hasMembers = (totalMemberRows || 0) > boardIds.length
+      hasMembers = (memberCount || 0) > 1
 
-      // Check if any tasks exist on user's boards
+      // Check onboarding criteria: tasks count > 0 on any column of user's boards
       const { count: taskCount } = await supabase
         .from('tasks')
-        .select('id', { count: 'exact', head: true })
+        .select('*', { count: 'exact', head: true })
         .in('board_id', boardIds)
 
       hasTask = (taskCount || 0) > 0
@@ -64,67 +69,18 @@ export default async function Home() {
   }
 
   return (
-    <div className="flex flex-col flex-1 min-h-screen bg-zinc-950 text-zinc-100 selection:bg-indigo-500/30 selection:text-indigo-200">
-      {/* Header Bar */}
-      <header className="sticky top-0 z-40 border-b border-zinc-800 bg-zinc-950/90 px-6 sm:px-10 py-4 backdrop-blur-md">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
-          <div className="flex items-center gap-3">
-            <Image
-              src="/ruwet-logo.png"
-              alt="Logo Ruwet"
-              width={36}
-              height={36}
-              className="h-9 w-9 rounded-xl object-cover border border-zinc-800 shadow-xs"
-            />
-            <span className="text-xl font-bold tracking-tight text-white">
-              Ruwet
-            </span>
-            <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-zinc-900 border border-zinc-800 px-2.5 py-0.5 text-[10px] font-semibold text-zinc-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              <span>v2.4.0</span>
-            </span>
-          </div>
+    <div className="flex min-h-screen bg-zinc-950 text-zinc-100 selection:bg-indigo-500/30 selection:text-indigo-200">
+      {/* Left Sidebar Navigation */}
+      <AppSidebar
+        userEmail={user?.email}
+        logoutAction={logout}
+        hasTelegramLinked={hasTelegramLinked}
+      />
 
-          {user ? (
-            <div className="flex items-center gap-3 sm:gap-5">
-              <div className="flex items-center gap-2.5">
-                <div className="h-7 w-7 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-bold text-white border border-zinc-700">
-                  {user.email?.charAt(0).toUpperCase()}
-                </div>
-                <span className="hidden md:inline-block text-xs font-medium text-zinc-300">
-                  {user.email}
-                </span>
-              </div>
-              <form action={logout}>
-                <button
-                  type="submit"
-                  className="rounded-lg bg-zinc-900 border border-zinc-800 px-3.5 py-1.5 text-xs font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white transition"
-                >
-                  Keluar
-                </button>
-              </form>
-            </div>
-          ) : (
-            <div className="flex items-center gap-3">
-              <Link
-                href="/login"
-                className="rounded-lg bg-zinc-900 border border-zinc-800 px-3.5 py-1.5 text-xs font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white transition"
-              >
-                Masuk
-              </Link>
-              <Link
-                href="/signup"
-                className="rounded-lg bg-indigo-600 px-4 py-2 text-xs font-bold text-white hover:bg-indigo-500 transition"
-              >
-                Daftar Gratis
-              </Link>
-            </div>
-          )}
-        </div>
-      </header>
-
-      {/* Main Content Area */}
-      <main className="flex flex-1 w-full max-w-7xl flex-col p-6 sm:p-10 mx-auto space-y-8">
+      {/* Main Container */}
+      <div className="flex flex-1 flex-col min-w-0">
+        {/* Main Content Area */}
+        <main className="flex flex-1 w-full max-w-7xl flex-col p-4 sm:p-8 mx-auto space-y-8">
         {user ? (
           <div className="space-y-8">
             {/* Dashboard Header Section */}
@@ -319,6 +275,7 @@ export default async function Home() {
           </div>
         )}
       </main>
+      </div>
     </div>
   )
 }
