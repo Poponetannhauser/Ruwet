@@ -52,7 +52,7 @@ export function TaskCard({
   task,
   columns,
   members,
-  currentUserId,
+  currentUserId: _currentUserId,
   staleThresholdHours = 48,
 }: TaskCardProps) {
   const [isEditOpen, setIsEditOpen] = useState(false)

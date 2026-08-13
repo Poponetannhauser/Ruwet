@@ -1,8 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
 import { updateBoard, deleteBoard, leaveBoard } from '../actions'
 import { InviteMemberModal } from './InviteMemberModal'
 import { MemberList } from './MemberList'
