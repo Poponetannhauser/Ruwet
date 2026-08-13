@@ -37,6 +37,10 @@ export async function createTask(boardId: string, columnId: string, formData: Fo
     return { error: 'Judul task tidak boleh kosong' }
   }
 
+  if (title.trim().length > 50) {
+    return { error: 'Judul task tidak boleh lebih dari 50 karakter' }
+  }
+
   // Validasi kolom milik board ini
   const { data: validCol } = await supabase
     .from('columns')
@@ -122,6 +126,10 @@ export async function updateTask(taskId: string, boardId: string, formData: Form
 
   if (!title || title.trim() === '') {
     return { error: 'Judul task tidak boleh kosong' }
+  }
+
+  if (title.trim().length > 50) {
+    return { error: 'Judul task tidak boleh lebih dari 50 karakter' }
   }
 
   // Cek apakah column_id atau assignee_id berubah
