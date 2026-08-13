@@ -47,10 +47,15 @@ export async function signup(formData: FormData) {
     return redirect('/signup?error=Terlalu%20banyak%20percobaan%20pendaftaran.%20Harap%20tunggu%201%20menit.')
   }
 
+  const { headers } = await import('next/headers')
+  const headerList = await headers()
+  const origin = headerList.get('origin') || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+
   const { error } = await supabase.auth.signUp({
     email,
     password,
     options: {
+      emailRedirectTo: `${origin}/auth/callback`,
       data: {
         full_name: fullName,
       },
