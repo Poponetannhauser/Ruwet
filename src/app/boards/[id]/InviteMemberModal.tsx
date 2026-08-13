@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { addBoardMemberByEmail } from '../actions'
 
 type InviteMemberModalProps = {
@@ -13,6 +14,11 @@ export function InviteMemberModal({ boardId }: InviteMemberModalProps) {
   const [error, setError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const inviteUrl = typeof window !== 'undefined'
     ? `${window.location.origin}/boards/join/${boardId}`
@@ -50,7 +56,7 @@ export function InviteMemberModal({ boardId }: InviteMemberModalProps) {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="rounded-lg bg-indigo-950/80 border border-indigo-700/50 px-3 py-1.5 text-xs font-bold text-indigo-300 hover:bg-indigo-900/60 transition flex items-center gap-1.5 shadow-sm"
+        className="rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800/60 px-3 py-1.5 text-xs font-bold text-zinc-300 hover:text-white transition flex items-center gap-1.5"
       >
         <svg className="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
@@ -58,77 +64,74 @@ export function InviteMemberModal({ boardId }: InviteMemberModalProps) {
         Undang Member
       </button>
 
-
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3 sm:p-4">
-          <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-xl bg-white p-4 sm:p-6 shadow-xl dark:bg-zinc-900">
-            <h3 className="text-lg font-bold text-zinc-900 dark:text-white">
+      {isOpen && mounted && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-xs p-3 sm:p-4">
+          <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-xl bg-[#22222a] p-4 sm:p-6 shadow-2xl border border-zinc-800/80">
+            <h3 className="text-lg font-bold text-white">
               Undang Anggota ke Board
             </h3>
-            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="mt-1 text-xs text-zinc-400">
               Bagikan link di bawah ini kepada rekan tim Anda untuk bergabung ke board ini.
             </p>
 
             <div className="mt-4 space-y-4">
               {error && (
-                <div className="rounded-md bg-red-50 p-3 text-xs text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                <div className="rounded-md bg-rose-950/60 border border-rose-800/40 p-3 text-xs text-rose-300">
                   {error}
                 </div>
               )}
+
               {successMessage && (
-                <div className="rounded-md bg-green-50 p-3 text-xs text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                <div className="rounded-md bg-emerald-950/60 border border-emerald-800/40 p-3 text-xs text-emerald-300">
                   {successMessage}
                 </div>
               )}
 
-              <form onSubmit={handleEmailInvite} className="space-y-2">
-                <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300">
-                  Undang via Nama / Email User
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    name="email"
-                    required
-                    placeholder="Nama lengkap atau User ID"
-                    className="flex-1 rounded-md border border-zinc-300 px-3 py-2 text-xs text-zinc-900 placeholder-zinc-400 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
-                  />
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="rounded-md bg-indigo-600 px-3 py-2 text-xs font-medium text-white hover:bg-indigo-700 disabled:opacity-50 transition"
-                  >
-                    {loading ? 'Mengirim...' : 'Undang'}
-                  </button>
+              <form onSubmit={handleEmailInvite} className="space-y-3">
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-300">
+                    Undang lewat Email
+                  </label>
+                  <div className="mt-1 flex gap-2">
+                    <input
+                      type="email"
+                      name="email"
+                      required
+                      placeholder="nama@email.com"
+                      className="flex-1 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs font-medium text-white placeholder-zinc-500 focus:border-indigo-500 focus:outline-none"
+                    />
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="rounded-lg bg-indigo-600 px-4 py-2 text-xs font-bold text-white hover:bg-indigo-500 disabled:opacity-50 transition shrink-0"
+                    >
+                      {loading ? '...' : 'Undang'}
+                    </button>
+                  </div>
                 </div>
               </form>
 
-              <div className="relative my-2">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-zinc-200 dark:border-zinc-800" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-2 text-zinc-400 dark:bg-zinc-900">
-                    atau
-                  </span>
-                </div>
+              <div className="relative flex items-center py-1">
+                <div className="flex-grow border-t border-zinc-800" />
+                <span className="mx-2 shrink-0 text-[10px] uppercase font-mono text-zinc-500">atau salin link</span>
+                <div className="flex-grow border-t border-zinc-800" />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-                  Link Undang (Invite Link)
+                <label className="block text-xs font-semibold text-zinc-300">
+                  Link Undangan
                 </label>
-                <div className="flex gap-2">
+                <div className="mt-1 flex gap-2">
                   <input
                     type="text"
                     readOnly
                     value={inviteUrl}
-                    className="flex-1 rounded-md border border-zinc-300 bg-zinc-50 px-3 py-2 text-xs text-zinc-800 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
+                    className="flex-1 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs font-mono text-zinc-400 focus:outline-none"
                   />
                   <button
-                    onClick={handleCopy}
                     type="button"
-                    className="rounded-md bg-zinc-100 px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 transition"
+                    onClick={handleCopy}
+                    className="rounded-lg bg-zinc-800 px-3 py-2 text-xs font-bold text-zinc-200 hover:bg-zinc-700 transition shrink-0"
                   >
                     {copied ? 'Tersalin!' : 'Salin Link'}
                   </button>
@@ -140,13 +143,14 @@ export function InviteMemberModal({ boardId }: InviteMemberModalProps) {
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                className="rounded-lg bg-zinc-900 border border-zinc-800 px-4 py-2 text-xs font-semibold text-zinc-400 hover:text-white transition"
               >
                 Tutup
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   )

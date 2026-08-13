@@ -150,32 +150,32 @@ export function TaskCard({
         {...attributes}
         {...listeners}
         onClick={() => setIsEditOpen(true)}
-        className="group relative cursor-grab active:cursor-grabbing touch-manipulation rounded-xl bg-zinc-950 p-3 hover:bg-zinc-950/80 transition-all"
+        className="group relative cursor-grab active:cursor-grabbing touch-manipulation rounded-xl bg-[#1A1A1E] p-3 hover:bg-[#232328] transition-all"
       >
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 space-y-1.5 min-w-0">
             <div className="flex items-center gap-1.5 flex-wrap">
               {task.task_number !== undefined && (
-                <span className="inline-block text-[10px] font-mono font-bold text-zinc-500 bg-zinc-900 px-1.5 py-0.2 rounded">
+                <span className="inline-block text-[10px] font-mono font-bold text-zinc-500 bg-zinc-900/90 px-1.5 py-0.2 rounded">
                   #{task.task_number}
                 </span>
               )}
               {task.priority && (
                 <span
-                  className={`inline-block text-[9px] font-bold uppercase px-1.5 py-0.2 rounded ${
+                  className={`inline-block text-[9px] font-bold uppercase px-1.5 py-0.2 rounded border ${
                     task.priority === 'urgent'
-                      ? 'bg-rose-950/60 text-rose-300'
+                      ? 'bg-rose-950/60 border-rose-800/40 text-rose-300'
                       : task.priority === 'high'
-                      ? 'bg-amber-950/60 text-amber-300'
+                      ? 'bg-amber-950/60 border-amber-800/40 text-amber-300'
                       : task.priority === 'low'
-                      ? 'bg-zinc-850 text-zinc-400'
-                      : 'bg-sky-950/60 text-sky-300'
+                      ? 'bg-zinc-850 border-zinc-700/40 text-zinc-400'
+                      : 'bg-indigo-950/60 border-indigo-800/40 text-indigo-300'
                   }`}
                 >
                   {task.priority}
                 </span>
               )}
-              <h4 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-400 transition-colors leading-snug">
+              <h4 className="text-xs font-bold text-zinc-100 group-hover:text-indigo-400 transition-colors leading-snug">
                 {task.title}
               </h4>
             </div>
@@ -192,19 +192,19 @@ export function TaskCard({
           <div className="flex items-center gap-2">
             {staleStatus && (
               <span
-                className={`inline-flex items-center gap-1 font-bold rounded-full px-2 py-0.5 border ${
+                className={`inline-flex items-center gap-1 font-semibold rounded px-1.5 py-0.5 text-[10px] ${
                   staleStatus === 'red'
-                    ? 'bg-rose-950/60 border-rose-800/60 text-rose-400'
+                    ? 'bg-rose-950/50 text-rose-400'
                     : staleStatus === 'yellow'
-                    ? 'bg-amber-950/60 border-amber-800/60 text-amber-400'
-                    : 'bg-emerald-950/60 border-emerald-800/60 text-emerald-400'
+                    ? 'bg-amber-950/50 text-amber-400'
+                    : 'bg-emerald-950/50 text-emerald-400'
                 }`}
                 title={`Stale status: ${staleStatus}`}
               >
                 <span
                   className={`w-1.5 h-1.5 rounded-full ${
                     staleStatus === 'red'
-                      ? 'bg-rose-500 animate-ping'
+                      ? 'bg-rose-400'
                       : staleStatus === 'yellow'
                       ? 'bg-amber-400'
                       : 'bg-emerald-400'

@@ -31,7 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="id"
       className={`${plusJakartaSans.variable} ${jetbrainsMono.variable} h-full antialiased dark`}
     >
-      <body className="min-h-full flex flex-col font-sans bg-zinc-950 text-zinc-100 selection:bg-indigo-500/30 selection:text-indigo-200">
+      <body className="min-h-full flex flex-col font-sans bg-[#1A1A1E] text-zinc-100 selection:bg-indigo-500/30 selection:text-indigo-200">
         {children}
       </body>
     </html>

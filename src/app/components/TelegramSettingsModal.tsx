@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { createClient } from '@/lib/supabase/client'
 
 interface TelegramSettingsModalProps {
@@ -16,6 +17,11 @@ export function TelegramSettingsModal({ isOpen, onClose }: TelegramSettingsModal
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [showUnlinkConfirm, setShowUnlinkConfirm] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     if (!isOpen) {
@@ -113,11 +119,11 @@ export function TelegramSettingsModal({ isOpen, onClose }: TelegramSettingsModal
     }
   }
 
-  if (!isOpen) return null
+  if (!isOpen || !mounted) return null
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-xs">
-      <div className="w-full max-w-md rounded-2xl bg-zinc-900 p-6 shadow-xl border border-zinc-800 text-white relative">
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
+      <div className="w-full max-w-md rounded-xl bg-[#2C2C30] p-6 shadow-2xl border border-zinc-800/80 text-white relative">
         <button
           onClick={() => {
             setShowUnlinkConfirm(false)
@@ -273,6 +279,7 @@ export function TelegramSettingsModal({ isOpen, onClose }: TelegramSettingsModal
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

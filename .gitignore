@@ -44,6 +44,7 @@ next-env.d.ts
 # agent rules & temp docs
 .agents/
 docs/*
+graphify-out/*
 
 # supabase temp
 supabase/.temp/

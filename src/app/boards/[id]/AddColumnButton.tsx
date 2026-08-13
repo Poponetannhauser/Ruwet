@@ -32,7 +32,7 @@ export function AddColumnButton({ boardId }: AddColumnButtonProps) {
   return (
     <div className="w-80 flex-shrink-0">
       {isOpen ? (
-        <div className="rounded-xl bg-zinc-900 p-4 shadow-sm border border-zinc-800">
+        <div className="rounded-xl bg-[#2C2C30] p-4 shadow-sm">
           <form onSubmit={handleSubmit} className="space-y-3">
             <div>
               <label className="block text-[10px] uppercase font-bold text-zinc-400 mb-1">
@@ -44,7 +44,7 @@ export function AddColumnButton({ boardId }: AddColumnButtonProps) {
                 required
                 autoFocus
                 placeholder="Contoh: In Progress..."
-                className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-xs text-white placeholder-zinc-500 focus:border-indigo-500 focus:outline-none"
+                className="w-full rounded-lg border border-zinc-700/60 bg-[#1A1A1E] px-3 py-2 text-xs text-white placeholder-zinc-500 focus:border-indigo-500 focus:outline-none"
               />
             </div>
             {error && (
@@ -54,7 +54,7 @@ export function AddColumnButton({ boardId }: AddColumnButtonProps) {
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="rounded-lg border border-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-400 hover:bg-zinc-800 hover:text-white"
+                className="rounded-lg border border-zinc-700/60 px-3 py-1.5 text-xs font-medium text-zinc-400 hover:bg-zinc-800 hover:text-white"
               >
                 Batal
               </button>
@@ -71,14 +71,13 @@ export function AddColumnButton({ boardId }: AddColumnButtonProps) {
       ) : (
         <button
           onClick={() => setIsOpen(true)}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-800 bg-zinc-900/50 p-4 text-xs font-bold text-zinc-400 hover:border-zinc-700 hover:text-zinc-200 hover:bg-zinc-900 transition-all duration-200"
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-700/60 bg-[#2C2C30]/60 p-3.5 text-xs font-bold text-zinc-400 hover:border-zinc-600 hover:text-zinc-200 hover:bg-[#2C2C30] transition-all duration-200"
         >
           <svg className="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
           Tambah Kolom Baru
         </button>
-
       )}
     </div>
   )

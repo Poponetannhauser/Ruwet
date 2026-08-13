@@ -55,7 +55,7 @@ export default async function BoardDetailPage({
   const isOwner = board.owner_id === user.id
 
   return (
-    <div className="flex min-h-screen bg-zinc-950 text-zinc-100 selection:bg-indigo-500/30 selection:text-indigo-200">
+    <div className="flex min-h-screen bg-[#1A1A1E] text-zinc-100 selection:bg-indigo-500/30 selection:text-indigo-200">
       {/* Left Sidebar Navigation */}
       <AppSidebar
         userEmail={user.email}

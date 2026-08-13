@@ -32,25 +32,25 @@
 
 /* Modern Clean Minimalist Components */
 .glass-panel {
-  background: rgba(24, 24, 27, 0.95);
-  border: 1px solid rgba(39, 39, 42, 0.8);
+  background: #2C2C30;
+  border: 1px solid rgba(63, 63, 70, 0.4);
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
 }
 
 .glass-card {
-  background: rgba(24, 24, 27, 0.8);
-  border: 1px solid rgba(39, 39, 42, 0.7);
+  background: #2C2C30;
+  border: 1px solid rgba(63, 63, 70, 0.4);
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
 }
 
 .glass-card:hover {
-  background: rgba(39, 39, 42, 0.9);
-  border-color: rgba(63, 63, 70, 0.9);
+  background: #34343a;
+  border-color: rgba(82, 82, 91, 0.6);
 }
 
 .glass-modal {
-  background: rgba(18, 18, 20, 0.98);
-  border: 1px solid rgba(39, 39, 42, 0.9);
+  background: #2C2C30;
+  border: 1px solid rgba(63, 63, 70, 0.5);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
 }
 

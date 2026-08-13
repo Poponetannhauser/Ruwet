@@ -27,7 +27,7 @@ export function AppSidebar({
   return (
     <>
       {/* Mobile Top Bar */}
-      <div className="flex md:hidden items-center justify-between border-b border-zinc-800 bg-zinc-950 px-4 py-3 sticky top-0 z-40">
+      <div className="flex md:hidden items-center justify-between border-b border-zinc-800/80 bg-[#2C2C30] px-4 py-3 sticky top-0 z-40">
         <div className="flex items-center gap-2.5">
           <button
             onClick={() => setIsMobileOpen(!isMobileOpen)}
@@ -63,19 +63,19 @@ export function AppSidebar({
 
       {/* Main Sidebar Container (Desktop & Mobile Drawer) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-zinc-900 border-r border-zinc-800 transition-transform duration-200 ease-in-out md:static md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-[#2C2C30] border-r border-zinc-800/80 transition-transform duration-200 ease-in-out md:static md:translate-x-0 ${
           isMobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         {/* Header & Logo */}
-        <div className="flex items-center justify-between border-b border-zinc-800 px-5 py-4">
+        <div className="flex items-center justify-between border-b border-zinc-800/80 px-5 py-4">
           <Link href="/" className="flex items-center gap-3 group">
             <Image
               src="/ruwet-logo.png"
               alt="Logo Ruwet"
               width={32}
               height={32}
-              className="h-8 w-8 rounded-xl object-cover border border-zinc-800 group-hover:border-zinc-700 transition"
+              className="h-8 w-8 rounded-lg object-cover border border-zinc-800 group-hover:border-zinc-700 transition"
             />
             <div className="flex flex-col">
               <span className="text-base font-extrabold tracking-tight text-white group-hover:text-indigo-400 transition-colors">
@@ -85,7 +85,7 @@ export function AppSidebar({
             </div>
           </Link>
 
-          <span className="rounded-full bg-zinc-800 border border-zinc-700 px-2 py-0.5 text-[10px] font-semibold text-zinc-400 font-mono">
+          <span className="rounded-full bg-zinc-800/80 border border-zinc-700/60 px-2 py-0.5 text-[10px] font-semibold text-zinc-400 font-mono">
             v2.4.0
           </span>
         </div>
@@ -102,11 +102,11 @@ export function AppSidebar({
               onClick={() => setIsMobileOpen(false)}
               className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-bold transition-all ${
                 isDashboardActive
-                  ? 'bg-indigo-600 text-white shadow-xs'
-                  : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
+                  ? 'bg-[#383842] text-white shadow-xs'
+                  : 'text-zinc-400 hover:bg-[#232328] hover:text-zinc-200'
               }`}
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
               </svg>
               <span>Dashboard Kanban</span>
@@ -125,10 +125,10 @@ export function AppSidebar({
                   setIsTelegramModalOpen(true)
                   setIsMobileOpen(false)
                 }}
-                className={`w-full flex items-center justify-between rounded-lg px-3 py-2.5 text-xs font-bold transition-all border ${
+                className={`w-full flex items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold transition-all border ${
                   hasTelegramLinked
-                    ? 'border-sky-800/60 bg-sky-950/30 text-sky-300 hover:bg-sky-900/40'
-                    : 'border-zinc-800 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
+                    ? 'border-sky-800/40 bg-sky-950/40 text-sky-300 hover:bg-sky-900/40'
+                    : 'border-zinc-800/80 bg-[#1c1c24] text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
                 }`}
               >
                 <div className="flex items-center gap-2.5">
@@ -138,10 +138,10 @@ export function AppSidebar({
                   <span>Bot Telegram</span>
                 </div>
                 <span
-                  className={`text-[9px] font-extrabold px-1.5 py-0.2 rounded border ${
+                  className={`text-[9px] font-bold px-1.5 py-0.2 rounded ${
                     hasTelegramLinked
-                      ? 'bg-sky-900/80 text-sky-200 border-sky-700'
-                      : 'bg-zinc-800 text-zinc-400 border-zinc-700'
+                      ? 'bg-sky-950 text-sky-300 border border-sky-800/60'
+                      : 'bg-zinc-800 text-zinc-400'
                   }`}
                 >
                   {hasTelegramLinked ? 'Aktif' : 'Link'}
@@ -153,21 +153,17 @@ export function AppSidebar({
 
         {/* Footer Profile & Logout */}
         {userEmail && (
-          <div className="border-t border-zinc-800 p-4 space-y-3 bg-zinc-950/40">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5 min-w-0 pr-2">
-                <div className="h-8 w-8 shrink-0 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-bold text-white border border-zinc-700">
-                  {userEmail.charAt(0).toUpperCase()}
-                </div>
-                <div className="flex flex-col min-w-0">
-                  <span className="text-xs font-bold text-white truncate" title={userEmail}>
-                    {userEmail}
-                  </span>
-                  <span className="text-[10px] text-zinc-500">Workspace Member</span>
-                </div>
+          <div className="border-t border-zinc-800/80 p-4 space-y-3 bg-[#16161c]/60">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="h-8 w-8 shrink-0 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-bold text-white border border-zinc-700">
+                {userEmail.charAt(0).toUpperCase()}
               </div>
-
-              <NotificationBell />
+              <div className="flex flex-col min-w-0">
+                <span className="text-xs font-bold text-white truncate" title={userEmail}>
+                  {userEmail}
+                </span>
+                <span className="text-[10px] text-zinc-500">Workspace Member</span>
+              </div>
             </div>
 
             {logoutAction && (

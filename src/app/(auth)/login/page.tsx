@@ -10,8 +10,8 @@ export default async function LoginPage({
   const { error, message } = await searchParams
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-950 text-zinc-100 px-4 py-12 sm:px-6 lg:px-8 selection:bg-indigo-500/30 selection:text-indigo-200">
-      <div className="w-full max-w-md space-y-8 bg-zinc-900 p-8 sm:p-10 rounded-2xl border border-zinc-800 shadow-sm relative overflow-hidden">
+    <div className="flex min-h-screen items-center justify-center bg-[#1A1A1E] text-zinc-100 px-4 py-12 sm:px-6 lg:px-8 selection:bg-indigo-500/30 selection:text-indigo-200">
+      <div className="w-full max-w-md space-y-8 bg-[#2C2C30] p-8 sm:p-10 rounded-xl border border-zinc-800/80 shadow-2xl relative overflow-hidden">
         <div className="text-center relative">
           <Image
             src="/ruwet-logo.png"
