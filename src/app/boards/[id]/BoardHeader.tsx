@@ -1,14 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { updateBoard, deleteBoard, leaveBoard } from '../actions'
 import { InviteMemberModal } from './InviteMemberModal'
 import { MemberList } from './MemberList'
 import { NotificationBell } from '@/app/components/NotificationBell'
 import { BoardSummaryModal } from './BoardSummaryModal'
 import { TelegramSettingsModal } from '@/app/components/TelegramSettingsModal'
-
-
 
 type Member = {
   id: string
@@ -60,6 +59,12 @@ export function BoardHeader({ board, isOwner, members, columns = [], tasks = [] 
   const [staleThreshold, setStaleThreshold] = useState(board.stale_threshold_hours || 48)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true)
+  }, [])
 
   async function handleUpdate(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -216,8 +221,8 @@ export function BoardHeader({ board, isOwner, members, columns = [], tasks = [] 
                 Hapus Board
               </button>
 
-              {isDeleting && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
+              {isDeleting && mounted && createPortal(
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
                   <div className="w-full max-w-sm rounded-xl glass-modal p-6 shadow-2xl border border-white/10">
                     <h3 className="text-lg font-extrabold text-white">
                       Konfirmasi Hapus Board
@@ -241,7 +246,8 @@ export function BoardHeader({ board, isOwner, members, columns = [], tasks = [] 
                       </button>
                     </div>
                   </div>
-                </div>
+                </div>,
+                document.body
               )}
             </div>
           ) : (

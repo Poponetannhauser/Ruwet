@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { updateTask, deleteTask } from './taskActions'
 import { ActivityFeed } from './ActivityFeed'
@@ -54,8 +55,14 @@ export function EditTaskModal({
   const [isDeletingConfirm, setIsDeletingConfirm] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
-  if (!isOpen) return null
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true)
+  }, [])
+
+  if (!isOpen || !mounted) return null
 
   async function handleUpdate(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -89,14 +96,14 @@ export function EditTaskModal({
     }
   }
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3 sm:p-4 backdrop-blur-xs"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-3 sm:p-4 backdrop-blur-xs"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 8 }}
@@ -352,7 +359,8 @@ export function EditTaskModal({
       )}
     </motion.div>
   )}
-</AnimatePresence>
+</AnimatePresence>,
+document.body
 )
 }
 

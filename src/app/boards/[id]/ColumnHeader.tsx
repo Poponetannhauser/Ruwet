@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { updateColumn, deleteColumn } from './columnActions'
 
 type ColumnHeaderProps = {
@@ -17,6 +18,12 @@ export function ColumnHeader({ column }: ColumnHeaderProps) {
   const [name, setName] = useState(column.name)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true)
+  }, [])
 
   async function handleUpdate(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -120,8 +127,8 @@ export function ColumnHeader({ column }: ColumnHeaderProps) {
       )}
 
       {/* Custom Delete Column Confirmation Modal */}
-      {isDeletingConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 text-left">
+      {isDeletingConfirm && mounted && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 text-left">
           <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-2xl dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
             <h3 className="text-base font-bold text-zinc-900 dark:text-white">
               Konfirmasi Hapus Kolom
@@ -147,7 +154,8 @@ export function ColumnHeader({ column }: ColumnHeaderProps) {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )
