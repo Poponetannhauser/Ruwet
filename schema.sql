@@ -61,12 +61,16 @@ create table tasks (
   assignee_id uuid references profiles(id) on delete set null,
   due_date date,
   task_number integer,
-  priority text default 'medium' check (priority in ('low', 'medium', 'high', 'urgent')),
+  priority text default 'P2' check (priority in ('P0', 'P1', 'P2', 'P3')),
+  category text,
+  phase text,
   status_updated_at timestamptz default now(),
   created_by uuid references profiles(id) on delete set null,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
+
+create index if not exists idx_tasks_board_category_phase on tasks (board_id, category, phase);
 
 
 -- Trigger to auto-assign task_number per board_id
@@ -108,6 +112,20 @@ create table comments (
   created_at timestamptz default now()
 );
 
+-- 8. Board Documents
+create table board_documents (
+  id uuid primary key default gen_random_uuid(),
+  board_id uuid references boards(id) on delete cascade not null,
+  title text not null,
+  content text default '',
+  doc_type text default 'general',
+  created_by uuid references profiles(id) on delete set null,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create index if not exists idx_board_documents_board_id on board_documents(board_id);
+
 -------------------------------------------------------
 -- ROW LEVEL SECURITY (RLS) POLICIES & FUNCTIONS
 -------------------------------------------------------
@@ -131,6 +149,7 @@ alter table columns enable row level security;
 alter table tasks enable row level security;
 alter table activity_log enable row level security;
 alter table comments enable row level security;
+alter table board_documents enable row level security;
 
 -- 1. Profiles Policies
 create policy "Allow authenticated users to view profiles"
@@ -334,8 +353,40 @@ create policy "Board members can insert comments"
     )
   );
 
+-- 8. Board Documents Policies
+create policy "Board members can view documents"
+  on board_documents for select
+  to authenticated
+  using (
+    is_board_member(board_id, auth.uid()) or
+    exists (select 1 from boards where id = board_id and owner_id = auth.uid())
+  );
 
--- 8. Notifications
+create policy "Board members can insert documents"
+  on board_documents for insert
+  to authenticated
+  with check (
+    is_board_member(board_id, auth.uid()) or
+    exists (select 1 from boards where id = board_id and owner_id = auth.uid())
+  );
+
+create policy "Board members can update documents"
+  on board_documents for update
+  to authenticated
+  using (
+    is_board_member(board_id, auth.uid()) or
+    exists (select 1 from boards where id = board_id and owner_id = auth.uid())
+  );
+
+create policy "Board members can delete documents"
+  on board_documents for delete
+  to authenticated
+  using (
+    is_board_member(board_id, auth.uid()) or
+    exists (select 1 from boards where id = board_id and owner_id = auth.uid())
+  );
+
+-- 9. Notifications
 create table notifications (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references profiles(id) on delete cascade not null,
