@@ -150,20 +150,65 @@ export function CreateTaskModal({
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-                    Prioritas Task
-                  </label>
-                  <select
-                    name="priority"
-                    defaultValue="medium"
-                    className="w-full rounded-md border border-zinc-300 px-3 py-2 text-xs text-zinc-900 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white font-medium"
-                  >
-                    <option value="low">Low (Rendah)</option>
-                    <option value="medium">Medium (Sedang)</option>
-                    <option value="high">High (Tinggi)</option>
-                    <option value="urgent">Urgent (Mendesak)</option>
-                  </select>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                      Prioritas Task
+                    </label>
+                    <select
+                      name="priority"
+                      defaultValue="P2"
+                      className="w-full rounded-md border border-zinc-300 px-3 py-2 text-xs text-zinc-900 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white font-medium"
+                    >
+                      <option value="P0">🔴 P0 - Blocker / Critical</option>
+                      <option value="P1">🟠 P1 - High Priority</option>
+                      <option value="P2">🔵 P2 - Medium Priority</option>
+                      <option value="P3">⚪ P3 - Low Priority</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                      Kategori (Category)
+                    </label>
+                    <input
+                      name="category"
+                      type="text"
+                      list="category-suggestions"
+                      placeholder="e.g. Design, Dev"
+                      className="w-full rounded-md border border-zinc-300 px-3 py-2 text-xs text-zinc-900 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                    />
+                    <datalist id="category-suggestions">
+                      <option value="Programming" />
+                      <option value="Design" />
+                      <option value="Art & Assets" />
+                      <option value="Audio / SFX" />
+                      <option value="Content & Writing" />
+                      <option value="QA & Testing" />
+                      <option value="Marketing & Ops" />
+                    </datalist>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                      Fase (Phase)
+                    </label>
+                    <input
+                      name="phase"
+                      type="text"
+                      list="phase-suggestions"
+                      placeholder="e.g. Prototype, Prod"
+                      className="w-full rounded-md border border-zinc-300 px-3 py-2 text-xs text-zinc-900 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                    />
+                    <datalist id="phase-suggestions">
+                      <option value="Prototype" />
+                      <option value="Core Production" />
+                      <option value="Content" />
+                      <option value="Polish" />
+                      <option value="Testing" />
+                      <option value="Release" />
+                    </datalist>
+                  </div>
                 </div>
 
 
