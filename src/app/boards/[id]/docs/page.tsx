@@ -57,7 +57,9 @@ export default async function BoardDocsPage({
               href={`/boards/${id}`}
               className="text-xs font-semibold text-zinc-400 hover:text-white flex items-center gap-1.5 transition"
             >
-              <span>←</span>
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+              </svg>
               <span>Kanban</span>
             </Link>
             <span className="text-zinc-600">/</span>

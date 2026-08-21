@@ -161,9 +161,12 @@ export function DocumentList({
                 <button
                   type="button"
                   onClick={onOpenUploadModal}
-                  className="block mx-auto text-indigo-400 hover:text-indigo-300 font-bold"
+                  className="inline-flex items-center gap-1.5 mx-auto text-indigo-400 hover:text-indigo-300 font-bold"
                 >
-                  + Upload Dokumen
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  <span>Upload Dokumen</span>
                 </button>
               </div>
             )}

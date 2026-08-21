@@ -75,7 +75,7 @@ export default async function BoardDetailPage({
           tasks={tasks || []}
         />
 
-        <main className="flex-1 p-4 sm:p-8 overflow-x-auto">
+        <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
           <KanbanBoard
             boardId={id}
             staleThresholdHours={board.stale_threshold_hours ? Number(board.stale_threshold_hours) : 48}
