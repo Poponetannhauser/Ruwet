@@ -221,13 +221,13 @@ export function CreateDocumentModal({
                         type="file"
                         onChange={handleFileChange}
                         className="sr-only"
-                        accept=".pdf,.doc,.docx,.md,.markdown,.txt,.json,.yaml,.yml,.png,.jpg,.jpeg,.webp"
+                        accept=".pdf,.doc,.docx,.md,.markdown,.txt,.csv,.json,.yaml,.yml,.png,.jpg,.jpeg,.webp"
                       />
                     </label>
                     {!isDragging && <span className="pl-1 text-zinc-500">atau drag &amp; drop</span>}
                   </div>
                   <p className="text-[11px] text-zinc-500">
-                    Mendukung PDF, Word, Markdown, Text, JSON, YAML, Gambar (Maks. 5MB)
+                    Mendukung PDF, Word, CSV / Spreadsheet, Markdown, Text, JSON, YAML, Gambar (Maks. 5MB)
                   </p>
                   {selectedFile && (
                     <div className="mt-2 text-xs font-semibold text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 px-2.5 py-1.5 rounded-lg flex items-center justify-center gap-2">

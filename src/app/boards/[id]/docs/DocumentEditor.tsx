@@ -8,6 +8,7 @@ import {
   DOCUMENT_TYPE_LABELS,
 } from './docTypes'
 import { deleteDocument } from './docActions'
+import { CsvTableView } from './CsvTableView'
 
 type DocumentViewerProps = {
   document: BoardDocument
@@ -39,12 +40,20 @@ export function DocumentEditor({
     }
   }
 
+  const isCsv =
+    doc.file_name?.toLowerCase().endsWith('.csv') ||
+    doc.file_type?.includes('csv')
+
   const isMarkdownOrText =
-    doc.file_name?.endsWith('.md') ||
-    doc.file_name?.endsWith('.txt') ||
-    doc.file_name?.endsWith('.json') ||
-    doc.file_type?.includes('text') ||
-    (!doc.content.startsWith('data:') && doc.content.length > 0)
+    !isCsv &&
+    (doc.file_name?.endsWith('.md') ||
+      doc.file_name?.endsWith('.markdown') ||
+      doc.file_name?.endsWith('.txt') ||
+      doc.file_name?.endsWith('.json') ||
+      doc.file_name?.endsWith('.yaml') ||
+      doc.file_name?.endsWith('.yml') ||
+      doc.file_type?.includes('text') ||
+      (!doc.content.startsWith('data:') && doc.content.length > 0))
 
   const isDataUrl = doc.content.startsWith('data:')
   const isImage = doc.file_type?.startsWith('image/') || doc.content.startsWith('data:image/')
@@ -234,7 +243,11 @@ export function DocumentEditor({
 
       {/* Document Content / Preview Area */}
       <div className="flex-1 p-5 sm:p-8 overflow-y-auto bg-[#1A1A1E] text-zinc-200">
-        {isImage ? (
+        {isCsv ? (
+          <div className="h-full">
+            <CsvTableView content={doc.content} fileName={doc.file_name} />
+          </div>
+        ) : isImage ? (
           <div className="flex flex-col items-center justify-center p-4">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={doc.content} alt={doc.title} className="max-w-full max-h-[600px] object-contain rounded-lg border border-zinc-800" />

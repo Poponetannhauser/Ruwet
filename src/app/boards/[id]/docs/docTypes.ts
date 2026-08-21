@@ -53,6 +53,7 @@ export const ALLOWED_DOC_EXTENSIONS = [
   '.md',
   '.markdown',
   '.txt',
+  '.csv',
   '.json',
   '.yaml',
   '.yml',

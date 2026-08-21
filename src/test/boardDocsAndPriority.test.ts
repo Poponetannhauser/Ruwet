@@ -42,6 +42,8 @@ describe("Priority P0-P3 & Formatting Tests", () => {
     expect(isValidDocumentExtension("wireframe.png")).toBe(true)
     expect(isValidDocumentExtension("mockup.jpg")).toBe(true)
     expect(isValidDocumentExtension("preview.webp")).toBe(true)
+    expect(isValidDocumentExtension("backlog.csv")).toBe(true)
+    expect(isValidDocumentExtension("DATA.CSV")).toBe(true)
 
     // Disallowed dangerous / web markup / executable extensions
     expect(isValidDocumentExtension("exploit.html")).toBe(false)

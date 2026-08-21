@@ -114,10 +114,11 @@ export async function uploadDocument(boardId: string, formData: FormData) {
   // If text or markdown file, read content text for quick in-browser preview
   let content = ''
   const isTextual =
-    (file.type && file.type.includes('text')) ||
+    (file.type && (file.type.includes('text') || file.type.includes('csv'))) ||
     sanitizedName.endsWith('.md') ||
     sanitizedName.endsWith('.markdown') ||
     sanitizedName.endsWith('.txt') ||
+    sanitizedName.endsWith('.csv') ||
     sanitizedName.endsWith('.json') ||
     sanitizedName.endsWith('.yaml') ||
     sanitizedName.endsWith('.yml')
