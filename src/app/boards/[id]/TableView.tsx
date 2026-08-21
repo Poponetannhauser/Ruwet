@@ -9,6 +9,7 @@ import {
   getCategoryBadgeStyle,
   getPhaseBadgeStyle,
   sanitizePhase,
+  calculateStaleStatus,
 } from './boardColors'
 
 type Member = {
@@ -37,6 +38,8 @@ type Task = {
   assignee_id: string | null
   due_date: string | null
   status_updated_at?: string | null
+  updated_at?: string | null
+  created_at?: string | null
   position: number
   task_number?: number
   priority?: string
@@ -53,6 +56,7 @@ type TableViewProps = {
   columns: Column[]
   members: Member[]
   boardId: string
+  staleThresholdHours?: number
 }
 
 function CustomCheckbox({
@@ -103,6 +107,7 @@ export function TableView({
   columns,
   members,
   boardId,
+  staleThresholdHours = 48,
 }: TableViewProps) {
   const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(new Set())
   const [activeEditTask, setActiveEditTask] = useState<Task | null>(null)
@@ -264,6 +269,9 @@ export function TableView({
               <th className="py-2.5 px-3 font-bold text-zinc-200 text-xs border-r border-zinc-800 min-w-[110px]">
                 Fase
               </th>
+              <th className="py-2.5 px-3 font-bold text-zinc-200 text-xs border-r border-zinc-800 min-w-[130px]">
+                Aktivitas
+              </th>
               <th className="py-2.5 px-3 font-bold text-zinc-200 text-xs border-r border-zinc-800 min-w-[110px]">
                 Tenggat
               </th>
@@ -367,6 +375,39 @@ export function TableView({
                       ) : (
                         <span className="text-zinc-600 italic">-</span>
                       )}
+                    </td>
+                    <td className="py-2 px-3 border-r border-zinc-800/80">
+                      {(() => {
+                        const staleInfo = calculateStaleStatus(task, columns, staleThresholdHours)
+                        if (!staleInfo) return <span className="text-zinc-600 italic">-</span>
+                        return (
+                          <span
+                            className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-semibold border ${
+                              staleInfo.status === 'red'
+                                ? 'bg-rose-500/10 text-rose-400 border-rose-500/30'
+                                : staleInfo.status === 'yellow'
+                                ? 'bg-amber-500/10 text-amber-400 border-amber-500/30'
+                                : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                            }`}
+                            title={`Status Aktivitas: ${staleInfo.label} (Threshold: ${staleThresholdHours}j)`}
+                          >
+                            {staleInfo.status === 'red' ? (
+                              <svg className="w-3 h-3 text-rose-400 shrink-0 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                              </svg>
+                            ) : staleInfo.status === 'yellow' ? (
+                              <svg className="w-3 h-3 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                            ) : (
+                              <svg className="w-3 h-3 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                              </svg>
+                            )}
+                            <span>{staleInfo.label}</span>
+                          </span>
+                        )
+                      })()}
                     </td>
                     <td className="py-2 px-3 border-r border-zinc-800/80 font-mono text-zinc-400">
                       {task.due_date ? (

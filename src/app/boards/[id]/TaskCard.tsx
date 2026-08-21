@@ -7,7 +7,12 @@ import { motion } from 'framer-motion'
 import { assignSelf } from './taskActions'
 import { EditTaskModal } from './EditTaskModal'
 import { CommentDrawer } from '@/app/components/CommentDrawer'
-import { getCategoryBadgeStyle, getPhaseBadgeStyle, sanitizePhase } from './boardColors'
+import {
+  getCategoryBadgeStyle,
+  getPhaseBadgeStyle,
+  sanitizePhase,
+  calculateStaleStatus,
+} from './boardColors'
 
 type Column = {
   id: string
@@ -81,46 +86,8 @@ export function TaskCard({
   const assigneeInitial = assigneeName.charAt(0).toUpperCase()
 
   // Calculate Stale Status
-  const currentColumn = columns.find((c) => c.id === task.column_id)
-  const isDoneColumn = currentColumn?.name.trim().toLowerCase() === 'done'
-  const hasAssignee = !!task.assignee_id
   const [nowMs] = useState(() => Date.now())
-
-  let staleStatus: 'green' | 'yellow' | 'red' | null = null
-  let staleLabel = ''
-
-  if (hasAssignee && !isDoneColumn && task.status_updated_at && nowMs > 0) {
-    const updatedMs = new Date(task.status_updated_at).getTime()
-    const diffMs = nowMs - updatedMs
-    const thresholdMs = staleThresholdHours * 60 * 60 * 1000
-
-    const ratio = diffMs / thresholdMs
-
-    // Calculate readable elapsed time
-    const diffMinutes = Math.floor(diffMs / (1000 * 60))
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-
-    let elapsedText = ''
-    if (diffDays > 0) {
-      elapsedText = `${diffDays}h`
-    } else if (diffHours > 0) {
-      elapsedText = `${diffHours}j`
-    } else {
-      elapsedText = `${diffMinutes}m`
-    }
-
-    if (ratio >= 1.0) {
-      staleStatus = 'red'
-      staleLabel = `Stale (${elapsedText})`
-    } else if (ratio >= 0.75) {
-      staleStatus = 'yellow'
-      staleLabel = `Warning (${elapsedText})`
-    } else {
-      staleStatus = 'green'
-      staleLabel = `Active (${elapsedText})`
-    }
-  }
+  const staleInfo = calculateStaleStatus(task, columns, staleThresholdHours, nowMs)
 
   async function handleAssignSelf(e: React.MouseEvent) {
     e.stopPropagation()
@@ -213,27 +180,31 @@ export function TaskCard({
 
         <div className="mt-3 flex items-center justify-between border-t border-zinc-100 pt-2 text-[10px] text-zinc-500 dark:border-zinc-800/80 dark:text-zinc-400">
           <div className="flex items-center gap-2">
-            {staleStatus && (
+            {staleInfo && (
               <span
-                className={`inline-flex items-center gap-1 font-semibold rounded px-1.5 py-0.5 text-[10px] ${
-                  staleStatus === 'red'
-                    ? 'bg-rose-950/50 text-rose-400'
-                    : staleStatus === 'yellow'
-                    ? 'bg-amber-950/50 text-amber-400'
-                    : 'bg-emerald-950/50 text-emerald-400'
+                className={`inline-flex items-center gap-1 font-semibold rounded px-1.5 py-0.5 text-[10px] border transition-colors ${
+                  staleInfo.status === 'red'
+                    ? 'bg-rose-500/10 text-rose-400 border-rose-500/30'
+                    : staleInfo.status === 'yellow'
+                    ? 'bg-amber-500/10 text-amber-400 border-amber-500/30'
+                    : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
                 }`}
-                title={`Stale status: ${staleStatus}`}
+                title={`Status Aktivitas: ${staleInfo.label} (Threshold: ${staleThresholdHours}j)`}
               >
-                <span
-                  className={`w-1.5 h-1.5 rounded-full ${
-                    staleStatus === 'red'
-                      ? 'bg-rose-400'
-                      : staleStatus === 'yellow'
-                      ? 'bg-amber-400'
-                      : 'bg-emerald-400'
-                  }`}
-                />
-                <span>{staleLabel}</span>
+                {staleInfo.status === 'red' ? (
+                  <svg className="w-3 h-3 text-rose-400 shrink-0 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                ) : staleInfo.status === 'yellow' ? (
+                  <svg className="w-3 h-3 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                ) : (
+                  <svg className="w-3 h-3 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                )}
+                <span>{staleInfo.label}</span>
               </span>
             )}
 

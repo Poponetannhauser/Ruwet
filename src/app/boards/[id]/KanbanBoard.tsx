@@ -877,6 +877,7 @@ export function KanbanBoard({
             columns={columns}
             members={members}
             boardId={boardId}
+            staleThresholdHours={staleThresholdHours}
           />
         </div>
       ) : (

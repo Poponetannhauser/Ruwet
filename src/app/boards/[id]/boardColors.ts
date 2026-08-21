@@ -98,3 +98,87 @@ export function sanitizePhase(phase: string | null | undefined): string | null {
 
   return p || null
 }
+
+export type StaleResult = {
+  status: 'green' | 'yellow' | 'red'
+  label: string
+  elapsedText: string
+  diffMs: number
+  ratio: number
+} | null
+
+/**
+ * Calculates staleness status for a task based on last update timestamp and board threshold
+ */
+export function calculateStaleStatus(
+  task: {
+    status_updated_at?: string | null
+    updated_at?: string | null
+    created_at?: string | null
+    column_id: string
+  },
+  columns: Array<{ id: string; name: string }>,
+  staleThresholdHours: number = 48,
+  nowMs: number = Date.now()
+): StaleResult {
+  const currentColumn = columns.find((c) => c.id === task.column_id)
+  const colName = currentColumn?.name?.trim().toLowerCase() || ''
+  const isDoneColumn =
+    colName === 'done' ||
+    colName === 'selesai' ||
+    colName === 'completed' ||
+    colName === 'release' ||
+    colName === 'archive'
+
+  if (isDoneColumn) return null
+
+  const timestampStr = task.status_updated_at || task.updated_at || task.created_at
+  if (!timestampStr) return null
+
+  const updatedMs = new Date(timestampStr).getTime()
+  if (isNaN(updatedMs) || updatedMs <= 0) return null
+
+  const diffMs = Math.max(0, nowMs - updatedMs)
+  const thresholdMs = staleThresholdHours * 60 * 60 * 1000
+
+  const ratio = diffMs / thresholdMs
+
+  const diffMinutes = Math.floor(diffMs / (1000 * 60))
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+
+  let elapsedText = ''
+  if (diffDays > 0) {
+    elapsedText = `${diffDays}h`
+  } else if (diffHours > 0) {
+    elapsedText = `${diffHours}j`
+  } else {
+    elapsedText = `${diffMinutes}m`
+  }
+
+  if (ratio >= 1.0) {
+    return {
+      status: 'red',
+      label: `Stale (${elapsedText})`,
+      elapsedText,
+      diffMs,
+      ratio,
+    }
+  } else if (ratio >= 0.75) {
+    return {
+      status: 'yellow',
+      label: `Warning (${elapsedText})`,
+      elapsedText,
+      diffMs,
+      ratio,
+    }
+  } else {
+    return {
+      status: 'green',
+      label: `Active (${elapsedText})`,
+      elapsedText,
+      diffMs,
+      ratio,
+    }
+  }
+}

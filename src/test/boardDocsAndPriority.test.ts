@@ -73,4 +73,68 @@ describe("Priority P0-P3 & Formatting Tests", () => {
     expect(sanitizePhase(null)).toBe(null)
     expect(sanitizePhase(undefined)).toBe(null)
   })
+
+  it("should accurately calculate stale status, ratios, and elapsed time labels", async () => {
+    const { calculateStaleStatus } = await import("@/app/boards/[id]/boardColors")
+    const mockColumns = [
+      { id: "col-todo", name: "To Do" },
+      { id: "col-prog", name: "In Progress" },
+      { id: "col-done", name: "Done" },
+    ]
+
+    const now = 1000000000000 // Fixed reference timestamp
+    const oneHourMs = 3600000
+    const thresholdHours = 48
+
+    // 1. Fresh/Active task (1 hour ago)
+    const fresh = calculateStaleStatus(
+      {
+        column_id: "col-todo",
+        status_updated_at: new Date(now - 1 * oneHourMs).toISOString(),
+      },
+      mockColumns,
+      thresholdHours,
+      now
+    )
+    expect(fresh?.status).toBe("green")
+    expect(fresh?.label).toContain("Active")
+
+    // 2. Warning task (40 hours ago, ratio >= 0.75)
+    const warning = calculateStaleStatus(
+      {
+        column_id: "col-prog",
+        status_updated_at: new Date(now - 40 * oneHourMs).toISOString(),
+      },
+      mockColumns,
+      thresholdHours,
+      now
+    )
+    expect(warning?.status).toBe("yellow")
+    expect(warning?.label).toContain("Warning")
+
+    // 3. Stale task (50 hours ago, ratio >= 1.0)
+    const stale = calculateStaleStatus(
+      {
+        column_id: "col-todo",
+        status_updated_at: new Date(now - 50 * oneHourMs).toISOString(),
+      },
+      mockColumns,
+      thresholdHours,
+      now
+    )
+    expect(stale?.status).toBe("red")
+    expect(stale?.label).toContain("Stale")
+
+    // 4. Task in Done column should return null (no stale status)
+    const doneTask = calculateStaleStatus(
+      {
+        column_id: "col-done",
+        status_updated_at: new Date(now - 100 * oneHourMs).toISOString(),
+      },
+      mockColumns,
+      thresholdHours,
+      now
+    )
+    expect(doneTask).toBe(null)
+  })
 })
