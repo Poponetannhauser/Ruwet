@@ -6,6 +6,37 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { NotificationBell } from './NotificationBell'
 import { TelegramSettingsModal } from './TelegramSettingsModal'
+import { BoardSummaryModal } from '../boards/[id]/BoardSummaryModal'
+import { BoardMembersModal } from '../boards/[id]/BoardMembersModal'
+
+type Member = {
+  id: string
+  user_id?: string
+  role: string
+  profiles: {
+    full_name: string
+    avatar_url: string | null
+  } | null
+}
+
+type Column = {
+  id: string
+  name: string
+}
+
+type Task = {
+  id: string
+  board_id: string
+  column_id: string
+  title: string
+  assignee_id: string | null
+  due_date: string | null
+  status_updated_at?: string | null
+  profiles?: {
+    full_name: string
+    avatar_url: string | null
+  } | null
+}
 
 type AppSidebarProps = {
   userEmail?: string | null
@@ -13,6 +44,11 @@ type AppSidebarProps = {
   hasTelegramLinked?: boolean
   currentBoardId?: string
   boardName?: string
+  members?: Member[]
+  columns?: Column[]
+  tasks?: Task[]
+  staleThresholdHours?: number
+  isOwner?: boolean
 }
 
 export function AppSidebar({
@@ -21,9 +57,16 @@ export function AppSidebar({
   hasTelegramLinked = false,
   currentBoardId,
   boardName,
+  members = [],
+  columns = [],
+  tasks = [],
+  staleThresholdHours = 48,
+  isOwner = false,
 }: AppSidebarProps) {
   const pathname = usePathname()
   const [isTelegramModalOpen, setIsTelegramModalOpen] = useState(false)
+  const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false)
+  const [isMembersModalOpen, setIsMembersModalOpen] = useState(false)
   const [isMobileOpen, setIsMobileOpen] = useState(false)
 
   const isDashboardActive = pathname === '/'
@@ -160,6 +203,43 @@ export function AppSidebar({
                 </svg>
                 <span>Docs &amp; Specs Hub</span>
               </Link>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSummaryModalOpen(true)
+                  setIsMobileOpen(false)
+                }}
+                className="w-full flex items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold text-zinc-400 hover:bg-[#232328] hover:text-zinc-200 transition-all text-left"
+              >
+                <div className="flex items-center gap-3">
+                  <svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+                  </svg>
+                  <span>Ringkasan Board</span>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMembersModalOpen(true)
+                  setIsMobileOpen(false)
+                }}
+                className="w-full flex items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold text-zinc-400 hover:bg-[#232328] hover:text-zinc-200 transition-all text-left"
+              >
+                <div className="flex items-center gap-3">
+                  <svg className="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                  </svg>
+                  <span>Anggota Tim</span>
+                </div>
+                {members.length > 0 && (
+                  <span className="text-[10px] font-mono font-bold bg-zinc-800 text-zinc-300 px-1.5 py-0.2 rounded">
+                    {members.length}
+                  </span>
+                )}
+              </button>
             </div>
           )}
 
@@ -167,7 +247,7 @@ export function AppSidebar({
           {userEmail && (
             <div className="space-y-1">
               <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-2">
-                Asisten & Notifikasi
+                Asisten &amp; Notifikasi
               </div>
 
               <button
@@ -238,6 +318,30 @@ export function AppSidebar({
         isOpen={isTelegramModalOpen}
         onClose={() => setIsTelegramModalOpen(false)}
       />
+
+      {/* Board Summary Modal */}
+      {currentBoardId && (
+        <BoardSummaryModal
+          boardName={boardName || 'Board'}
+          staleThresholdHours={staleThresholdHours}
+          columns={columns}
+          tasks={tasks}
+          members={members}
+          isOpen={isSummaryModalOpen}
+          onClose={() => setIsSummaryModalOpen(false)}
+        />
+      )}
+
+      {/* Board Members Modal */}
+      {currentBoardId && (
+        <BoardMembersModal
+          boardId={currentBoardId}
+          members={members}
+          isOwner={isOwner}
+          isOpen={isMembersModalOpen}
+          onClose={() => setIsMembersModalOpen(false)}
+        />
+      )}
     </>
   )
 }

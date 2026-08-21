@@ -22,16 +22,36 @@ export default async function BoardDocsPage({
     redirect('/login')
   }
 
-  // Fetch profile, board, and documents
-  const [profileRes, boardRes, docsRes] = await Promise.all([
+  // Fetch profile, board, members, columns, tasks, and documents
+  const [profileRes, boardRes, docsRes, membersRes, columnsRes, rawTasksRes] = await Promise.all([
     supabase.from('profiles').select('telegram_chat_id').eq('id', user.id).single(),
     supabase.from('boards').select('*').eq('id', id).single(),
     getBoardDocuments(id),
+    supabase
+      .from('board_members')
+      .select('id, user_id, role, profiles(full_name, avatar_url)')
+      .eq('board_id', id),
+    supabase.from('columns').select('*').eq('board_id', id).order('position'),
+    supabase
+      .from('tasks')
+      .select('*, profiles:assignee_id(full_name, avatar_url)')
+      .eq('board_id', id)
+      .order('position'),
   ])
 
   const board = boardRes.data
   const hasTelegramLinked = !!profileRes.data?.telegram_chat_id
   const documents = docsRes.data || []
+  const members = (membersRes.data || []).map((m) => ({
+    ...m,
+    profiles: Array.isArray(m.profiles) ? m.profiles[0] : m.profiles,
+  }))
+  const columns = columnsRes.data || []
+  const tasks = (rawTasksRes.data || []).map((t) => ({
+    ...t,
+    profiles: Array.isArray(t.profiles) ? t.profiles[0] : t.profiles,
+  }))
+  const isOwner = board?.owner_id === user.id
 
   if (boardRes.error || !board) {
     notFound()
@@ -46,6 +66,11 @@ export default async function BoardDocsPage({
         hasTelegramLinked={hasTelegramLinked}
         currentBoardId={id}
         boardName={board.name}
+        members={members}
+        columns={columns}
+        tasks={tasks}
+        staleThresholdHours={board.stale_threshold_hours ? Number(board.stale_threshold_hours) : 48}
+        isOwner={isOwner}
       />
 
       {/* Main Content Workspace */}

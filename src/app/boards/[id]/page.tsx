@@ -63,6 +63,11 @@ export default async function BoardDetailPage({
         hasTelegramLinked={hasTelegramLinked}
         currentBoardId={id}
         boardName={board.name}
+        members={members}
+        columns={columns || []}
+        tasks={tasks || []}
+        staleThresholdHours={board.stale_threshold_hours ? Number(board.stale_threshold_hours) : 48}
+        isOwner={isOwner}
       />
 
       {/* Main Board Workspace Area */}
@@ -72,7 +77,6 @@ export default async function BoardDetailPage({
           isOwner={isOwner}
           members={members}
           columns={columns || []}
-          tasks={tasks || []}
         />
 
         <main className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">

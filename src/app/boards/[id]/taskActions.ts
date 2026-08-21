@@ -380,3 +380,140 @@ export async function moveTask(
   revalidatePath(`/boards/${boardId}`)
   return { success: true }
 }
+
+export type BatchTaskItem = {
+  title: string
+  description?: string | null
+  priority?: string | null
+  category?: string | null
+  phase?: string | null
+  assignee_id?: string | null
+  due_date?: string | null
+}
+
+export async function createBatchTasks(
+  boardId: string,
+  columnId: string,
+  taskList: BatchTaskItem[]
+) {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/login')
+  }
+
+  if (!taskList || taskList.length === 0) {
+    return { error: 'Daftar task kosong' }
+  }
+
+  if (taskList.length > 100) {
+    return { error: 'Maksimal 100 task dapat dibuat sekaligus dalam satu batch' }
+  }
+
+  const rateLimit = checkRateLimit(`task_batch_create:${user.id}`, { maxRequests: 10, intervalMs: 60000 })
+  if (!rateLimit.success) {
+    return { error: 'Terlalu banyak permintaan batch. Harap tunggu sebentar.' }
+  }
+
+  // Validasi kolom milik board ini
+  const { data: validCol } = await supabase
+    .from('columns')
+    .select('id, name')
+    .eq('id', columnId)
+    .eq('board_id', boardId)
+    .single()
+
+  if (!validCol) {
+    return { error: 'Kolom tidak valid untuk board ini' }
+  }
+
+  // Hitung jumlah task di kolom ini untuk menentukan start position
+  const { count } = await supabase
+    .from('tasks')
+    .select('id', { count: 'exact', head: true })
+    .eq('column_id', columnId)
+
+  let startPosition = (count || 0) + 1
+  const now = new Date().toISOString()
+  const validPriorities = ['P0', 'P1', 'P2', 'P3']
+
+  const insertPayloads: Array<{
+    board_id: string
+    column_id: string
+    title: string
+    description: string | null
+    assignee_id: string | null
+    due_date: string | null
+    priority: string
+    category: string | null
+    phase: string | null
+    position: number
+    created_by: string
+    status_updated_at: string
+    created_at: string
+    updated_at: string
+  }> = []
+
+  for (const item of taskList) {
+    const rawTitle = (item.title || '').trim()
+    if (!rawTitle) continue
+
+    const title = rawTitle.slice(0, 50)
+    const description = item.description ? item.description.trim() : null
+    const category = item.category && item.category.trim() !== '' ? item.category.trim().slice(0, 50) : null
+    const phase = item.phase && item.phase.trim() !== '' ? item.phase.trim().slice(0, 50) : null
+    const targetAssignee = item.assignee_id && item.assignee_id !== '' ? item.assignee_id : null
+    const dueDate = item.due_date && item.due_date.trim() !== '' ? item.due_date.trim() : null
+
+    let priority = 'P2'
+    if (item.priority) {
+      const upper = item.priority.toUpperCase().trim()
+      if (validPriorities.includes(upper)) {
+        priority = upper
+      } else if (upper === 'URGENT') {
+        priority = 'P0'
+      } else if (upper === 'HIGH') {
+        priority = 'P1'
+      } else if (upper === 'LOW') {
+        priority = 'P3'
+      }
+    }
+
+    insertPayloads.push({
+      board_id: boardId,
+      column_id: columnId,
+      title,
+      description,
+      assignee_id: targetAssignee,
+      due_date: dueDate,
+      priority,
+      category,
+      phase,
+      position: startPosition++,
+      created_by: user.id,
+      status_updated_at: now,
+      created_at: now,
+      updated_at: now,
+    })
+  }
+
+  if (insertPayloads.length === 0) {
+    return { error: 'Tidak ada task valid yang dapat dibuat (semua baris judul kosong)' }
+  }
+
+  const { data: createdTasks, error } = await supabase
+    .from('tasks')
+    .insert(insertPayloads)
+    .select('id, title')
+
+  if (error) {
+    return { error: error.message || 'Gagal membuat batch task' }
+  }
+
+  revalidatePath(`/boards/${boardId}`)
+  return { success: true, count: createdTasks?.length || insertPayloads.length }
+}
