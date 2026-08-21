@@ -342,11 +342,21 @@ export function BatchTaskModal({ boardId, columns, members: _members }: BatchTas
                         </label>
                         <input
                           type="text"
+                          list="batch-category-suggestions"
                           value={defaultCategory}
                           onChange={(e) => setDefaultCategory(e.target.value)}
-                          placeholder="e.g. Dev, Design"
+                          placeholder="e.g. Development, Design"
                           className="w-full rounded-md border border-zinc-700 bg-zinc-800 px-2.5 py-1.5 text-xs text-white focus:border-indigo-500 focus:outline-none"
                         />
+                        <datalist id="batch-category-suggestions">
+                          <option value="Development" />
+                          <option value="Design" />
+                          <option value="Art & Assets" />
+                          <option value="Audio" />
+                          <option value="Content" />
+                          <option value="QA & Testing" />
+                          <option value="Marketing" />
+                        </datalist>
                       </div>
 
                       <div>
@@ -355,11 +365,20 @@ export function BatchTaskModal({ boardId, columns, members: _members }: BatchTas
                         </label>
                         <input
                           type="text"
+                          list="batch-phase-suggestions"
                           value={defaultPhase}
                           onChange={(e) => setDefaultPhase(e.target.value)}
-                          placeholder="e.g. Prototype"
+                          placeholder="e.g. Prototype, Polish"
                           className="w-full rounded-md border border-zinc-700 bg-zinc-800 px-2.5 py-1.5 text-xs text-white focus:border-indigo-500 focus:outline-none"
                         />
+                        <datalist id="batch-phase-suggestions">
+                          <option value="Prototype" />
+                          <option value="Core Production" />
+                          <option value="Content" />
+                          <option value="Polish" />
+                          <option value="Testing" />
+                          <option value="Release" />
+                        </datalist>
                       </div>
                     </div>
 
