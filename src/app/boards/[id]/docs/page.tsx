@@ -89,6 +89,7 @@ export default async function BoardDocsPage({
           <DocsClientView
             boardId={id}
             initialDocuments={documents}
+            dbError={docsRes.error}
           />
         </main>
       </div>

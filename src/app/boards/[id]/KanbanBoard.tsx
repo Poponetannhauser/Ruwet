@@ -551,61 +551,89 @@ export function KanbanBoard({
           </div>
 
           {/* Priority Filter */}
-          <select
-            value={filterPriority}
-            onChange={(e) => setFilterPriority(e.target.value)}
-            className="text-xs py-1.5 pl-2.5 pr-8 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium cursor-pointer"
-          >
-            <option value="all">Semua Prioritas</option>
-            <option value="P0">P0 - Blocker</option>
-            <option value="P1">P1 - High</option>
-            <option value="P2">P2 - Medium</option>
-            <option value="P3">P3 - Low</option>
-          </select>
+          <div className="relative">
+            <select
+              value={filterPriority}
+              onChange={(e) => setFilterPriority(e.target.value)}
+              className="appearance-none text-xs py-1.5 pl-2.5 pr-8 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium cursor-pointer"
+            >
+              <option value="all">Semua Prioritas</option>
+              <option value="P0">P0 - Blocker</option>
+              <option value="P1">P1 - High</option>
+              <option value="P2">P2 - Medium</option>
+              <option value="P3">P3 - Low</option>
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-zinc-400">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
 
           {/* Category Filter */}
-          <select
-            value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
-            className="text-xs py-1.5 pl-2.5 pr-8 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium cursor-pointer"
-          >
-            <option value="all">Semua Kategori</option>
-            {availableCategories.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
+              className="appearance-none text-xs py-1.5 pl-2.5 pr-8 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium cursor-pointer"
+            >
+              <option value="all">Semua Kategori</option>
+              {availableCategories.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-zinc-400">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
 
           {/* Phase Filter */}
-          <select
-            value={filterPhase}
-            onChange={(e) => setFilterPhase(e.target.value)}
-            className="text-xs py-1.5 pl-2.5 pr-8 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium cursor-pointer"
-          >
-            <option value="all">Semua Fase</option>
-            {availablePhases.map((p) => (
-              <option key={p} value={p}>
-                {p}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              value={filterPhase}
+              onChange={(e) => setFilterPhase(e.target.value)}
+              className="appearance-none text-xs py-1.5 pl-2.5 pr-8 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium cursor-pointer"
+            >
+              <option value="all">Semua Fase</option>
+              {availablePhases.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-zinc-400">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
 
           {/* Assignee Filter */}
-          <select
-            value={filterAssignee}
-            onChange={(e) => setFilterAssignee(e.target.value)}
-            className="text-xs py-1.5 pl-2.5 pr-8 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium cursor-pointer"
-          >
-            <option value="all">Semua Assignee</option>
-            <option value="me">Ditugaskan ke Saya</option>
-            <option value="unassigned">Belum Ditugaskan</option>
-            {members.map((m) => (
-              <option key={m.id} value={m.user_id || ''}>
-                {m.profiles?.full_name || 'User'}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              value={filterAssignee}
+              onChange={(e) => setFilterAssignee(e.target.value)}
+              className="appearance-none text-xs py-1.5 pl-2.5 pr-8 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium cursor-pointer"
+            >
+              <option value="all">Semua Assignee</option>
+              <option value="me">Ditugaskan ke Saya</option>
+              <option value="unassigned">Belum Ditugaskan</option>
+              {members.map((m) => (
+                <option key={m.id} value={m.user_id || ''}>
+                  {m.profiles?.full_name || 'User'}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-zinc-400">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
 
           {/* Reset Filters */}
           {(searchQuery || filterPriority !== 'all' || filterCategory !== 'all' || filterPhase !== 'all' || filterAssignee !== 'all') && (
