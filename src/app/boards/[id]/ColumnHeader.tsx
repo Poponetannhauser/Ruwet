@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { updateColumn, deleteColumn } from './columnActions'
+import { updateColumn, deleteColumn, moveColumn } from './columnActions'
 
 type ColumnHeaderProps = {
   column: {
@@ -10,9 +10,12 @@ type ColumnHeaderProps = {
     name: string
     board_id: string
   }
+  isFirst?: boolean
+  isLast?: boolean
+  onMove?: (direction: 'left' | 'right') => void
 }
 
-export function ColumnHeader({ column }: ColumnHeaderProps) {
+export function ColumnHeader({ column, isFirst = false, isLast = false, onMove }: ColumnHeaderProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [isDeletingConfirm, setIsDeletingConfirm] = useState(false)
   const [name, setName] = useState(column.name)
@@ -24,6 +27,14 @@ export function ColumnHeader({ column }: ColumnHeaderProps) {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true)
   }, [])
+
+  async function handleMove(direction: 'left' | 'right') {
+    if (onMove) onMove(direction)
+    const result = await moveColumn(column.id, column.board_id, direction)
+    if (result && result.error) {
+      setError(result.error)
+    }
+  }
 
   async function handleUpdate(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -85,7 +96,6 @@ export function ColumnHeader({ column }: ColumnHeaderProps) {
           </button>
         </form>
       ) : (
-
         <div className="flex items-center justify-between group py-1">
           <div className="flex items-center gap-2">
             <span
@@ -97,7 +107,30 @@ export function ColumnHeader({ column }: ColumnHeaderProps) {
             </span>
           </div>
 
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity mr-3">
+          <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity mr-1">
+            {!isFirst && (
+              <button
+                onClick={() => handleMove('left')}
+                className="rounded-md p-1 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 transition-colors"
+                title="Geser Kolom ke Kiri"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.75 19.5L8.25 12l7.5-7.5" />
+                </svg>
+              </button>
+            )}
+
+            {!isLast && (
+              <button
+                onClick={() => handleMove('right')}
+                className="rounded-md p-1 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 transition-colors"
+                title="Geser Kolom ke Kanan"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                </svg>
+              </button>
+            )}
 
             <button
               onClick={() => setIsEditing(true)}
@@ -108,6 +141,7 @@ export function ColumnHeader({ column }: ColumnHeaderProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.89 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.89L16.863 4.487zm0 0L19.5 7.125" />
               </svg>
             </button>
+
             <button
               onClick={() => setIsDeletingConfirm(true)}
               disabled={loading}

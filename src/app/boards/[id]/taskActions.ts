@@ -517,3 +517,72 @@ export async function createBatchTasks(
   revalidatePath(`/boards/${boardId}`)
   return { success: true, count: createdTasks?.length || insertPayloads.length }
 }
+
+export async function deleteBatchTasks(taskIds: string[], boardId: string) {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/login')
+  }
+
+  if (!taskIds || taskIds.length === 0) {
+    return { error: 'Tidak ada task yang dipilih' }
+  }
+
+  const { error } = await supabase
+    .from('tasks')
+    .delete()
+    .in('id', taskIds)
+    .eq('board_id', boardId)
+
+  if (error) {
+    return { error: error.message || 'Gagal menghapus task' }
+  }
+
+  revalidatePath(`/boards/${boardId}`)
+  return { success: true, count: taskIds.length }
+}
+
+export async function moveBatchTasks(
+  taskIds: string[],
+  boardId: string,
+  targetColumnId: string
+) {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/login')
+  }
+
+  if (!taskIds || taskIds.length === 0) {
+    return { error: 'Tidak ada task yang dipilih' }
+  }
+
+  const now = new Date().toISOString()
+
+  const { error } = await supabase
+    .from('tasks')
+    .update({
+      column_id: targetColumnId,
+      status_updated_at: now,
+      updated_at: now,
+    })
+    .in('id', taskIds)
+    .eq('board_id', boardId)
+
+  if (error) {
+    return { error: error.message || 'Gagal memindahkan task' }
+  }
+
+  revalidatePath(`/boards/${boardId}`)
+  return { success: true, count: taskIds.length }
+}
+

@@ -25,6 +25,7 @@ import { ColumnHeader } from './ColumnHeader'
 import { AddColumnButton } from './AddColumnButton'
 import { CreateTaskModal } from './CreateTaskModal'
 import { TaskCard } from './TaskCard'
+import { TableView } from './TableView'
 import { moveTask } from './taskActions'
 
 type Member = {
@@ -80,6 +81,9 @@ function ColumnContainer({
   members,
   currentUserId,
   staleThresholdHours,
+  isFirst = false,
+  isLast = false,
+  onMoveColumn,
 }: {
   column: Column
   tasks: Task[]
@@ -87,6 +91,9 @@ function ColumnContainer({
   members: Member[]
   currentUserId: string
   staleThresholdHours?: number
+  isFirst?: boolean
+  isLast?: boolean
+  onMoveColumn?: (columnId: string, direction: 'left' | 'right') => void
 }) {
   const { setNodeRef, isOver } = useDroppable({
     id: column.id,
@@ -104,7 +111,12 @@ function ColumnContainer({
       <div>
         <div className="flex items-center justify-between pb-2 mb-2.5 px-1">
           <div className="flex-1">
-            <ColumnHeader column={column} />
+            <ColumnHeader
+              column={column}
+              isFirst={isFirst}
+              isLast={isLast}
+              onMove={(dir) => onMoveColumn && onMoveColumn(column.id, dir)}
+            />
           </div>
           <span className="rounded-full bg-zinc-800/80 px-2 py-0.5 text-[10px] font-bold text-zinc-400 font-mono">
             {tasks.length}
@@ -162,7 +174,18 @@ export function KanbanBoard({
   const [tasks, setTasks] = useState<Task[]>(initialTasks)
   const [activeTask, setActiveTask] = useState<Task | null>(null)
   const [previousTasksState, setPreviousTasksState] = useState<Task[]>(initialTasks)
+  const [viewMode, setViewMode] = useState<'kanban' | 'table'>('kanban')
   const [, setTick] = useState(0)
+
+  function handleMoveColumn(columnId: string, direction: 'left' | 'right') {
+    setColumns((prev) => {
+      const idx = prev.findIndex((c) => c.id === columnId)
+      if (idx === -1) return prev
+      const targetIdx = direction === 'left' ? idx - 1 : idx + 1
+      if (targetIdx < 0 || targetIdx >= prev.length) return prev
+      return arrayMove(prev, idx, targetIdx)
+    })
+  }
 
   // Filter States
   const [searchQuery, setSearchQuery] = useState('')
@@ -655,52 +678,103 @@ export function KanbanBoard({
             )}
           </div>
 
-          <div className="text-[11px] text-zinc-400 font-mono">
-            Menampilkan <span className="font-bold text-white">{filteredTasks.length}</span> dari {tasks.length} task
+          <div className="flex items-center gap-3">
+            {/* View Mode Toggle Switcher */}
+            <div className="flex items-center rounded-lg bg-[#18181b] p-0.5 border border-zinc-700/80">
+              <button
+                type="button"
+                onClick={() => setViewMode('kanban')}
+                className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-md transition ${
+                  viewMode === 'kanban'
+                    ? 'bg-indigo-600 text-white shadow-xs'
+                    : 'text-zinc-400 hover:text-zinc-200'
+                }`}
+                title="Tampilan Kanban (Card Columns)"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+                </svg>
+                <span className="hidden sm:inline">Kanban</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setViewMode('table')}
+                className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-md transition ${
+                  viewMode === 'table'
+                    ? 'bg-indigo-600 text-white shadow-xs'
+                    : 'text-zinc-400 hover:text-zinc-200'
+                }`}
+                title="Tampilan Tabel Ringkas (Notion-style Table)"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                </svg>
+                <span className="hidden sm:inline">Tabel</span>
+              </button>
+            </div>
+
+            <div className="text-[11px] text-zinc-400 font-mono hidden md:block">
+              <span className="font-bold text-white">{filteredTasks.length}</span> / {tasks.length} task
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Kanban Columns (Scrollable Area) */}
-      <div className="flex-1 overflow-x-auto overflow-y-auto px-4 sm:px-8 py-4 min-h-0">
-        <DndContext
-          sensors={sensors}
-          onDragStart={handleDragStart}
-          onDragOver={handleDragOver}
-          onDragEnd={handleDragEnd}
-        >
-          <div className="flex gap-6 items-start pb-6 min-w-max">
-            {columns.map((col) => {
-              const colTasks = filteredTasks.filter((t) => t.column_id === col.id)
-              return (
-                <ColumnContainer
-                  key={col.id}
-                  column={col}
-                  tasks={colTasks}
-                  columns={columns}
-                  members={members}
-                  currentUserId={currentUserId}
-                  staleThresholdHours={staleThresholdHours}
-                />
-              )
-            })}
-            <AddColumnButton boardId={boardId} />
-          </div>
+      {/* Main Board View: Table View OR Kanban Columns */}
+      {viewMode === 'table' ? (
+        <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-4 min-h-0">
+          <TableView
+            tasks={filteredTasks}
+            columns={columns}
+            members={members}
+            boardId={boardId}
+          />
+        </div>
+      ) : (
+        <div className="flex-1 overflow-x-auto overflow-y-auto px-4 sm:px-8 py-4 min-h-0">
+          <DndContext
+            sensors={sensors}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDragEnd={handleDragEnd}
+          >
+            <div className="flex gap-6 items-start pb-6 min-w-max">
+              {columns.map((col, idx) => {
+                const colTasks = filteredTasks.filter((t) => t.column_id === col.id)
+                return (
+                  <ColumnContainer
+                    key={col.id}
+                    column={col}
+                    tasks={colTasks}
+                    columns={columns}
+                    members={members}
+                    currentUserId={currentUserId}
+                    staleThresholdHours={staleThresholdHours}
+                    isFirst={idx === 0}
+                    isLast={idx === columns.length - 1}
+                    onMoveColumn={handleMoveColumn}
+                  />
+                )
+              })}
+              <AddColumnButton boardId={boardId} />
+            </div>
 
-          <DragOverlay>
-            {activeTask ? (
-              <div className="opacity-80 rotate-2 scale-105 shadow-2xl">
-                <TaskCard
-                  task={activeTask}
-                  columns={columns}
-                  members={members}
-                  currentUserId={currentUserId}
-                />
-              </div>
-            ) : null}
-          </DragOverlay>
-        </DndContext>
-      </div>
+            <DragOverlay>
+              {activeTask ? (
+                <div className="opacity-80 rotate-2 scale-105 shadow-2xl">
+                  <TaskCard
+                    task={activeTask}
+                    columns={columns}
+                    members={members}
+                    currentUserId={currentUserId}
+                  />
+                </div>
+              ) : null}
+            </DragOverlay>
+          </DndContext>
+        </div>
+      )}
     </div>
   )
 }
