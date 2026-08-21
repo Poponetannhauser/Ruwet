@@ -1,7 +1,11 @@
 -- Migration: Update tasks priority to P0-P3, add category and phase, and add board_documents table
 
 -- 1. Tasks Table Generalization
--- 1a. Map existing priorities to P0-P3
+-- 1a. Drop old check constraint first so new values (P0-P3) are permitted during update
+alter table tasks
+  drop constraint if exists tasks_priority_check;
+
+-- 1b. Map existing priorities to P0-P3
 update tasks
 set priority = case
   when priority = 'urgent' then 'P0'
@@ -11,10 +15,7 @@ set priority = case
 end
 where priority in ('low', 'medium', 'high', 'urgent');
 
--- 1b. Drop old constraint and add new P0-P3 check constraint
-alter table tasks
-  drop constraint if exists tasks_priority_check;
-
+-- 1c. Add new P0-P3 check constraint and set default
 alter table tasks
   add constraint tasks_priority_check check (priority in ('P0', 'P1', 'P2', 'P3'));
 
