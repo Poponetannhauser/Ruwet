@@ -27,7 +27,6 @@ import { CreateTaskModal } from './CreateTaskModal'
 import { TaskCard } from './TaskCard'
 import { TableView } from './TableView'
 import { moveTask } from './taskActions'
-import { getCategoryBadgeStyle, getPhaseBadgeStyle } from './boardColors'
 
 type Member = {
   id: string
@@ -597,18 +596,18 @@ export function KanbanBoard({
               <button
                 type="button"
                 onClick={() => setIsFilterPopoverOpen(!isFilterPopoverOpen)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition cursor-pointer ${
                   (filterPriority !== 'all' ||
                     filterCategory !== 'all' ||
                     filterPhase !== 'all' ||
                     filterAssignee !== 'all' ||
                     isFilterPopoverOpen)
-                    ? 'bg-gradient-to-r from-indigo-950/90 to-purple-950/90 border-indigo-500/80 text-indigo-200 shadow-md shadow-indigo-950/40'
-                    : 'bg-[#18181b] border-zinc-700/80 text-zinc-300 hover:text-white hover:bg-zinc-800'
+                    ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/15'
+                    : 'bg-[#18181b] border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:border-zinc-700'
                 }`}
                 title="Buka Filter Papan"
               >
-                <svg className="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
                 </svg>
                 <span>Filter</span>
@@ -616,7 +615,7 @@ export function KanbanBoard({
                   filterCategory !== 'all' ||
                   filterPhase !== 'all' ||
                   filterAssignee !== 'all') && (
-                  <span className="rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 px-1.5 py-0.2 text-[10px] font-extrabold text-white font-mono shadow-xs">
+                  <span className="rounded-full bg-indigo-500/20 border border-indigo-500/30 px-1.5 py-0.2 text-[10px] font-medium text-indigo-300 font-mono">
                     {(filterPriority !== 'all' ? 1 : 0) +
                       (filterCategory !== 'all' ? 1 : 0) +
                       (filterPhase !== 'all' ? 1 : 0) +
@@ -632,12 +631,9 @@ export function KanbanBoard({
                     className="fixed inset-0 z-30"
                     onClick={() => setIsFilterPopoverOpen(false)}
                   />
-                  <div className="absolute left-0 top-full mt-2 z-40 w-72 rounded-xl bg-[#202025] border border-zinc-700/90 shadow-2xl p-4 space-y-3.5 border-t-2 border-t-indigo-500">
-                    <div className="flex items-center justify-between border-b border-zinc-700/60 pb-2.5">
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
-                        <span className="text-xs font-bold text-white">Filter Papan</span>
-                      </div>
+                  <div className="absolute left-0 top-full mt-2 z-40 w-72 rounded-xl bg-[#1A1A1E] border border-zinc-800 shadow-2xl p-4 space-y-3">
+                    <div className="flex items-center justify-between border-b border-zinc-800 pb-2.5">
+                      <span className="text-xs font-semibold text-zinc-200">Filter Board</span>
                       {(filterPriority !== 'all' ||
                         filterCategory !== 'all' ||
                         filterPhase !== 'all' ||
@@ -650,7 +646,7 @@ export function KanbanBoard({
                             setFilterPhase('all')
                             setFilterAssignee('all')
                           }}
-                          className="text-[10px] font-bold text-rose-400 hover:text-rose-300 transition cursor-pointer"
+                          className="text-[10px] font-medium text-zinc-400 hover:text-rose-400 transition cursor-pointer"
                         >
                           Reset Semua
                         </button>
@@ -659,14 +655,13 @@ export function KanbanBoard({
 
                     {/* Priority */}
                     <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-rose-300 uppercase tracking-wider flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
+                      <label className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider">
                         Prioritas
                       </label>
                       <select
                         value={filterPriority}
                         onChange={(e) => setFilterPriority(e.target.value)}
-                        className="w-full text-xs py-1.5 px-2.5 rounded-lg bg-[#161619] border border-zinc-700/70 text-zinc-200 focus:outline-none focus:border-rose-500 font-medium cursor-pointer"
+                        className="w-full text-xs py-1.5 px-2.5 rounded-lg bg-[#141416] border border-zinc-800 text-zinc-300 hover:border-zinc-700 focus:outline-none focus:border-indigo-500/60 font-medium cursor-pointer"
                       >
                         <option value="all">Semua Prioritas</option>
                         <option value="P0">P0 - Blocker</option>
@@ -678,14 +673,13 @@ export function KanbanBoard({
 
                     {/* Assignee */}
                     <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                      <label className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider">
                         Assignee
                       </label>
                       <select
                         value={filterAssignee}
                         onChange={(e) => setFilterAssignee(e.target.value)}
-                        className="w-full text-xs py-1.5 px-2.5 rounded-lg bg-[#161619] border border-zinc-700/70 text-zinc-200 focus:outline-none focus:border-emerald-500 font-medium cursor-pointer"
+                        className="w-full text-xs py-1.5 px-2.5 rounded-lg bg-[#141416] border border-zinc-800 text-zinc-300 hover:border-zinc-700 focus:outline-none focus:border-indigo-500/60 font-medium cursor-pointer"
                       >
                         <option value="all">Semua Assignee</option>
                         <option value="me">Ditugaskan ke Saya</option>
@@ -700,14 +694,13 @@ export function KanbanBoard({
 
                     {/* Category */}
                     <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+                      <label className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider">
                         Kategori
                       </label>
                       <select
                         value={filterCategory}
                         onChange={(e) => setFilterCategory(e.target.value)}
-                        className="w-full text-xs py-1.5 px-2.5 rounded-lg bg-[#161619] border border-zinc-700/70 text-zinc-200 focus:outline-none focus:border-cyan-500 font-medium cursor-pointer"
+                        className="w-full text-xs py-1.5 px-2.5 rounded-lg bg-[#141416] border border-zinc-800 text-zinc-300 hover:border-zinc-700 focus:outline-none focus:border-indigo-500/60 font-medium cursor-pointer"
                       >
                         <option value="all">Semua Kategori</option>
                         {availableCategories.map((c) => (
@@ -720,14 +713,13 @@ export function KanbanBoard({
 
                     {/* Phase */}
                     <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                      <label className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider">
                         Fase
                       </label>
                       <select
                         value={filterPhase}
                         onChange={(e) => setFilterPhase(e.target.value)}
-                        className="w-full text-xs py-1.5 px-2.5 rounded-lg bg-[#161619] border border-zinc-700/70 text-zinc-200 focus:outline-none focus:border-purple-500 font-medium cursor-pointer"
+                        className="w-full text-xs py-1.5 px-2.5 rounded-lg bg-[#141416] border border-zinc-800 text-zinc-300 hover:border-zinc-700 focus:outline-none focus:border-indigo-500/60 font-medium cursor-pointer"
                       >
                         <option value="all">Semua Fase</option>
                         {availablePhases.map((p) => (
@@ -744,17 +736,7 @@ export function KanbanBoard({
 
             {/* Active Filter Chips */}
             {filterPriority !== 'all' && (
-              <span
-                className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-0.5 text-[11px] font-bold border shadow-2xs ${
-                  filterPriority === 'P0'
-                    ? 'bg-rose-950/80 border-rose-600/80 text-rose-200'
-                    : filterPriority === 'P1'
-                    ? 'bg-amber-950/80 border-amber-600/80 text-amber-200'
-                    : filterPriority === 'P2'
-                    ? 'bg-indigo-950/80 border-indigo-600/80 text-indigo-200'
-                    : 'bg-zinc-800 border-zinc-600 text-zinc-300'
-                }`}
-              >
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-800/80 border border-zinc-700/60 px-2.5 py-1 text-xs text-zinc-300 shadow-2xs">
                 <span
                   className={`w-1.5 h-1.5 rounded-full ${
                     filterPriority === 'P0'
@@ -762,14 +744,16 @@ export function KanbanBoard({
                       : filterPriority === 'P1'
                       ? 'bg-amber-400'
                       : filterPriority === 'P2'
-                      ? 'bg-indigo-400'
+                      ? 'bg-sky-400'
                       : 'bg-zinc-400'
                   }`}
                 />
-                <span>Prioritas: {filterPriority}</span>
+                <span className="text-zinc-500 text-[11px]">Prioritas:</span>
+                <span className="font-medium text-[11px] text-zinc-200">{filterPriority}</span>
                 <button
                   onClick={() => setFilterPriority('all')}
-                  className="hover:text-white cursor-pointer ml-0.5"
+                  className="text-zinc-500 hover:text-zinc-200 transition cursor-pointer ml-0.5"
+                  title="Hapus filter prioritas"
                 >
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -779,9 +763,10 @@ export function KanbanBoard({
             )}
 
             {filterAssignee !== 'all' && (
-              <span className="inline-flex items-center gap-1.5 rounded-md bg-emerald-950/80 border border-emerald-600/80 px-2.5 py-0.5 text-[11px] text-emerald-200 font-bold shadow-2xs">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                <span>
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-800/80 border border-zinc-700/60 px-2.5 py-1 text-xs text-zinc-300 shadow-2xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400/80" />
+                <span className="text-zinc-500 text-[11px]">Assignee:</span>
+                <span className="font-medium text-[11px] text-zinc-200">
                   {filterAssignee === 'me'
                     ? 'Saya'
                     : filterAssignee === 'unassigned'
@@ -790,7 +775,8 @@ export function KanbanBoard({
                 </span>
                 <button
                   onClick={() => setFilterAssignee('all')}
-                  className="hover:text-white cursor-pointer ml-0.5"
+                  className="text-zinc-500 hover:text-zinc-200 transition cursor-pointer ml-0.5"
+                  title="Hapus filter assignee"
                 >
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -800,16 +786,14 @@ export function KanbanBoard({
             )}
 
             {filterCategory !== 'all' && (
-              <span
-                className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-0.5 text-[11px] font-bold border shadow-2xs ${getCategoryBadgeStyle(
-                  filterCategory
-                )}`}
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
-                <span>Kategori: {filterCategory}</span>
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-800/80 border border-zinc-700/60 px-2.5 py-1 text-xs text-zinc-300 shadow-2xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400/80" />
+                <span className="text-zinc-500 text-[11px]">Kategori:</span>
+                <span className="font-medium text-[11px] text-zinc-200">{filterCategory}</span>
                 <button
                   onClick={() => setFilterCategory('all')}
-                  className="hover:text-white cursor-pointer ml-0.5"
+                  className="text-zinc-500 hover:text-zinc-200 transition cursor-pointer ml-0.5"
+                  title="Hapus filter kategori"
                 >
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -819,16 +803,14 @@ export function KanbanBoard({
             )}
 
             {filterPhase !== 'all' && (
-              <span
-                className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-0.5 text-[11px] font-bold border shadow-2xs ${getPhaseBadgeStyle(
-                  filterPhase
-                )}`}
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
-                <span>Fase: {filterPhase}</span>
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-800/80 border border-zinc-700/60 px-2.5 py-1 text-xs text-zinc-300 shadow-2xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-violet-400/80" />
+                <span className="text-zinc-500 text-[11px]">Fase:</span>
+                <span className="font-medium text-[11px] text-zinc-200">{filterPhase}</span>
                 <button
                   onClick={() => setFilterPhase('all')}
-                  className="hover:text-white cursor-pointer ml-0.5"
+                  className="text-zinc-500 hover:text-zinc-200 transition cursor-pointer ml-0.5"
+                  title="Hapus filter fase"
                 >
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

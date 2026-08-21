@@ -185,31 +185,31 @@ export function TableView({
     switch (priority) {
       case 'P0':
         return (
-          <span className="px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-rose-950/80 text-rose-300 border border-rose-800/60 font-mono shadow-2xs">
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/25 font-mono shadow-2xs">
             P0
           </span>
         )
       case 'P1':
         return (
-          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-950/80 text-amber-300 border border-amber-800/60 font-mono shadow-2xs">
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/25 font-mono shadow-2xs">
             P1
           </span>
         )
       case 'P2':
         return (
-          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-950/80 text-indigo-300 border border-indigo-800/60 font-mono shadow-2xs">
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-sky-500/10 text-sky-400 border border-sky-500/25 font-mono shadow-2xs">
             P2
           </span>
         )
       case 'P3':
         return (
-          <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-800 text-zinc-400 border border-zinc-700/60 font-mono shadow-2xs">
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-800/70 text-zinc-400 border border-zinc-700/50 font-mono shadow-2xs">
             P3
           </span>
         )
       default:
         return (
-          <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-800 text-zinc-400 font-mono shadow-2xs">
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-800/70 text-zinc-400 border border-zinc-700/50 font-mono shadow-2xs">
             P2
           </span>
         )
