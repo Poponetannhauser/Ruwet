@@ -135,7 +135,7 @@ export function AppSidebar({
           </Link>
 
           <span className="rounded-full bg-zinc-800/80 border border-zinc-700/60 px-2 py-0.5 text-[10px] font-semibold text-zinc-400 font-mono">
-            v2.4.0
+            v0.3.0
           </span>
         </div>
 

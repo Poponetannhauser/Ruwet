@@ -203,13 +203,16 @@ export function BatchTaskModal({ boardId, columns, members: _members }: BatchTas
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800/80 px-3 py-1.5 text-xs font-bold text-zinc-300 hover:text-white transition flex items-center gap-1.5 shadow-xs"
+        className="rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800/80 px-3 py-1.5 text-xs font-bold text-zinc-300 hover:text-white transition flex items-center gap-2 shadow-xs"
         title="Import atau Tambah Banyak Task Sekaligus"
       >
         <svg className="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.5V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
         </svg>
         <span>Import Tasks</span>
+        <span className="rounded px-1.5 py-0.2 text-[9px] font-extrabold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono shadow-2xs">
+          Beta
+        </span>
       </button>
 
       {mounted && typeof document !== 'undefined' &&
@@ -238,9 +241,14 @@ export function BatchTaskModal({ boardId, columns, members: _members }: BatchTas
                         </svg>
                       </div>
                       <div>
-                        <h3 className="text-sm sm:text-base font-bold text-white tracking-tight">
-                          Import &amp; Batch Add Tasks
-                        </h3>
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-sm sm:text-base font-bold text-white tracking-tight">
+                            Import &amp; Batch Add Tasks
+                          </h3>
+                          <span className="rounded px-1.5 py-0.2 text-[9px] font-extrabold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono">
+                            Beta
+                          </span>
+                        </div>
                         <p className="text-[11px] text-zinc-400">
                           Buat banyak task sekaligus dari teks atau file CSV
                         </p>

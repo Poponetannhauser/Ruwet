@@ -109,7 +109,7 @@ export default async function Home() {
                 </span>
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-[#1A1A1E] border border-zinc-800 px-2 py-0.5 text-[10px] font-semibold text-zinc-400">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                  <span>v2.4.0</span>
+                  <span>v0.3.0</span>
                 </span>
               </div>
 
