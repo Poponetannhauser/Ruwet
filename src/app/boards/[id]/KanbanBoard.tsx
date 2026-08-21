@@ -54,6 +54,10 @@ type Task = {
   due_date: string | null
   status_updated_at?: string | null
   position: number
+  task_number?: number
+  priority?: string
+  category?: string | null
+  phase?: string | null
   profiles: {
     full_name: string
     avatar_url: string | null
@@ -159,6 +163,65 @@ export function KanbanBoard({
   const [activeTask, setActiveTask] = useState<Task | null>(null)
   const [previousTasksState, setPreviousTasksState] = useState<Task[]>(initialTasks)
   const [, setTick] = useState(0)
+
+  // Filter States
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filterPriority, setFilterPriority] = useState<string>('all')
+  const [filterCategory, setFilterCategory] = useState<string>('all')
+  const [filterPhase, setFilterPhase] = useState<string>('all')
+  const [filterAssignee, setFilterAssignee] = useState<string>('all')
+
+  // Extract unique categories & phases from current tasks
+  const availableCategories = Array.from(
+    new Set(tasks.map((t) => t.category).filter((c): c is string => !!c && c.trim() !== ''))
+  ).sort()
+
+  const availablePhases = Array.from(
+    new Set(tasks.map((t) => t.phase).filter((p): p is string => !!p && p.trim() !== ''))
+  ).sort()
+
+  // Filtered tasks calculation
+  const filteredTasks = tasks.filter((t) => {
+    // Search query (title or description or task number)
+    if (searchQuery.trim() !== '') {
+      const q = searchQuery.toLowerCase()
+      const matchTitle = t.title.toLowerCase().includes(q)
+      const matchDesc = t.description?.toLowerCase().includes(q)
+      const matchNum = t.task_number?.toString() === q || `#${t.task_number}` === q
+      if (!matchTitle && !matchDesc && !matchNum) return false
+    }
+
+    // Priority filter
+    if (filterPriority !== 'all') {
+      const taskP = (t.priority || 'P2').toUpperCase()
+      const normalizedP =
+        taskP === 'URGENT' ? 'P0' : taskP === 'HIGH' ? 'P1' : taskP === 'LOW' ? 'P3' : taskP === 'MEDIUM' ? 'P2' : taskP
+      if (normalizedP !== filterPriority) return false
+    }
+
+    // Category filter
+    if (filterCategory !== 'all') {
+      if ((t.category || '').toLowerCase() !== filterCategory.toLowerCase()) return false
+    }
+
+    // Phase filter
+    if (filterPhase !== 'all') {
+      if ((t.phase || '').toLowerCase() !== filterPhase.toLowerCase()) return false
+    }
+
+    // Assignee filter
+    if (filterAssignee !== 'all') {
+      if (filterAssignee === 'unassigned') {
+        if (t.assignee_id) return false
+      } else if (filterAssignee === 'me') {
+        if (t.assignee_id !== currentUserId) return false
+      } else if (t.assignee_id !== filterAssignee) {
+        return false
+      }
+    }
+
+    return true
+  })
 
   // Track props update for initialColumns
   const [prevInitialColumns, setPrevInitialColumns] = useState(initialColumns)
@@ -460,6 +523,112 @@ export function KanbanBoard({
         </div>
       )}
 
+      {/* Interactive Filter Toolbar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-[#232328] p-3 sm:p-4 rounded-xl border border-zinc-800/80">
+        <div className="flex flex-wrap items-center gap-2.5 flex-1 min-w-[280px]">
+          {/* Keyword Search Input */}
+          <div className="relative min-w-[180px] max-w-xs flex-1">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none text-zinc-500">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Cari task / #nomor..."
+              className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg bg-[#18181b] border border-zinc-700/80 text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute inset-y-0 right-0 flex items-center pr-2.5 text-zinc-400 hover:text-white text-xs"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          {/* Priority Filter */}
+          <select
+            value={filterPriority}
+            onChange={(e) => setFilterPriority(e.target.value)}
+            className="text-xs py-1.5 px-2.5 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium"
+          >
+            <option value="all">Semua Prioritas</option>
+            <option value="P0">🔴 P0 - Blocker</option>
+            <option value="P1">🟠 P1 - High</option>
+            <option value="P2">🔵 P2 - Medium</option>
+            <option value="P3">⚪ P3 - Low</option>
+          </select>
+
+          {/* Category Filter */}
+          <select
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
+            className="text-xs py-1.5 px-2.5 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium"
+          >
+            <option value="all">Semua Kategori</option>
+            {availableCategories.map((c) => (
+              <option key={c} value={c}>
+                📁 {c}
+              </option>
+            ))}
+          </select>
+
+          {/* Phase Filter */}
+          <select
+            value={filterPhase}
+            onChange={(e) => setFilterPhase(e.target.value)}
+            className="text-xs py-1.5 px-2.5 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium"
+          >
+            <option value="all">Semua Fase</option>
+            {availablePhases.map((p) => (
+              <option key={p} value={p}>
+                🔄 {p}
+              </option>
+            ))}
+          </select>
+
+          {/* Assignee Filter */}
+          <select
+            value={filterAssignee}
+            onChange={(e) => setFilterAssignee(e.target.value)}
+            className="text-xs py-1.5 px-2.5 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium"
+          >
+            <option value="all">Semua Assignee</option>
+            <option value="me">Ditugaskan ke Saya</option>
+            <option value="unassigned">Belum Ditugaskan</option>
+            {members.map((m) => (
+              <option key={m.id} value={m.user_id || ''}>
+                👤 {m.profiles?.full_name || 'User'}
+              </option>
+            ))}
+          </select>
+
+          {/* Reset Filters */}
+          {(searchQuery || filterPriority !== 'all' || filterCategory !== 'all' || filterPhase !== 'all' || filterAssignee !== 'all') && (
+            <button
+              onClick={() => {
+                setSearchQuery('')
+                setFilterPriority('all')
+                setFilterCategory('all')
+                setFilterPhase('all')
+                setFilterAssignee('all')
+              }}
+              className="text-[11px] font-semibold text-rose-400 hover:text-rose-300 px-2 py-1 rounded hover:bg-rose-950/40 transition"
+            >
+              Reset Filter
+            </button>
+          )}
+        </div>
+
+        <div className="text-[11px] text-zinc-400 font-mono">
+          Menampilkan <span className="font-bold text-white">{filteredTasks.length}</span> dari {tasks.length} task
+        </div>
+      </div>
+
       <DndContext
         sensors={sensors}
         onDragStart={handleDragStart}
@@ -468,7 +637,7 @@ export function KanbanBoard({
       >
         <div className="flex gap-6 items-start pr-6 sm:pr-10 pb-4">
         {columns.map((col) => {
-          const colTasks = tasks.filter((t) => t.column_id === col.id)
+          const colTasks = filteredTasks.filter((t) => t.column_id === col.id)
           return (
             <ColumnContainer
               key={col.id}
