@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useSyncExternalStore } from 'react'
+import { useState, useEffect, useMemo, useSyncExternalStore } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import {
   DndContext,
@@ -195,57 +195,67 @@ export function KanbanBoard({
   const [filterPhase, setFilterPhase] = useState<string>('all')
   const [filterAssignee, setFilterAssignee] = useState<string>('all')
 
-  // Extract unique categories & phases from current tasks
-  const availableCategories = Array.from(
-    new Set(tasks.map((t) => t.category).filter((c): c is string => !!c && c.trim() !== ''))
-  ).sort()
+  // Extract unique categories & phases from current tasks (memoized)
+  const availableCategories = useMemo(
+    () =>
+      Array.from(
+        new Set(tasks.map((t) => t.category).filter((c): c is string => !!c && c.trim() !== ''))
+      ).sort(),
+    [tasks]
+  )
 
-  const availablePhases = Array.from(
-    new Set(tasks.map((t) => t.phase).filter((p): p is string => !!p && p.trim() !== ''))
-  ).sort()
+  const availablePhases = useMemo(
+    () =>
+      Array.from(
+        new Set(tasks.map((t) => t.phase).filter((p): p is string => !!p && p.trim() !== ''))
+      ).sort(),
+    [tasks]
+  )
 
-  // Filtered tasks calculation
-  const filteredTasks = tasks.filter((t) => {
-    // Search query (title or description or task number)
-    if (searchQuery.trim() !== '') {
-      const q = searchQuery.toLowerCase()
-      const matchTitle = t.title.toLowerCase().includes(q)
-      const matchDesc = t.description?.toLowerCase().includes(q)
-      const matchNum = t.task_number?.toString() === q || `#${t.task_number}` === q
-      if (!matchTitle && !matchDesc && !matchNum) return false
-    }
-
-    // Priority filter
-    if (filterPriority !== 'all') {
-      const taskP = (t.priority || 'P2').toUpperCase()
-      const normalizedP =
-        taskP === 'URGENT' ? 'P0' : taskP === 'HIGH' ? 'P1' : taskP === 'LOW' ? 'P3' : taskP === 'MEDIUM' ? 'P2' : taskP
-      if (normalizedP !== filterPriority) return false
-    }
-
-    // Category filter
-    if (filterCategory !== 'all') {
-      if ((t.category || '').toLowerCase() !== filterCategory.toLowerCase()) return false
-    }
-
-    // Phase filter
-    if (filterPhase !== 'all') {
-      if ((t.phase || '').toLowerCase() !== filterPhase.toLowerCase()) return false
-    }
-
-    // Assignee filter
-    if (filterAssignee !== 'all') {
-      if (filterAssignee === 'unassigned') {
-        if (t.assignee_id) return false
-      } else if (filterAssignee === 'me') {
-        if (t.assignee_id !== currentUserId) return false
-      } else if (t.assignee_id !== filterAssignee) {
-        return false
+  // Filtered tasks calculation (memoized)
+  const filteredTasks = useMemo(() => {
+    return tasks.filter((t) => {
+      // Search query (title or description or task number)
+      if (searchQuery.trim() !== '') {
+        const q = searchQuery.toLowerCase()
+        const matchTitle = t.title.toLowerCase().includes(q)
+        const matchDesc = t.description?.toLowerCase().includes(q)
+        const matchNum = t.task_number?.toString() === q || `#${t.task_number}` === q
+        if (!matchTitle && !matchDesc && !matchNum) return false
       }
-    }
 
-    return true
-  })
+      // Priority filter
+      if (filterPriority !== 'all') {
+        const taskP = (t.priority || 'P2').toUpperCase()
+        const normalizedP =
+          taskP === 'URGENT' ? 'P0' : taskP === 'HIGH' ? 'P1' : taskP === 'LOW' ? 'P3' : taskP === 'MEDIUM' ? 'P2' : taskP
+        if (normalizedP !== filterPriority) return false
+      }
+
+      // Category filter
+      if (filterCategory !== 'all') {
+        if ((t.category || '').toLowerCase() !== filterCategory.toLowerCase()) return false
+      }
+
+      // Phase filter
+      if (filterPhase !== 'all') {
+        if ((t.phase || '').toLowerCase() !== filterPhase.toLowerCase()) return false
+      }
+
+      // Assignee filter
+      if (filterAssignee !== 'all') {
+        if (filterAssignee === 'unassigned') {
+          if (t.assignee_id) return false
+        } else if (filterAssignee === 'me') {
+          if (t.assignee_id !== currentUserId) return false
+        } else if (t.assignee_id !== filterAssignee) {
+          return false
+        }
+      }
+
+      return true
+    })
+  }, [tasks, searchQuery, filterPriority, filterCategory, filterPhase, filterAssignee, currentUserId])
 
   // Track props update for initialColumns
   const [prevInitialColumns, setPrevInitialColumns] = useState(initialColumns)
@@ -336,8 +346,10 @@ export function KanbanBoard({
           }
         }
       )
-      .subscribe((status, err) => {
-        console.log(`[Realtime Board ${boardId}] Status:`, status, err || '')
+      .subscribe((_status, err) => {
+        if (err) {
+          console.error(`[Board Realtime Error ${boardId}]:`, err)
+        }
       })
 
     return () => {

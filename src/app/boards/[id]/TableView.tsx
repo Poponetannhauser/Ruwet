@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { deleteBatchTasks, moveBatchTasks } from './taskActions'
 import { EditTaskModal } from './EditTaskModal'
 import {
@@ -360,98 +361,114 @@ export function TableView({
       </div>
 
       {/* Floating Bulk Action Bar */}
-      {selectedTaskIds.size > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#222228] border border-zinc-700/80 shadow-2xl rounded-2xl px-5 py-3 flex items-center gap-4 text-xs">
-          <div className="flex items-center gap-2 font-bold text-white">
-            <span className="w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-mono">
-              {selectedTaskIds.size}
-            </span>
-            <span>Task Terpilih</span>
-          </div>
+      <AnimatePresence>
+        {selectedTaskIds.size > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 40, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 40, scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#222228]/95 backdrop-blur-md border border-zinc-700/80 shadow-2xl rounded-2xl px-5 py-3 flex items-center gap-4 text-xs"
+          >
+            <div className="flex items-center gap-2 font-bold text-white">
+              <span className="w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-mono shadow-xs">
+                {selectedTaskIds.size}
+              </span>
+              <span>Task Terpilih</span>
+            </div>
 
-          <div className="h-4 w-px bg-zinc-700" />
+            <div className="h-4 w-px bg-zinc-700" />
 
-          {/* Move to Column */}
-          <div className="flex items-center gap-2">
-            <select
-              value={bulkMoveColumnId}
-              onChange={(e) => {
-                const target = e.target.value
-                setBulkMoveColumnId(target)
-                if (target) handleBulkMove(target)
-              }}
-              disabled={isBulkMoving}
-              className="rounded-lg bg-zinc-800 border border-zinc-700 px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500 font-semibold"
+            {/* Move to Column */}
+            <div className="flex items-center gap-2">
+              <select
+                value={bulkMoveColumnId}
+                onChange={(e) => {
+                  const target = e.target.value
+                  setBulkMoveColumnId(target)
+                  if (target) handleBulkMove(target)
+                }}
+                disabled={isBulkMoving}
+                className="rounded-lg bg-zinc-800 border border-zinc-700 px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500 font-semibold cursor-pointer"
+              >
+                <option value="">Pindah ke Kolom...</option>
+                {columns.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Bulk Delete */}
+            <button
+              type="button"
+              onClick={() => setIsConfirmDeleteOpen(true)}
+              disabled={isBulkDeleting}
+              className="rounded-lg bg-rose-950/70 border border-rose-800/60 px-3 py-1.5 text-xs font-bold text-rose-300 hover:bg-rose-900/70 transition flex items-center gap-1.5 cursor-pointer shadow-2xs"
             >
-              <option value="">Pindah ke Kolom...</option>
-              {columns.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </div>
+              <svg className="w-3.5 h-3.5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+              </svg>
+              <span>Hapus ({selectedTaskIds.size})</span>
+            </button>
 
-          {/* Bulk Delete */}
-          <button
-            type="button"
-            onClick={() => setIsConfirmDeleteOpen(true)}
-            disabled={isBulkDeleting}
-            className="rounded-lg bg-rose-950/60 border border-rose-800/60 px-3 py-1.5 text-xs font-bold text-rose-300 hover:bg-rose-900/60 transition flex items-center gap-1.5"
-          >
-            <svg className="w-3.5 h-3.5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-            </svg>
-            <span>Hapus ({selectedTaskIds.size})</span>
-          </button>
-
-          {/* Cancel selection */}
-          <button
-            type="button"
-            onClick={() => setSelectedTaskIds(new Set())}
-            className="text-zinc-400 hover:text-white transition text-xs font-semibold"
-          >
-            Batal
-          </button>
-        </div>
-      )}
+            {/* Cancel selection */}
+            <button
+              type="button"
+              onClick={() => setSelectedTaskIds(new Set())}
+              className="text-zinc-400 hover:text-white transition text-xs font-semibold cursor-pointer"
+            >
+              Batal
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Bulk Delete Modal Confirmation */}
-      {isConfirmDeleteOpen && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-          <div className="w-full max-w-sm rounded-xl bg-[#2C2C30] p-6 shadow-2xl border border-zinc-800">
-            <h3 className="text-base font-bold text-white">
-              Konfirmasi Hapus {selectedTaskIds.size} Task
-            </h3>
-            <p className="mt-2 text-xs text-zinc-400 leading-relaxed">
-              Apakah Anda yakin ingin menghapus <strong>{selectedTaskIds.size} task</strong> yang dipilih secara permanen?
-            </p>
-            <div className="mt-5 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setIsConfirmDeleteOpen(false)}
-                className="rounded-lg border border-zinc-700 px-3.5 py-1.5 text-xs font-semibold text-zinc-300 hover:bg-zinc-800 transition"
-              >
-                Batal
-              </button>
-              <button
-                type="button"
-                onClick={handleBulkDelete}
-                disabled={isBulkDeleting}
-                className="rounded-lg bg-rose-600 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-rose-500 disabled:opacity-50 transition shadow-xs flex items-center gap-1.5"
-              >
-                {isBulkDeleting && (
-                  <svg className="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                  </svg>
-                )}
-                <span>{isBulkDeleting ? 'Menghapus...' : 'Ya, Hapus Semua'}</span>
-              </button>
-            </div>
+      <AnimatePresence>
+        {isConfirmDeleteOpen && (
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ duration: 0.15 }}
+              className="w-full max-w-sm rounded-xl bg-[#2C2C30] p-6 shadow-2xl border border-zinc-800"
+            >
+              <h3 className="text-base font-bold text-white">
+                Konfirmasi Hapus {selectedTaskIds.size} Task
+              </h3>
+              <p className="mt-2 text-xs text-zinc-400 leading-relaxed">
+                Apakah Anda yakin ingin menghapus <strong>{selectedTaskIds.size} task</strong> yang dipilih secara permanen?
+              </p>
+              <div className="mt-5 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsConfirmDeleteOpen(false)}
+                  className="rounded-lg border border-zinc-700 px-3.5 py-1.5 text-xs font-semibold text-zinc-300 hover:bg-zinc-800 transition cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={handleBulkDelete}
+                  disabled={isBulkDeleting}
+                  className="rounded-lg bg-rose-600 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-rose-500 disabled:opacity-50 transition shadow-xs flex items-center gap-1.5 cursor-pointer"
+                >
+                  {isBulkDeleting && (
+                    <svg className="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                    </svg>
+                  )}
+                  <span>{isBulkDeleting ? 'Menghapus...' : 'Ya, Hapus Semua'}</span>
+                </button>
+              </div>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
 
       {/* Edit Task Modal */}
       {activeEditTask && (

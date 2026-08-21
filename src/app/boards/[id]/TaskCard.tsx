@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { motion } from 'framer-motion'
@@ -72,7 +72,7 @@ export function TaskCard({
   } = useSortable({ id: task.id })
 
   const style = {
-    transform: CSS.Transform.toString(transform),
+    transform: CSS.Translate.toString(transform),
     transition,
     opacity: isDragging ? 0.35 : 1,
   }
@@ -84,18 +84,9 @@ export function TaskCard({
   const currentColumn = columns.find((c) => c.id === task.column_id)
   const isDoneColumn = currentColumn?.name.trim().toLowerCase() === 'done'
   const hasAssignee = !!task.assignee_id
-
-  const [nowMs, setNowMs] = useState(() => Date.now())
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setNowMs(Date.now())
-    }, 5000)
-    return () => clearInterval(timer)
-  }, [])
+  const [nowMs] = useState(() => Date.now())
 
   let staleStatus: 'green' | 'yellow' | 'red' | null = null
-
   let staleLabel = ''
 
   if (hasAssignee && !isDoneColumn && task.status_updated_at && nowMs > 0) {
