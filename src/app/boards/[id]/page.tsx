@@ -61,6 +61,8 @@ export default async function BoardDetailPage({
         userEmail={user.email}
         logoutAction={logout}
         hasTelegramLinked={hasTelegramLinked}
+        currentBoardId={id}
+        boardName={board.name}
       />
 
       {/* Main Board Workspace Area */}
