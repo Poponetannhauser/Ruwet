@@ -54,6 +54,49 @@ type TableViewProps = {
   boardId: string
 }
 
+function CustomCheckbox({
+  checked,
+  onChange,
+  ariaLabel,
+  indeterminate = false,
+}: {
+  checked: boolean
+  onChange: () => void
+  ariaLabel?: string
+  indeterminate?: boolean
+}) {
+  return (
+    <button
+      type="button"
+      role="checkbox"
+      aria-checked={indeterminate ? 'mixed' : checked}
+      aria-label={ariaLabel}
+      onClick={(e) => {
+        e.stopPropagation()
+        onChange()
+      }}
+      className={`relative inline-flex items-center justify-center w-4 h-4 rounded-md border transition-all duration-150 cursor-pointer select-none focus:outline-none focus:ring-2 focus:ring-indigo-500/50 ${
+        checked || indeterminate
+          ? 'bg-indigo-600 border-indigo-500 text-white shadow-xs shadow-indigo-950/60'
+          : 'bg-zinc-900/90 border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800'
+      }`}
+    >
+      {checked && (
+        <svg
+          className="w-2.5 h-2.5 stroke-current stroke-[3]"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+        </svg>
+      )}
+      {indeterminate && !checked && (
+        <span className="w-2 h-0.5 bg-white rounded-full" />
+      )}
+    </button>
+  )
+}
+
 export function TableView({
   tasks,
   columns,
@@ -78,6 +121,7 @@ export function TableView({
   // Select all / Deselect all
   const isAllSelected =
     tasks.length > 0 && tasks.every((t) => selectedTaskIds.has(t.id))
+  const isIndeterminate = selectedTaskIds.size > 0 && !isAllSelected
 
   function toggleSelectAll() {
     if (isAllSelected) {
@@ -189,13 +233,14 @@ export function TableView({
           <thead className="sticky top-0 z-20 bg-[#25252b] border-b border-zinc-700/80 shadow-xs">
             <tr>
               <th className="py-2.5 px-3 w-10 text-center border-r border-zinc-800">
-                <input
-                  type="checkbox"
-                  checked={isAllSelected}
-                  onChange={toggleSelectAll}
-                  className="rounded border-zinc-700 bg-zinc-800 accent-indigo-500 cursor-pointer w-3.5 h-3.5"
-                  aria-label="Pilih semua task"
-                />
+                <div className="flex items-center justify-center">
+                  <CustomCheckbox
+                    checked={isAllSelected}
+                    indeterminate={isIndeterminate}
+                    onChange={toggleSelectAll}
+                    ariaLabel="Pilih semua task"
+                  />
+                </div>
               </th>
               <th className="py-2.5 px-3 font-bold text-zinc-200 text-xs border-r border-zinc-800 w-16 text-center">
                 #
@@ -242,13 +287,13 @@ export function TableView({
                     }`}
                   >
                     <td className="py-2 px-3 text-center border-r border-zinc-800/80">
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => toggleSelectTask(task.id)}
-                        className="rounded border-zinc-700 bg-zinc-800 accent-indigo-500 cursor-pointer w-3.5 h-3.5"
-                        aria-label={`Pilih task ${task.title}`}
-                      />
+                      <div className="flex items-center justify-center">
+                        <CustomCheckbox
+                          checked={isSelected}
+                          onChange={() => toggleSelectTask(task.id)}
+                          ariaLabel={`Pilih task ${task.title}`}
+                        />
+                      </div>
                     </td>
                     <td className="py-2 px-3 text-center text-zinc-500 font-mono border-r border-zinc-800/80">
                       {task.task_number ? `#${task.task_number}` : idx + 1}
