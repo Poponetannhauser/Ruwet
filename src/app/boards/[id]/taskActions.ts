@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache'
 import { logActivity } from './activityActions'
 import { createNotification } from '@/app/notificationActions'
 import { checkRateLimit } from '@/lib/rateLimit'
+import { sanitizePhase } from './boardColors'
 
 export async function createTask(boardId: string, columnId: string, formData: FormData) {
   const supabase = await createClient()
@@ -47,7 +48,7 @@ export async function createTask(boardId: string, columnId: string, formData: Fo
   }
 
   const category = categoryRaw && categoryRaw.trim() !== '' ? categoryRaw.trim().slice(0, 50) : null
-  const phase = phaseRaw && phaseRaw.trim() !== '' ? phaseRaw.trim().slice(0, 50) : null
+  const phase = sanitizePhase(phaseRaw)?.slice(0, 50) || null
 
   if (!title || title.trim() === '') {
     return { error: 'Judul task tidak boleh kosong' }
@@ -190,7 +191,7 @@ export async function updateTask(taskId: string, boardId: string, formData: Form
   }
 
   if (phaseRaw !== undefined) {
-    updateData.phase = phaseRaw && phaseRaw.trim() !== '' ? phaseRaw.trim().slice(0, 50) : null
+    updateData.phase = sanitizePhase(phaseRaw)?.slice(0, 50) || null
   }
 
   if (priorityRaw) {
@@ -465,7 +466,7 @@ export async function createBatchTasks(
     const title = rawTitle.slice(0, 50)
     const description = item.description ? item.description.trim() : null
     const category = item.category && item.category.trim() !== '' ? item.category.trim().slice(0, 50) : null
-    const phase = item.phase && item.phase.trim() !== '' ? item.phase.trim().slice(0, 50) : null
+    const phase = sanitizePhase(item.phase)?.slice(0, 50) || null
     const targetAssignee = item.assignee_id && item.assignee_id !== '' ? item.assignee_id : null
     const dueDate = item.due_date && item.due_date.trim() !== '' ? item.due_date.trim() : null
 

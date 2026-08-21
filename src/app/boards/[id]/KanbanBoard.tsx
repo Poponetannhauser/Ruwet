@@ -27,6 +27,7 @@ import { CreateTaskModal } from './CreateTaskModal'
 import { TaskCard } from './TaskCard'
 import { TableView } from './TableView'
 import { moveTask } from './taskActions'
+import { sanitizePhase } from './boardColors'
 
 type Member = {
   id: string
@@ -207,7 +208,11 @@ export function KanbanBoard({
   const availablePhases = useMemo(
     () =>
       Array.from(
-        new Set(tasks.map((t) => t.phase).filter((p): p is string => !!p && p.trim() !== ''))
+        new Set(
+          tasks
+            .map((t) => sanitizePhase(t.phase))
+            .filter((p): p is string => !!p && p.trim() !== '')
+        )
       ).sort(),
     [tasks]
   )
@@ -239,7 +244,8 @@ export function KanbanBoard({
 
       // Phase filter
       if (filterPhase !== 'all') {
-        if ((t.phase || '').toLowerCase() !== filterPhase.toLowerCase()) return false
+        const sanitized = sanitizePhase(t.phase) || ''
+        if (sanitized.toLowerCase() !== filterPhase.toLowerCase()) return false
       }
 
       // Assignee filter

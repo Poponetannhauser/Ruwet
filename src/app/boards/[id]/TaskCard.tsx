@@ -7,7 +7,7 @@ import { motion } from 'framer-motion'
 import { assignSelf } from './taskActions'
 import { EditTaskModal } from './EditTaskModal'
 import { CommentDrawer } from '@/app/components/CommentDrawer'
-import { getCategoryBadgeStyle, getPhaseBadgeStyle } from './boardColors'
+import { getCategoryBadgeStyle, getPhaseBadgeStyle, sanitizePhase } from './boardColors'
 
 type Column = {
   id: string
@@ -193,9 +193,9 @@ export function TaskCard({
                   className={`inline-block text-[9px] font-semibold px-1.5 py-0.2 rounded border ${getPhaseBadgeStyle(
                     task.phase
                   )}`}
-                  title={`Fase: ${task.phase}`}
+                  title={`Fase: ${sanitizePhase(task.phase) || task.phase}`}
                 >
-                  {task.phase}
+                  {sanitizePhase(task.phase) || task.phase}
                 </span>
               )}
               <h4 className="text-xs font-bold text-zinc-100 group-hover:text-indigo-400 transition-colors leading-snug">

@@ -8,6 +8,7 @@ import {
   getColumnBadgeStyle,
   getCategoryBadgeStyle,
   getPhaseBadgeStyle,
+  sanitizePhase,
 } from './boardColors'
 
 type Member = {
@@ -359,9 +360,9 @@ export function TableView({
                           className={`inline-block px-2 py-0.5 rounded text-[10px] font-medium border truncate max-w-[110px] ${getPhaseBadgeStyle(
                             task.phase
                           )}`}
-                          title={task.phase}
+                          title={sanitizePhase(task.phase) || task.phase}
                         >
-                          {task.phase}
+                          {sanitizePhase(task.phase) || task.phase}
                         </span>
                       ) : (
                         <span className="text-zinc-600 italic">-</span>

@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createBatchTasks, type BatchTaskItem } from './taskActions'
 import { parseCsv } from './docs/CsvTableView'
+import { sanitizePhase } from './boardColors'
 
 type Column = {
   id: string
@@ -84,8 +85,8 @@ export function BatchTaskModal({ boardId, columns, members: _members }: BatchTas
         items.push({
           title: trimmed,
           priority: defaultPriority,
-          category: defaultCategory || null,
-          phase: defaultPhase || null,
+          category: defaultCategory ? defaultCategory.trim() : null,
+          phase: sanitizePhase(defaultPhase),
         })
       }
     }
@@ -125,13 +126,16 @@ export function BatchTaskModal({ boardId, columns, members: _members }: BatchTas
       const rawTitle = (row[actualTitleIdx] || '').trim()
       if (!rawTitle) continue
 
+      const rawCat = catIdx !== -1 && row[catIdx] ? row[catIdx].trim() : defaultCategory ? defaultCategory.trim() : null
+      const rawPhase = phaseIdx !== -1 && row[phaseIdx] ? row[phaseIdx] : defaultPhase
+
       items.push({
         title: rawTitle,
         priority: prioIdx !== -1 && row[prioIdx] ? row[prioIdx] : defaultPriority,
-        category: catIdx !== -1 && row[catIdx] ? row[catIdx] : defaultCategory || null,
-        phase: phaseIdx !== -1 && row[phaseIdx] ? row[phaseIdx] : defaultPhase || null,
-        description: descIdx !== -1 && row[descIdx] ? row[descIdx] : null,
-        due_date: dueIdx !== -1 && row[dueIdx] ? row[dueIdx] : null,
+        category: rawCat || null,
+        phase: sanitizePhase(rawPhase),
+        description: descIdx !== -1 && row[descIdx] ? row[descIdx].trim() : null,
+        due_date: dueIdx !== -1 && row[dueIdx] ? row[dueIdx].trim() : null,
       })
     }
 

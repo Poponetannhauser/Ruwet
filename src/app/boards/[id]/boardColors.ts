@@ -79,3 +79,22 @@ export function getPhaseBadgeStyle(phase: string | null | undefined): string {
 
   return 'bg-zinc-800/70 text-zinc-300 border-zinc-700/50'
 }
+
+/**
+ * Sanitizes phase strings by removing numeric prefixes and boilerplate
+ * e.g. "0 - Prototype", "0. Prototype", "Phase 0 - Prototype", "[0] Prototype" -> "Prototype"
+ */
+export function sanitizePhase(phase: string | null | undefined): string | null {
+  if (!phase) return null
+  let p = phase.trim()
+  if (!p) return null
+
+  p = p
+    .replace(/^(?:phase|fase|stage)\s*\d+[\s\-_:.)\]]+/i, '')
+    .replace(/^\[\s*\d+\s*\][\s\-_:.)]*/, '')
+    .replace(/^\(\s*\d+\s*\)[\s\-_:.)]*/, '')
+    .replace(/^\d+[\s\-_:.)]+/, '')
+    .trim()
+
+  return p || null
+}

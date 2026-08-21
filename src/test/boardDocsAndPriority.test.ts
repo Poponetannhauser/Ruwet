@@ -54,4 +54,23 @@ describe("Priority P0-P3 & Formatting Tests", () => {
     expect(isValidDocumentExtension("backdoor.php")).toBe(false)
     expect(isValidDocumentExtension("stealer.js")).toBe(false)
   })
+
+  it("should sanitize phase strings by stripping numeric and boilerplate prefixes", async () => {
+    const { sanitizePhase } = await import("@/app/boards/[id]/boardColors")
+
+    expect(sanitizePhase("0 - Prototype")).toBe("Prototype")
+    expect(sanitizePhase("0. Prototype")).toBe("Prototype")
+    expect(sanitizePhase("0: Prototype")).toBe("Prototype")
+    expect(sanitizePhase("01 - Core Production")).toBe("Core Production")
+    expect(sanitizePhase("Phase 0 - Prototype")).toBe("Prototype")
+    expect(sanitizePhase("Fase 1: Content")).toBe("Content")
+    expect(sanitizePhase("Stage 2 - Polish")).toBe("Polish")
+    expect(sanitizePhase("[0] Prototype")).toBe("Prototype")
+    expect(sanitizePhase("(1) MVP")).toBe("MVP")
+    expect(sanitizePhase("Prototype")).toBe("Prototype")
+    expect(sanitizePhase("Core Production")).toBe("Core Production")
+    expect(sanitizePhase("")).toBe(null)
+    expect(sanitizePhase(null)).toBe(null)
+    expect(sanitizePhase(undefined)).toBe(null)
+  })
 })
