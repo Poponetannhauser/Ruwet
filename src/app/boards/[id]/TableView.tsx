@@ -3,6 +3,11 @@
 import { useState, useMemo } from 'react'
 import { deleteBatchTasks, moveBatchTasks } from './taskActions'
 import { EditTaskModal } from './EditTaskModal'
+import {
+  getColumnBadgeStyle,
+  getCategoryBadgeStyle,
+  getPhaseBadgeStyle,
+} from './boardColors'
 
 type Member = {
   id: string
@@ -60,7 +65,6 @@ export function TableView({
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false)
   const [bulkMoveColumnId, setBulkMoveColumnId] = useState('')
   const [isBulkMoving, setIsBulkMoving] = useState(false)
-  const [search, setSearch] = useState('')
   const [error, setError] = useState<string | null>(null)
 
   // Map column names
@@ -70,30 +74,15 @@ export function TableView({
     return map
   }, [columns])
 
-  // Filter tasks based on search
-  const filteredTasks = useMemo(() => {
-    if (!search.trim()) return tasks
-    const query = search.toLowerCase()
-    return tasks.filter(
-      (t) =>
-        t.title.toLowerCase().includes(query) ||
-        (t.description && t.description.toLowerCase().includes(query)) ||
-        (t.category && t.category.toLowerCase().includes(query)) ||
-        (t.phase && t.phase.toLowerCase().includes(query)) ||
-        (t.profiles?.full_name && t.profiles.full_name.toLowerCase().includes(query))
-    )
-  }, [tasks, search])
-
   // Select all / Deselect all
   const isAllSelected =
-    filteredTasks.length > 0 &&
-    filteredTasks.every((t) => selectedTaskIds.has(t.id))
+    tasks.length > 0 && tasks.every((t) => selectedTaskIds.has(t.id))
 
   function toggleSelectAll() {
     if (isAllSelected) {
       setSelectedTaskIds(new Set())
     } else {
-      const allIds = new Set(filteredTasks.map((t) => t.id))
+      const allIds = new Set(tasks.map((t) => t.id))
       setSelectedTaskIds(allIds)
     }
   }
@@ -150,60 +139,40 @@ export function TableView({
   function getPriorityBadge(priority?: string) {
     switch (priority) {
       case 'P0':
-        return <span className="px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-rose-950/80 text-rose-300 border border-rose-800/60 font-mono">P0</span>
+        return (
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-rose-950/80 text-rose-300 border border-rose-800/60 font-mono shadow-2xs">
+            P0
+          </span>
+        )
       case 'P1':
-        return <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-950/80 text-amber-300 border border-amber-800/60 font-mono">P1</span>
+        return (
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-950/80 text-amber-300 border border-amber-800/60 font-mono shadow-2xs">
+            P1
+          </span>
+        )
       case 'P2':
-        return <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-950/80 text-indigo-300 border border-indigo-800/60 font-mono">P2</span>
+        return (
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-950/80 text-indigo-300 border border-indigo-800/60 font-mono shadow-2xs">
+            P2
+          </span>
+        )
       case 'P3':
-        return <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-800 text-zinc-400 border border-zinc-700/60 font-mono">P3</span>
+        return (
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-800 text-zinc-400 border border-zinc-700/60 font-mono shadow-2xs">
+            P3
+          </span>
+        )
       default:
-        return <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-800 text-zinc-400 font-mono">P2</span>
+        return (
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-800 text-zinc-400 font-mono shadow-2xs">
+            P2
+          </span>
+        )
     }
   }
 
   return (
     <div className="flex flex-col h-full space-y-3 pb-16">
-      {/* Search & Info Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-[#232328] p-3 rounded-lg border border-zinc-800/80">
-        <div className="relative min-w-[200px] max-w-sm flex-1">
-          <span className="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none text-zinc-500">
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </span>
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Cari task di dalam tabel..."
-            className="w-full pl-8 pr-7 py-1 text-xs rounded-md bg-[#18181b] border border-zinc-700/80 text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500"
-          />
-          {search && (
-            <button
-              type="button"
-              onClick={() => setSearch('')}
-              className="absolute inset-y-0 right-0 flex items-center pr-2.5 text-zinc-400 hover:text-white transition"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          )}
-        </div>
-
-        <div className="flex items-center gap-2 text-[11px] font-mono text-zinc-400">
-          <span className="bg-[#18181b] px-2 py-0.5 rounded border border-zinc-800">
-            Total <strong className="text-zinc-200">{filteredTasks.length}</strong> Task
-          </span>
-          {selectedTaskIds.size > 0 && (
-            <span className="bg-indigo-950/60 border border-indigo-800/60 px-2 py-0.5 rounded text-indigo-300 font-bold">
-              {selectedTaskIds.size} Terpilih
-            </span>
-          )}
-        </div>
-      </div>
-
       {error && (
         <div className="rounded-lg bg-rose-950/40 border border-rose-800/40 p-3 text-xs text-rose-300 flex items-center gap-2">
           <svg className="w-4 h-4 shrink-0 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -214,7 +183,7 @@ export function TableView({
       )}
 
       {/* Table Container */}
-      <div className="flex-1 overflow-auto rounded-lg border border-zinc-800/80 bg-[#1A1A1E] shadow-inner max-h-[calc(100vh-220px)]">
+      <div className="flex-1 overflow-auto rounded-xl border border-zinc-800/80 bg-[#1A1A1E] shadow-inner max-h-[calc(100vh-210px)]">
         <table className="w-full border-collapse text-left text-xs text-zinc-300 min-w-max">
           <thead className="sticky top-0 z-20 bg-[#25252b] border-b border-zinc-700/80 shadow-xs">
             <tr>
@@ -223,7 +192,7 @@ export function TableView({
                   type="checkbox"
                   checked={isAllSelected}
                   onChange={toggleSelectAll}
-                  className="rounded border-zinc-700 bg-zinc-800 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                  className="rounded border-zinc-700 bg-zinc-800 accent-indigo-500 cursor-pointer w-3.5 h-3.5"
                   aria-label="Pilih semua task"
                 />
               </th>
@@ -257,8 +226,8 @@ export function TableView({
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-800/60 text-[11px]">
-            {filteredTasks.length > 0 ? (
-              filteredTasks.map((task, idx) => {
+            {tasks.length > 0 ? (
+              tasks.map((task, idx) => {
                 const isSelected = selectedTaskIds.has(task.id)
                 const columnName = columnMap.get(task.column_id) || 'Kolom'
 
@@ -276,7 +245,7 @@ export function TableView({
                         type="checkbox"
                         checked={isSelected}
                         onChange={() => toggleSelectTask(task.id)}
-                        className="rounded border-zinc-700 bg-zinc-800 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                        className="rounded border-zinc-700 bg-zinc-800 accent-indigo-500 cursor-pointer w-3.5 h-3.5"
                         aria-label={`Pilih task ${task.title}`}
                       />
                     </td>
@@ -299,7 +268,11 @@ export function TableView({
                       )}
                     </td>
                     <td className="py-2 px-3 border-r border-zinc-800/80">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-zinc-800 border border-zinc-700 text-zinc-300 truncate max-w-[130px]">
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border truncate max-w-[130px] shadow-2xs ${getColumnBadgeStyle(
+                          columnName
+                        )}`}
+                      >
                         {columnName}
                       </span>
                     </td>
@@ -309,10 +282,10 @@ export function TableView({
                     <td className="py-2 px-3.5 border-r border-zinc-800/80">
                       {task.profiles ? (
                         <div className="flex items-center gap-1.5">
-                          <div className="w-5 h-5 rounded-full bg-indigo-600 flex items-center justify-center text-[9px] font-bold text-white uppercase">
+                          <div className="w-5 h-5 rounded-full bg-indigo-600 flex items-center justify-center text-[9px] font-bold text-white uppercase border border-indigo-400/40">
                             {task.profiles.full_name.charAt(0)}
                           </div>
-                          <span className="truncate max-w-[100px] text-zinc-300">
+                          <span className="truncate max-w-[100px] text-zinc-300 font-medium">
                             {task.profiles.full_name}
                           </span>
                         </div>
@@ -320,11 +293,33 @@ export function TableView({
                         <span className="text-zinc-600 italic">-</span>
                       )}
                     </td>
-                    <td className="py-2 px-3 border-r border-zinc-800/80 text-zinc-400">
-                      {task.category || <span className="text-zinc-600 italic">-</span>}
+                    <td className="py-2 px-3 border-r border-zinc-800/80">
+                      {task.category ? (
+                        <span
+                          className={`inline-block px-2 py-0.5 rounded text-[10px] font-medium border truncate max-w-[110px] ${getCategoryBadgeStyle(
+                            task.category
+                          )}`}
+                          title={task.category}
+                        >
+                          {task.category}
+                        </span>
+                      ) : (
+                        <span className="text-zinc-600 italic">-</span>
+                      )}
                     </td>
-                    <td className="py-2 px-3 border-r border-zinc-800/80 text-zinc-400">
-                      {task.phase || <span className="text-zinc-600 italic">-</span>}
+                    <td className="py-2 px-3 border-r border-zinc-800/80">
+                      {task.phase ? (
+                        <span
+                          className={`inline-block px-2 py-0.5 rounded text-[10px] font-medium border truncate max-w-[110px] ${getPhaseBadgeStyle(
+                            task.phase
+                          )}`}
+                          title={task.phase}
+                        >
+                          {task.phase}
+                        </span>
+                      ) : (
+                        <span className="text-zinc-600 italic">-</span>
+                      )}
                     </td>
                     <td className="py-2 px-3 border-r border-zinc-800/80 font-mono text-zinc-400">
                       {task.due_date ? (
@@ -356,7 +351,7 @@ export function TableView({
             ) : (
               <tr>
                 <td colSpan={10} className="py-12 text-center text-zinc-500 italic text-xs">
-                  Tidak ada task yang ditemukan.
+                  Tidak ada task yang cocok dengan filter yang dipilih.
                 </td>
               </tr>
             )}

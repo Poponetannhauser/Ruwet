@@ -83,7 +83,6 @@ export function CommentDrawer({
                     </svg>
                     Diskusi Komentar
                   </span>
-                  <span className="text-[10px] text-zinc-500 font-mono">Real-time</span>
                 </div>
 
                 {/* Comment Section Content */}

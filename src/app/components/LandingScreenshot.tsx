@@ -79,7 +79,7 @@ export function LandingScreenshot() {
             </div>
             <h4 className="text-base font-bold text-white">{current.alt}</h4>
             <p className="text-xs text-zinc-400 leading-relaxed">
-              Tampilan workspace modern dengan kolom interaktif, badge stale real-time, dan manajemen tim terpadu.
+              Tampilan workspace modern dengan kolom interaktif, deteksi task stale, dan manajemen tim terpadu.
             </p>
           </div>
         )}

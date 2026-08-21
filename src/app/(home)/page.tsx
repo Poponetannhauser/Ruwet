@@ -225,7 +225,7 @@ export default async function Home() {
                     <div>
                       <h4 className="text-base font-bold text-white">Belum ada board</h4>
                       <p className="text-xs text-zinc-400 mt-1 max-w-sm">
-                        Buat board Kanban pertama Anda untuk mulai mengelola tugas dan berkolaborasi secara realtime.
+                        Buat board Kanban pertama Anda untuk mulai mengelola tugas dan berkolaborasi bersama tim.
                       </p>
                     </div>
                     <div className="pt-2">
@@ -250,12 +250,12 @@ export default async function Home() {
                 <h1 className="text-4xl sm:text-6xl font-bold tracking-tight text-white leading-tight">
                   Kelola Tugas Tim dengan{' '}
                   <span className="text-indigo-400">
-                    Akuntabilitas Realtime
+                    Akuntabilitas Terpadu
                   </span>
                 </h1>
 
                 <p className="text-base sm:text-lg text-zinc-400 max-w-2xl leading-relaxed">
-                  Ruwet membantu tim kecil bekerja lebih fokus: deteksi otomatis tugas macet (stale tasks), kolaborasi realtime, dan asisten bot Telegram personal.
+                  Ruwet membantu tim kecil bekerja lebih fokus: deteksi otomatis tugas macet (stale tasks), kolaborasi terpadu, dan asisten bot Telegram personal.
                 </p>
 
                 <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
@@ -283,7 +283,7 @@ export default async function Home() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
                       </svg>
                     </div>
-                    <h3 className="text-lg font-bold text-white mb-2">Real-time Sync</h3>
+                    <h3 className="text-lg font-bold text-white mb-2">Sinkronisasi Instan</h3>
                     <p className="text-xs text-zinc-400 leading-relaxed">
                       Pergerakan kartu task, perubahan status, dan diskusi komentar tersinkronisasi secara instan ke seluruh anggota tim tanpa perlu reload.
                     </p>

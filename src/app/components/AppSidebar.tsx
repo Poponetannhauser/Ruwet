@@ -130,7 +130,7 @@ export function AppSidebar({
               <span className="text-base font-extrabold tracking-tight text-white group-hover:text-indigo-400 transition-colors">
                 Ruwet
               </span>
-              <span className="text-[10px] text-zinc-500 font-mono">Real-time Kanban</span>
+              <span className="text-[10px] text-zinc-500 font-mono">Kanban Workspace</span>
             </div>
           </Link>
 

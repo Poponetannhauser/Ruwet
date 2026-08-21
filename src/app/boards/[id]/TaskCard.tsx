@@ -7,6 +7,7 @@ import { motion } from 'framer-motion'
 import { assignSelf } from './taskActions'
 import { EditTaskModal } from './EditTaskModal'
 import { CommentDrawer } from '@/app/components/CommentDrawer'
+import { getCategoryBadgeStyle, getPhaseBadgeStyle } from './boardColors'
 
 type Column = {
   id: string
@@ -188,7 +189,9 @@ export function TaskCard({
               )}
               {task.category && (
                 <span
-                  className="inline-block text-[9px] font-semibold text-emerald-400 bg-emerald-950/50 border border-emerald-800/50 px-1.5 py-0.2 rounded"
+                  className={`inline-block text-[9px] font-semibold px-1.5 py-0.2 rounded border ${getCategoryBadgeStyle(
+                    task.category
+                  )}`}
                   title={`Kategori: ${task.category}`}
                 >
                   {task.category}
@@ -196,7 +199,9 @@ export function TaskCard({
               )}
               {task.phase && (
                 <span
-                  className="inline-block text-[9px] font-semibold text-purple-300 bg-purple-950/50 border border-purple-800/50 px-1.5 py-0.2 rounded"
+                  className={`inline-block text-[9px] font-semibold px-1.5 py-0.2 rounded border ${getPhaseBadgeStyle(
+                    task.phase
+                  )}`}
                   title={`Fase: ${task.phase}`}
                 >
                   {task.phase}

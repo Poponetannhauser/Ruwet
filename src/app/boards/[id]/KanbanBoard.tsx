@@ -175,6 +175,7 @@ export function KanbanBoard({
   const [activeTask, setActiveTask] = useState<Task | null>(null)
   const [previousTasksState, setPreviousTasksState] = useState<Task[]>(initialTasks)
   const [viewMode, setViewMode] = useState<'kanban' | 'table'>('kanban')
+  const [isFilterPopoverOpen, setIsFilterPopoverOpen] = useState(false)
   const [, setTick] = useState(0)
 
   function handleMoveColumn(columnId: string, direction: 'left' | 'right') {
@@ -550,10 +551,10 @@ export function KanbanBoard({
 
       {/* Interactive Filter Toolbar (Pinned Top, Not Horizontally Scrolled) */}
       <div className="px-4 sm:px-8 pt-4 pb-2 shrink-0 w-full">
-        <div className="flex flex-wrap items-center justify-between gap-3 bg-[#232328] p-3 sm:p-4 rounded-xl border border-zinc-800/80">
-          <div className="flex flex-wrap items-center gap-2.5 flex-1 min-w-[280px]">
+        <div className="flex flex-wrap items-center justify-between gap-3 bg-[#232328] p-3 sm:p-3.5 rounded-xl border border-zinc-800/80">
+          <div className="flex flex-wrap items-center gap-2 flex-1 min-w-[280px]">
             {/* Keyword Search Input */}
-            <div className="relative min-w-[180px] max-w-xs flex-1">
+            <div className="relative min-w-[170px] max-w-xs flex-1">
               <span className="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none text-zinc-500">
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -564,117 +565,224 @@ export function KanbanBoard({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Cari task / #nomor..."
-                className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg bg-[#18181b] border border-zinc-700/80 text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500"
+                className="w-full pl-8 pr-7 py-1.5 text-xs rounded-lg bg-[#18181b] border border-zinc-700/80 text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute inset-y-0 right-0 flex items-center pr-2.5 text-zinc-400 hover:text-white text-xs"
+                  className="absolute inset-y-0 right-0 flex items-center pr-2.5 text-zinc-400 hover:text-white"
                 >
-                  ✕
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               )}
             </div>
 
-            {/* Priority Filter */}
+            {/* Compact Filter Popover Trigger */}
             <div className="relative">
-              <select
-                value={filterPriority}
-                onChange={(e) => setFilterPriority(e.target.value)}
-                className="appearance-none text-xs py-1.5 pl-2.5 pr-8 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium cursor-pointer"
-              >
-                <option value="all">Semua Prioritas</option>
-                <option value="P0">P0 - Blocker</option>
-                <option value="P1">P1 - High</option>
-                <option value="P2">P2 - Medium</option>
-                <option value="P3">P3 - Low</option>
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-zinc-400">
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-            </div>
-
-            {/* Category Filter */}
-            <div className="relative">
-              <select
-                value={filterCategory}
-                onChange={(e) => setFilterCategory(e.target.value)}
-                className="appearance-none text-xs py-1.5 pl-2.5 pr-8 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium cursor-pointer"
-              >
-                <option value="all">Semua Kategori</option>
-                {availableCategories.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-zinc-400">
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-            </div>
-
-            {/* Phase Filter */}
-            <div className="relative">
-              <select
-                value={filterPhase}
-                onChange={(e) => setFilterPhase(e.target.value)}
-                className="appearance-none text-xs py-1.5 pl-2.5 pr-8 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium cursor-pointer"
-              >
-                <option value="all">Semua Fase</option>
-                {availablePhases.map((p) => (
-                  <option key={p} value={p}>
-                    {p}
-                  </option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-zinc-400">
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-            </div>
-
-            {/* Assignee Filter */}
-            <div className="relative">
-              <select
-                value={filterAssignee}
-                onChange={(e) => setFilterAssignee(e.target.value)}
-                className="appearance-none text-xs py-1.5 pl-2.5 pr-8 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium cursor-pointer"
-              >
-                <option value="all">Semua Assignee</option>
-                <option value="me">Ditugaskan ke Saya</option>
-                <option value="unassigned">Belum Ditugaskan</option>
-                {members.map((m) => (
-                  <option key={m.id} value={m.user_id || ''}>
-                    {m.profiles?.full_name || 'User'}
-                  </option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-zinc-400">
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-            </div>
-
-            {/* Reset Filters */}
-            {(searchQuery || filterPriority !== 'all' || filterCategory !== 'all' || filterPhase !== 'all' || filterAssignee !== 'all') && (
               <button
-                onClick={() => {
-                  setSearchQuery('')
-                  setFilterPriority('all')
-                  setFilterCategory('all')
-                  setFilterPhase('all')
-                  setFilterAssignee('all')
-                }}
-                className="text-[11px] font-semibold text-rose-400 hover:text-rose-300 px-2 py-1 rounded hover:bg-rose-950/40 transition"
+                type="button"
+                onClick={() => setIsFilterPopoverOpen(!isFilterPopoverOpen)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition ${
+                  (filterPriority !== 'all' ||
+                    filterCategory !== 'all' ||
+                    filterPhase !== 'all' ||
+                    filterAssignee !== 'all' ||
+                    isFilterPopoverOpen)
+                    ? 'bg-indigo-950/70 border-indigo-500/60 text-indigo-200'
+                    : 'bg-[#18181b] border-zinc-700/80 text-zinc-300 hover:text-white hover:bg-zinc-800'
+                }`}
+                title="Buka Filter Papan"
               >
-                Reset Filter
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
+                </svg>
+                <span>Filter</span>
+                {(filterPriority !== 'all' ||
+                  filterCategory !== 'all' ||
+                  filterPhase !== 'all' ||
+                  filterAssignee !== 'all') && (
+                  <span className="rounded-full bg-indigo-600 px-1.5 py-0.2 text-[10px] font-bold text-white font-mono">
+                    {(filterPriority !== 'all' ? 1 : 0) +
+                      (filterCategory !== 'all' ? 1 : 0) +
+                      (filterPhase !== 'all' ? 1 : 0) +
+                      (filterAssignee !== 'all' ? 1 : 0)}
+                  </span>
+                )}
               </button>
+
+              {/* Filter Popover Dropdown */}
+              {isFilterPopoverOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-30"
+                    onClick={() => setIsFilterPopoverOpen(false)}
+                  />
+                  <div className="absolute left-0 top-full mt-2 z-40 w-72 rounded-xl bg-[#202025] border border-zinc-700/90 shadow-2xl p-3.5 space-y-3">
+                    <div className="flex items-center justify-between border-b border-zinc-700/60 pb-2">
+                      <span className="text-xs font-bold text-white">Filter Task</span>
+                      {(filterPriority !== 'all' ||
+                        filterCategory !== 'all' ||
+                        filterPhase !== 'all' ||
+                        filterAssignee !== 'all') && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFilterPriority('all')
+                            setFilterCategory('all')
+                            setFilterPhase('all')
+                            setFilterAssignee('all')
+                          }}
+                          className="text-[10px] font-semibold text-rose-400 hover:text-rose-300 transition"
+                        >
+                          Reset Semua
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Priority */}
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                        Prioritas
+                      </label>
+                      <select
+                        value={filterPriority}
+                        onChange={(e) => setFilterPriority(e.target.value)}
+                        className="w-full text-xs py-1.5 px-2 rounded-md bg-[#161619] border border-zinc-700/70 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium"
+                      >
+                        <option value="all">Semua Prioritas</option>
+                        <option value="P0">P0 - Blocker</option>
+                        <option value="P1">P1 - High</option>
+                        <option value="P2">P2 - Medium</option>
+                        <option value="P3">P3 - Low</option>
+                      </select>
+                    </div>
+
+                    {/* Assignee */}
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                        Assignee
+                      </label>
+                      <select
+                        value={filterAssignee}
+                        onChange={(e) => setFilterAssignee(e.target.value)}
+                        className="w-full text-xs py-1.5 px-2 rounded-md bg-[#161619] border border-zinc-700/70 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium"
+                      >
+                        <option value="all">Semua Assignee</option>
+                        <option value="me">Ditugaskan ke Saya</option>
+                        <option value="unassigned">Belum Ditugaskan</option>
+                        {members.map((m) => (
+                          <option key={m.id} value={m.user_id || ''}>
+                            {m.profiles?.full_name || 'User'}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Category */}
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                        Kategori
+                      </label>
+                      <select
+                        value={filterCategory}
+                        onChange={(e) => setFilterCategory(e.target.value)}
+                        className="w-full text-xs py-1.5 px-2 rounded-md bg-[#161619] border border-zinc-700/70 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium"
+                      >
+                        <option value="all">Semua Kategori</option>
+                        {availableCategories.map((c) => (
+                          <option key={c} value={c}>
+                            {c}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Phase */}
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                        Fase
+                      </label>
+                      <select
+                        value={filterPhase}
+                        onChange={(e) => setFilterPhase(e.target.value)}
+                        className="w-full text-xs py-1.5 px-2 rounded-md bg-[#161619] border border-zinc-700/70 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium"
+                      >
+                        <option value="all">Semua Fase</option>
+                        {availablePhases.map((p) => (
+                          <option key={p} value={p}>
+                            {p}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Active Filter Chips */}
+            {filterPriority !== 'all' && (
+              <span className="inline-flex items-center gap-1 rounded-md bg-indigo-950/70 border border-indigo-800/60 px-2 py-0.5 text-[11px] text-indigo-300 font-medium">
+                <span>P: {filterPriority}</span>
+                <button
+                  onClick={() => setFilterPriority('all')}
+                  className="hover:text-white"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </span>
+            )}
+
+            {filterAssignee !== 'all' && (
+              <span className="inline-flex items-center gap-1 rounded-md bg-indigo-950/70 border border-indigo-800/60 px-2 py-0.5 text-[11px] text-indigo-300 font-medium">
+                <span>
+                  {filterAssignee === 'me'
+                    ? 'Saya'
+                    : filterAssignee === 'unassigned'
+                    ? 'Belum Ditugaskan'
+                    : members.find((m) => m.user_id === filterAssignee)?.profiles?.full_name || 'Assignee'}
+                </span>
+                <button
+                  onClick={() => setFilterAssignee('all')}
+                  className="hover:text-white"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </span>
+            )}
+
+            {filterCategory !== 'all' && (
+              <span className="inline-flex items-center gap-1 rounded-md bg-indigo-950/70 border border-indigo-800/60 px-2 py-0.5 text-[11px] text-indigo-300 font-medium">
+                <span>{filterCategory}</span>
+                <button
+                  onClick={() => setFilterCategory('all')}
+                  className="hover:text-white"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </span>
+            )}
+
+            {filterPhase !== 'all' && (
+              <span className="inline-flex items-center gap-1 rounded-md bg-indigo-950/70 border border-indigo-800/60 px-2 py-0.5 text-[11px] text-indigo-300 font-medium">
+                <span>{filterPhase}</span>
+                <button
+                  onClick={() => setFilterPhase('all')}
+                  className="hover:text-white"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </span>
             )}
           </div>
 
