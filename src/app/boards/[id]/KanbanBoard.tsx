@@ -554,25 +554,25 @@ export function KanbanBoard({
           <select
             value={filterPriority}
             onChange={(e) => setFilterPriority(e.target.value)}
-            className="text-xs py-1.5 px-2.5 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium"
+            className="text-xs py-1.5 pl-2.5 pr-8 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium cursor-pointer"
           >
             <option value="all">Semua Prioritas</option>
-            <option value="P0">🔴 P0 - Blocker</option>
-            <option value="P1">🟠 P1 - High</option>
-            <option value="P2">🔵 P2 - Medium</option>
-            <option value="P3">⚪ P3 - Low</option>
+            <option value="P0">P0 - Blocker</option>
+            <option value="P1">P1 - High</option>
+            <option value="P2">P2 - Medium</option>
+            <option value="P3">P3 - Low</option>
           </select>
 
           {/* Category Filter */}
           <select
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
-            className="text-xs py-1.5 px-2.5 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium"
+            className="text-xs py-1.5 pl-2.5 pr-8 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium cursor-pointer"
           >
             <option value="all">Semua Kategori</option>
             {availableCategories.map((c) => (
               <option key={c} value={c}>
-                📁 {c}
+                {c}
               </option>
             ))}
           </select>
@@ -581,12 +581,12 @@ export function KanbanBoard({
           <select
             value={filterPhase}
             onChange={(e) => setFilterPhase(e.target.value)}
-            className="text-xs py-1.5 px-2.5 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium"
+            className="text-xs py-1.5 pl-2.5 pr-8 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium cursor-pointer"
           >
             <option value="all">Semua Fase</option>
             {availablePhases.map((p) => (
               <option key={p} value={p}>
-                🔄 {p}
+                {p}
               </option>
             ))}
           </select>
@@ -595,14 +595,14 @@ export function KanbanBoard({
           <select
             value={filterAssignee}
             onChange={(e) => setFilterAssignee(e.target.value)}
-            className="text-xs py-1.5 px-2.5 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium"
+            className="text-xs py-1.5 pl-2.5 pr-8 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium cursor-pointer"
           >
             <option value="all">Semua Assignee</option>
             <option value="me">Ditugaskan ke Saya</option>
             <option value="unassigned">Belum Ditugaskan</option>
             {members.map((m) => (
               <option key={m.id} value={m.user_id || ''}>
-                👤 {m.profiles?.full_name || 'User'}
+                {m.profiles?.full_name || 'User'}
               </option>
             ))}
           </select>

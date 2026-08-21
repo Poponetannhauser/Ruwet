@@ -4,21 +4,21 @@ import { useState } from 'react'
 import {
   type BoardDocument,
   type DocumentType,
-  DOCUMENT_TEMPLATES,
+  DOCUMENT_TYPE_LABELS,
 } from './docTypes'
 
 type DocumentListProps = {
   documents: BoardDocument[]
   selectedDocId: string | null
   onSelectDoc: (id: string) => void
-  onOpenCreateModal: () => void
+  onOpenUploadModal: () => void
 }
 
 export function DocumentList({
   documents,
   selectedDocId,
   onSelectDoc,
-  onOpenCreateModal,
+  onOpenUploadModal,
 }: DocumentListProps) {
   const [filterType, setFilterType] = useState<string>('all')
   const [search, setSearch] = useState('')
@@ -29,7 +29,9 @@ export function DocumentList({
     }
     if (search.trim() !== '') {
       const q = search.toLowerCase()
-      return doc.title.toLowerCase().includes(q)
+      const matchTitle = doc.title.toLowerCase().includes(q)
+      const matchFileName = (doc.file_name || '').toLowerCase().includes(q)
+      return matchTitle || matchFileName
     }
     return true
   })
@@ -40,7 +42,9 @@ export function DocumentList({
       <div className="p-4 border-b border-zinc-800/80 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-base">📚</span>
+            <svg className="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+            </svg>
             <h3 className="text-sm font-bold text-white">Dokumen Board</h3>
             <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400">
               {documents.length}
@@ -48,11 +52,13 @@ export function DocumentList({
           </div>
           <button
             type="button"
-            onClick={onOpenCreateModal}
-            className="flex items-center gap-1 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 px-2.5 py-1 rounded-lg transition shadow-xs"
+            onClick={onOpenUploadModal}
+            className="flex items-center gap-1.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 px-3 py-1.5 rounded-lg transition shadow-xs"
           >
-            <span>+</span>
-            <span>Baru</span>
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            <span>Upload</span>
           </button>
         </div>
 
@@ -61,7 +67,7 @@ export function DocumentList({
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Cari dokumen..."
+          placeholder="Cari dokumen / nama file..."
           className="w-full px-3 py-1.5 text-xs rounded-lg bg-[#1a1a1e] border border-zinc-700/80 text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500"
         />
 
@@ -69,7 +75,7 @@ export function DocumentList({
         <div className="flex items-center gap-1 overflow-x-auto pb-1 text-[10px]">
           <button
             onClick={() => setFilterType('all')}
-            className={`px-2 py-0.5 rounded-full font-medium transition shrink-0 ${
+            className={`px-2.5 py-0.5 rounded-full font-medium transition shrink-0 ${
               filterType === 'all'
                 ? 'bg-indigo-600 text-white'
                 : 'bg-zinc-800 text-zinc-400 hover:text-white'
@@ -77,23 +83,21 @@ export function DocumentList({
           >
             Semua
           </button>
-          {(['prd', 'gdd', 'tech_spec', 'meeting_notes', 'general'] as DocumentType[]).map((t) => {
-            const tmpl = DOCUMENT_TEMPLATES[t]
-            return (
+          {(Object.entries(DOCUMENT_TYPE_LABELS) as [DocumentType, typeof DOCUMENT_TYPE_LABELS[DocumentType]][]).map(
+            ([key, val]) => (
               <button
-                key={t}
-                onClick={() => setFilterType(t)}
-                className={`px-2 py-0.5 rounded-full font-medium transition shrink-0 flex items-center gap-1 ${
-                  filterType === t
+                key={key}
+                onClick={() => setFilterType(key)}
+                className={`px-2.5 py-0.5 rounded-full font-medium transition shrink-0 ${
+                  filterType === key
                     ? 'bg-indigo-600 text-white'
                     : 'bg-zinc-800 text-zinc-400 hover:text-white'
                 }`}
               >
-                <span>{tmpl.icon}</span>
-                <span>{t.toUpperCase()}</span>
+                {val.label}
               </button>
             )
-          })}
+          )}
         </div>
       </div>
 
@@ -102,7 +106,7 @@ export function DocumentList({
         {filteredDocs.length > 0 ? (
           filteredDocs.map((doc) => {
             const isSelected = selectedDocId === doc.id
-            const tmpl = DOCUMENT_TEMPLATES[doc.doc_type] || DOCUMENT_TEMPLATES.general
+            const typeLabel = DOCUMENT_TYPE_LABELS[doc.doc_type]?.label || doc.doc_type.toUpperCase()
             return (
               <button
                 key={doc.id}
@@ -115,27 +119,30 @@ export function DocumentList({
                 }`}
               >
                 <div className="flex items-center justify-between gap-1">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span className="text-sm shrink-0">{tmpl.icon}</span>
-                    <span
-                      className={`text-xs font-bold truncate ${
-                        isSelected ? 'text-white' : 'text-zinc-200'
-                      }`}
-                    >
-                      {doc.title}
-                    </span>
-                  </div>
-                  <span className="text-[9px] uppercase font-mono px-1.5 py-0.2 rounded bg-zinc-800/90 text-zinc-400 border border-zinc-700/40 shrink-0">
-                    {doc.doc_type}
+                  <span
+                    className={`text-xs font-bold truncate ${
+                      isSelected ? 'text-white' : 'text-zinc-200'
+                    }`}
+                  >
+                    {doc.title}
+                  </span>
+                  <span className="text-[9px] uppercase font-mono px-1.5 py-0.2 rounded bg-zinc-800 text-zinc-300 border border-zinc-700/60 shrink-0">
+                    {typeLabel}
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between text-[10px] text-zinc-500 pt-1">
+                {doc.file_name && (
+                  <div className="text-[10px] text-zinc-400 font-mono truncate">
+                    {doc.file_name} {doc.file_size ? `(${(doc.file_size / 1024).toFixed(1)} KB)` : ''}
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between text-[10px] text-zinc-500 pt-0.5">
                   <span>
-                    {doc.profiles?.full_name ? `Oleh ${doc.profiles.full_name}` : 'Anggota Tim'}
+                    {doc.profiles?.full_name ? doc.profiles.full_name : 'Anggota Tim'}
                   </span>
                   <span>
-                    {new Date(doc.updated_at).toLocaleDateString('id-ID', {
+                    {new Date(doc.created_at).toLocaleDateString('id-ID', {
                       month: 'short',
                       day: 'numeric',
                     })}
@@ -150,13 +157,13 @@ export function DocumentList({
               <span>Tidak ada dokumen yang cocok</span>
             ) : (
               <div className="space-y-2">
-                <span>Belum ada dokumen di board ini.</span>
+                <span>Belum ada dokumen yang diupload di board ini.</span>
                 <button
                   type="button"
-                  onClick={onOpenCreateModal}
+                  onClick={onOpenUploadModal}
                   className="block mx-auto text-indigo-400 hover:text-indigo-300 font-bold"
                 >
-                  + Buat Dokumen Pertama
+                  + Upload Dokumen
                 </button>
               </div>
             )}

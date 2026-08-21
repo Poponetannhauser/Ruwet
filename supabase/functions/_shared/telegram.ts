@@ -49,17 +49,17 @@ export function formatPriorityBadge(priority?: string): string {
   switch (p) {
     case 'p0':
     case 'urgent':
-      return '[🔴 P0] '
+      return '[P0] '
     case 'p1':
     case 'high':
-      return '[🟠 P1] '
+      return '[P1] '
     case 'p3':
     case 'low':
-      return '[⚪ P3] '
+      return '[P3] '
     case 'p2':
     case 'medium':
     default:
-      return '[🔵 P2] '
+      return '[P2] '
   }
 }
 

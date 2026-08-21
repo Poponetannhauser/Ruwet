@@ -3,24 +3,25 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { createDocument } from './docActions'
-import { DOCUMENT_TEMPLATES, type DocumentType } from './docTypes'
+import { uploadDocument } from './docActions'
+import { DOCUMENT_TYPE_LABELS, type DocumentType } from './docTypes'
 
-type CreateDocumentModalProps = {
+type UploadDocumentModalProps = {
   boardId: string
   isOpen: boolean
   onClose: () => void
-  onCreated?: (docId: string) => void
+  onUploaded?: (docId: string) => void
 }
 
 export function CreateDocumentModal({
   boardId,
   isOpen,
   onClose,
-  onCreated,
-}: CreateDocumentModalProps) {
+  onUploaded,
+}: UploadDocumentModalProps) {
   const [selectedType, setSelectedType] = useState<DocumentType>('prd')
   const [title, setTitle] = useState('')
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [mounted, setMounted] = useState(false)
@@ -32,27 +33,47 @@ export function CreateDocumentModal({
 
   if (!isOpen || !mounted) return null
 
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0]
+      setSelectedFile(file)
+      if (!title) {
+        // Strip extension for title suggestion
+        const cleanName = file.name.replace(/\.[^/.]+$/, '')
+        setTitle(cleanName)
+      }
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setError(null)
+
+    if (!selectedFile) {
+      setError('Silakan pilih file untuk diupload')
+      return
+    }
+
     setLoading(true)
 
     const formData = new FormData(e.currentTarget)
     formData.set('doc_type', selectedType)
-    if (!formData.get('content')) {
-      formData.set('content', DOCUMENT_TEMPLATES[selectedType].template)
+    formData.set('file', selectedFile)
+    if (title.trim()) {
+      formData.set('title', title.trim())
     }
 
-    const res = await createDocument(boardId, formData)
+    const res = await uploadDocument(boardId, formData)
     if (res.error) {
       setError(res.error)
       setLoading(false)
     } else {
       setLoading(false)
       setTitle('')
+      setSelectedFile(null)
       onClose()
-      if (res.id && onCreated) {
-        onCreated(res.id)
+      if (res.id && onUploaded) {
+        onUploaded(res.id)
       }
     }
   }
@@ -74,9 +95,9 @@ export function CreateDocumentModal({
         >
           <div className="flex items-center justify-between pb-3 border-b border-zinc-800/80">
             <div>
-              <h3 className="text-base font-bold text-white">Buat Dokumen Baru</h3>
+              <h3 className="text-base font-bold text-white">Upload Dokumen</h3>
               <p className="text-xs text-zinc-400 mt-0.5">
-                Simpan PRD, GDD, Tech Spec, atau catatan tim untuk board ini.
+                Simpan file PRD, GDD, Tech Spec, atau catatan tim untuk board ini.
               </p>
             </div>
             <button
@@ -95,36 +116,28 @@ export function CreateDocumentModal({
           )}
 
           <form onSubmit={handleSubmit} className="mt-4 space-y-4">
-            {/* Template Selector */}
+            {/* Document Type Classification */}
             <div>
               <label className="block text-xs font-semibold text-zinc-300 mb-2">
-                Pilih Template Starter
+                Tipe Dokumen
               </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {(Object.entries(DOCUMENT_TEMPLATES) as [DocumentType, typeof DOCUMENT_TEMPLATES[DocumentType]][]).map(
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {(Object.entries(DOCUMENT_TYPE_LABELS) as [DocumentType, typeof DOCUMENT_TYPE_LABELS[DocumentType]][]).map(
                   ([key, val]) => {
                     const isSelected = selectedType === key
                     return (
                       <button
                         key={key}
                         type="button"
-                        onClick={() => {
-                          setSelectedType(key)
-                          if (!title) {
-                            setTitle(val.name.split(' (')[0])
-                          }
-                        }}
+                        onClick={() => setSelectedType(key)}
                         className={`text-left p-2.5 rounded-lg border transition-all flex flex-col justify-between ${
                           isSelected
                             ? 'bg-indigo-950/60 border-indigo-500/80 text-white shadow-xs'
                             : 'bg-[#1e1e24] border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200'
                         }`}
                       >
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-base">{val.icon}</span>
-                          <span className="text-xs font-bold">{val.name}</span>
-                        </div>
-                        <span className="text-[10px] text-zinc-500 line-clamp-2">
+                        <span className="text-xs font-bold">{val.label}</span>
+                        <span className="text-[10px] text-zinc-500 truncate">
                           {val.description}
                         </span>
                       </button>
@@ -134,18 +147,60 @@ export function CreateDocumentModal({
               </div>
             </div>
 
+            {/* File Upload Drop Area */}
+            <div>
+              <label className="block text-xs font-semibold text-zinc-300 mb-1">
+                Pilih File Dokumen <span className="text-rose-400">*</span>
+              </label>
+              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-zinc-700 border-dashed rounded-lg hover:border-indigo-500 transition bg-zinc-900/50">
+                <div className="space-y-1 text-center">
+                  <svg
+                    className="mx-auto h-10 w-10 text-zinc-400"
+                    stroke="currentColor"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                    />
+                  </svg>
+                  <div className="flex text-xs text-zinc-400 justify-center">
+                    <label className="relative cursor-pointer rounded-md font-medium text-indigo-400 hover:text-indigo-300 focus-within:outline-none">
+                      <span>Pilih file dari perangkat</span>
+                      <input
+                        type="file"
+                        onChange={handleFileChange}
+                        className="sr-only"
+                        accept=".pdf,.doc,.docx,.md,.txt,.json,.png,.jpg,.jpeg"
+                      />
+                    </label>
+                  </div>
+                  <p className="text-[11px] text-zinc-500">
+                    Mendukung PDF, DOCX, Markdown, TXT, gambar (Max 10MB)
+                  </p>
+                  {selectedFile && (
+                    <div className="mt-2 text-xs font-semibold text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 px-2 py-1 rounded">
+                      File dipilih: {selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
             {/* Document Title */}
             <div>
               <label className="block text-xs font-semibold text-zinc-300 mb-1">
-                Judul Dokumen <span className="text-rose-400">*</span>
+                Judul / Keterangan Dokumen
               </label>
               <input
                 name="title"
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                required
-                placeholder="Contoh: Game Design Document v1.0 / PRD Fitur Auth"
+                placeholder="Contoh: PRD Fitur Autentikasi v1.2"
                 className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-xs text-white placeholder-zinc-500 focus:border-indigo-500 focus:outline-none"
               />
             </div>
@@ -160,10 +215,10 @@ export function CreateDocumentModal({
               </button>
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || !selectedFile}
                 className="rounded-lg bg-indigo-600 px-4 py-2 text-xs font-bold text-white hover:bg-indigo-500 disabled:opacity-50 transition shadow-xs"
               >
-                {loading ? 'Membuat...' : 'Buat Dokumen'}
+                {loading ? 'Mengupload...' : 'Upload Dokumen'}
               </button>
             </div>
           </form>

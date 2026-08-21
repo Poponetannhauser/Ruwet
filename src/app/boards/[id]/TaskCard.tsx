@@ -191,7 +191,7 @@ export function TaskCard({
                   className="inline-block text-[9px] font-semibold text-emerald-400 bg-emerald-950/50 border border-emerald-800/50 px-1.5 py-0.2 rounded"
                   title={`Kategori: ${task.category}`}
                 >
-                  📁 {task.category}
+                  {task.category}
                 </span>
               )}
               {task.phase && (
@@ -199,7 +199,7 @@ export function TaskCard({
                   className="inline-block text-[9px] font-semibold text-purple-300 bg-purple-950/50 border border-purple-800/50 px-1.5 py-0.2 rounded"
                   title={`Fase: ${task.phase}`}
                 >
-                  🔄 {task.phase}
+                  {task.phase}
                 </span>
               )}
               <h4 className="text-xs font-bold text-zinc-100 group-hover:text-indigo-400 transition-colors leading-snug">

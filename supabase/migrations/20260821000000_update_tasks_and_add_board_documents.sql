@@ -31,11 +31,14 @@ create index if not exists idx_tasks_board_category_phase
   on tasks (board_id, category, phase);
 
 
--- 2. Board Documents Table
+-- 2. Board Documents Table (File Upload Storage)
 create table if not exists board_documents (
   id uuid primary key default gen_random_uuid(),
   board_id uuid references boards(id) on delete cascade not null,
   title text not null,
+  file_name text,
+  file_size bigint,
+  file_type text,
   content text default '',
   doc_type text default 'general', -- 'prd' | 'gdd' | 'tech_spec' | 'meeting_notes' | 'general'
   created_by uuid references profiles(id) on delete set null,

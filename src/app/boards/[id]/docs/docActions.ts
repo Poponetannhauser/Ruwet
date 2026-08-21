@@ -7,7 +7,6 @@ import { checkRateLimit } from '@/lib/rateLimit'
 import {
   type BoardDocument,
   type DocumentType,
-  DOCUMENT_TEMPLATES,
 } from './docTypes'
 
 export async function getBoardDocuments(boardId: string) {
@@ -25,7 +24,7 @@ export async function getBoardDocuments(boardId: string) {
     .from('board_documents')
     .select('*, profiles:created_by(full_name, avatar_url)')
     .eq('board_id', boardId)
-    .order('updated_at', { ascending: false })
+    .order('created_at', { ascending: false })
 
   if (error) {
     return { data: [], error: error.message }
@@ -39,7 +38,7 @@ export async function getBoardDocuments(boardId: string) {
   return { data: docs as BoardDocument[], error: null }
 }
 
-export async function createDocument(boardId: string, formData: FormData) {
+export async function uploadDocument(boardId: string, formData: FormData) {
   const supabase = await createClient()
 
   const {
@@ -50,25 +49,51 @@ export async function createDocument(boardId: string, formData: FormData) {
     redirect('/login')
   }
 
-  const rateLimit = checkRateLimit(`doc_create:${user.id}`, { maxRequests: 20, intervalMs: 60000 })
+  const rateLimit = checkRateLimit(`doc_upload:${user.id}`, { maxRequests: 20, intervalMs: 60000 })
   if (!rateLimit.success) {
-    return { error: 'Terlalu banyak membuat dokumen. Harap tunggu sebentar.' }
+    return { error: 'Terlalu sering mengupload dokumen. Harap tunggu sebentar.' }
   }
 
-  const title = (formData.get('title') as string) || ''
+  const file = formData.get('file') as File | null
+  const titleInput = (formData.get('title') as string) || ''
   const docType = ((formData.get('doc_type') as string) || 'general') as DocumentType
-  let content = (formData.get('content') as string) || ''
 
-  if (!title || title.trim() === '') {
-    return { error: 'Judul dokumen tidak boleh kosong' }
+  if (!file || !(file instanceof File) || file.size === 0) {
+    return { error: 'Silakan pilih file dokumen untuk diupload' }
   }
 
-  if (title.trim().length > 100) {
-    return { error: 'Judul dokumen maksimal 100 karakter' }
+  // Max 10MB file limit
+  if (file.size > 10 * 1024 * 1024) {
+    return { error: 'Ukuran file maksimal adalah 10MB' }
   }
 
-  if (!content && DOCUMENT_TEMPLATES[docType]) {
-    content = DOCUMENT_TEMPLATES[docType].template
+  const title = titleInput.trim() || file.name
+
+  // If text or markdown file, read content text for quick in-browser preview
+  let content = ''
+  const isTextual =
+    file.type.includes('text') ||
+    file.name.endsWith('.md') ||
+    file.name.endsWith('.txt') ||
+    file.name.endsWith('.json') ||
+    file.name.endsWith('.yaml') ||
+    file.name.endsWith('.yml')
+
+  if (isTextual) {
+    try {
+      content = await file.text()
+    } catch {
+      content = ''
+    }
+  } else {
+    // For binary documents (PDF, Docx, etc.), store base64 data URL so user can view/download
+    try {
+      const buffer = await file.arrayBuffer()
+      const base64 = Buffer.from(buffer).toString('base64')
+      content = `data:${file.type || 'application/octet-stream'};base64,${base64}`
+    } catch {
+      content = ''
+    }
   }
 
   const now = new Date().toISOString()
@@ -77,9 +102,12 @@ export async function createDocument(boardId: string, formData: FormData) {
     .from('board_documents')
     .insert({
       board_id: boardId,
-      title: title.trim(),
+      title: title,
+      file_name: file.name,
+      file_size: file.size,
+      file_type: file.type || 'application/octet-stream',
       content: content,
-      doc_type: docType in DOCUMENT_TEMPLATES ? docType : 'general',
+      doc_type: docType,
       created_by: user.id,
       created_at: now,
       updated_at: now,
@@ -88,61 +116,12 @@ export async function createDocument(boardId: string, formData: FormData) {
     .single()
 
   if (error || !newDoc) {
-    return { error: error?.message || 'Gagal membuat dokumen' }
+    return { error: error?.message || 'Gagal mengupload dokumen' }
   }
 
   revalidatePath(`/boards/${boardId}`)
   revalidatePath(`/boards/${boardId}/docs`)
   return { success: true, id: newDoc.id }
-}
-
-export async function updateDocument(docId: string, boardId: string, formData: FormData) {
-  const supabase = await createClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/login')
-  }
-
-  const title = (formData.get('title') as string) || ''
-  const content = (formData.get('content') as string) ?? ''
-  const docType = (formData.get('doc_type') as string) || undefined
-
-  if (!title || title.trim() === '') {
-    return { error: 'Judul dokumen tidak boleh kosong' }
-  }
-
-  if (title.trim().length > 100) {
-    return { error: 'Judul dokumen maksimal 100 karakter' }
-  }
-
-  const now = new Date().toISOString()
-  const updateData: Record<string, unknown> = {
-    title: title.trim(),
-    content: content,
-    updated_at: now,
-  }
-
-  if (docType && docType in DOCUMENT_TEMPLATES) {
-    updateData.doc_type = docType as DocumentType
-  }
-
-  const { error } = await supabase
-    .from('board_documents')
-    .update(updateData)
-    .eq('id', docId)
-    .eq('board_id', boardId)
-
-  if (error) {
-    return { error: error.message }
-  }
-
-  revalidatePath(`/boards/${boardId}`)
-  revalidatePath(`/boards/${boardId}/docs`)
-  return { success: true }
 }
 
 export async function deleteDocument(docId: string, boardId: string) {

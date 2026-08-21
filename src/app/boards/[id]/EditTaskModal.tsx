@@ -287,10 +287,10 @@ export function EditTaskModal({
                     }
                     className="w-full rounded-md border border-zinc-300 px-3 py-2 text-xs text-zinc-900 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white font-medium"
                   >
-                    <option value="P0">🔴 P0 - Blocker / Critical</option>
-                    <option value="P1">🟠 P1 - High Priority</option>
-                    <option value="P2">🔵 P2 - Medium Priority</option>
-                    <option value="P3">⚪ P3 - Low Priority</option>
+                    <option value="P0">P0 - Blocker / Critical</option>
+                    <option value="P1">P1 - High Priority</option>
+                    <option value="P2">P2 - Medium Priority</option>
+                    <option value="P3">P3 - Low Priority</option>
                   </select>
                 </div>
 
