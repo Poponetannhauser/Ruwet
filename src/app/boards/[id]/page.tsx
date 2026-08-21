@@ -55,7 +55,7 @@ export default async function BoardDetailPage({
   const isOwner = board.owner_id === user.id
 
   return (
-    <div className="flex min-h-screen bg-[#1A1A1E] text-zinc-100 selection:bg-indigo-500/30 selection:text-indigo-200">
+    <div className="flex h-screen overflow-hidden bg-[#1A1A1E] text-zinc-100 selection:bg-indigo-500/30 selection:text-indigo-200">
       {/* Left Sidebar Navigation */}
       <AppSidebar
         userEmail={user.email}
@@ -66,7 +66,7 @@ export default async function BoardDetailPage({
       />
 
       {/* Main Board Workspace Area */}
-      <div className="flex flex-1 flex-col min-w-0">
+      <div className="flex flex-1 flex-col min-w-0 h-full overflow-hidden">
         <BoardHeader
           board={board}
           isOwner={isOwner}
@@ -75,7 +75,7 @@ export default async function BoardDetailPage({
           tasks={tasks || []}
         />
 
-        <main className="flex-1 p-4 sm:p-8 overflow-x-auto">
+        <main className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
           <KanbanBoard
             boardId={id}
             staleThresholdHours={board.stale_threshold_hours ? Number(board.stale_threshold_hours) : 48}

@@ -499,15 +499,17 @@ export function KanbanBoard({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col flex-1 min-h-0 h-full">
       {isOffline && (
-        <div className="flex items-center justify-between rounded-lg bg-amber-50 px-4 py-2 text-xs font-semibold text-amber-800 border border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800">
-          <span className="flex items-center gap-1.5">
-            <svg className="w-4 h-4 text-amber-500 inline shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-            </svg>
-            Anda sedang dalam mode Offline. Interaksi board dibatasi sementara.
-          </span>
+        <div className="px-4 sm:px-8 pt-3 shrink-0">
+          <div className="flex items-center justify-between rounded-lg bg-amber-50 px-4 py-2 text-xs font-semibold text-amber-800 border border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800">
+            <span className="flex items-center gap-1.5">
+              <svg className="w-4 h-4 text-amber-500 inline shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+              </svg>
+              Anda sedang dalam mode Offline. Interaksi board dibatasi sementara.
+            </span>
+          </div>
         </div>
       )}
 
@@ -523,177 +525,182 @@ export function KanbanBoard({
         </div>
       )}
 
-      {/* Interactive Filter Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-[#232328] p-3 sm:p-4 rounded-xl border border-zinc-800/80">
-        <div className="flex flex-wrap items-center gap-2.5 flex-1 min-w-[280px]">
-          {/* Keyword Search Input */}
-          <div className="relative min-w-[180px] max-w-xs flex-1">
-            <span className="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none text-zinc-500">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </span>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Cari task / #nomor..."
-              className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg bg-[#18181b] border border-zinc-700/80 text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute inset-y-0 right-0 flex items-center pr-2.5 text-zinc-400 hover:text-white text-xs"
+      {/* Interactive Filter Toolbar (Pinned Top, Not Horizontally Scrolled) */}
+      <div className="px-4 sm:px-8 pt-4 pb-2 shrink-0 w-full">
+        <div className="flex flex-wrap items-center justify-between gap-3 bg-[#232328] p-3 sm:p-4 rounded-xl border border-zinc-800/80">
+          <div className="flex flex-wrap items-center gap-2.5 flex-1 min-w-[280px]">
+            {/* Keyword Search Input */}
+            <div className="relative min-w-[180px] max-w-xs flex-1">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none text-zinc-500">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </span>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Cari task / #nomor..."
+                className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg bg-[#18181b] border border-zinc-700/80 text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute inset-y-0 right-0 flex items-center pr-2.5 text-zinc-400 hover:text-white text-xs"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            {/* Priority Filter */}
+            <div className="relative">
+              <select
+                value={filterPriority}
+                onChange={(e) => setFilterPriority(e.target.value)}
+                className="appearance-none text-xs py-1.5 pl-2.5 pr-8 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium cursor-pointer"
               >
-                ✕
+                <option value="all">Semua Prioritas</option>
+                <option value="P0">P0 - Blocker</option>
+                <option value="P1">P1 - High</option>
+                <option value="P2">P2 - Medium</option>
+                <option value="P3">P3 - Low</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-zinc-400">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Category Filter */}
+            <div className="relative">
+              <select
+                value={filterCategory}
+                onChange={(e) => setFilterCategory(e.target.value)}
+                className="appearance-none text-xs py-1.5 pl-2.5 pr-8 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium cursor-pointer"
+              >
+                <option value="all">Semua Kategori</option>
+                {availableCategories.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-zinc-400">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Phase Filter */}
+            <div className="relative">
+              <select
+                value={filterPhase}
+                onChange={(e) => setFilterPhase(e.target.value)}
+                className="appearance-none text-xs py-1.5 pl-2.5 pr-8 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium cursor-pointer"
+              >
+                <option value="all">Semua Fase</option>
+                {availablePhases.map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-zinc-400">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Assignee Filter */}
+            <div className="relative">
+              <select
+                value={filterAssignee}
+                onChange={(e) => setFilterAssignee(e.target.value)}
+                className="appearance-none text-xs py-1.5 pl-2.5 pr-8 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium cursor-pointer"
+              >
+                <option value="all">Semua Assignee</option>
+                <option value="me">Ditugaskan ke Saya</option>
+                <option value="unassigned">Belum Ditugaskan</option>
+                {members.map((m) => (
+                  <option key={m.id} value={m.user_id || ''}>
+                    {m.profiles?.full_name || 'User'}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-zinc-400">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Reset Filters */}
+            {(searchQuery || filterPriority !== 'all' || filterCategory !== 'all' || filterPhase !== 'all' || filterAssignee !== 'all') && (
+              <button
+                onClick={() => {
+                  setSearchQuery('')
+                  setFilterPriority('all')
+                  setFilterCategory('all')
+                  setFilterPhase('all')
+                  setFilterAssignee('all')
+                }}
+                className="text-[11px] font-semibold text-rose-400 hover:text-rose-300 px-2 py-1 rounded hover:bg-rose-950/40 transition"
+              >
+                Reset Filter
               </button>
             )}
           </div>
 
-          {/* Priority Filter */}
-          <div className="relative">
-            <select
-              value={filterPriority}
-              onChange={(e) => setFilterPriority(e.target.value)}
-              className="appearance-none text-xs py-1.5 pl-2.5 pr-8 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium cursor-pointer"
-            >
-              <option value="all">Semua Prioritas</option>
-              <option value="P0">P0 - Blocker</option>
-              <option value="P1">P1 - High</option>
-              <option value="P2">P2 - Medium</option>
-              <option value="P3">P3 - Low</option>
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-zinc-400">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
+          <div className="text-[11px] text-zinc-400 font-mono">
+            Menampilkan <span className="font-bold text-white">{filteredTasks.length}</span> dari {tasks.length} task
           </div>
-
-          {/* Category Filter */}
-          <div className="relative">
-            <select
-              value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
-              className="appearance-none text-xs py-1.5 pl-2.5 pr-8 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium cursor-pointer"
-            >
-              <option value="all">Semua Kategori</option>
-              {availableCategories.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-zinc-400">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
-          </div>
-
-          {/* Phase Filter */}
-          <div className="relative">
-            <select
-              value={filterPhase}
-              onChange={(e) => setFilterPhase(e.target.value)}
-              className="appearance-none text-xs py-1.5 pl-2.5 pr-8 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium cursor-pointer"
-            >
-              <option value="all">Semua Fase</option>
-              {availablePhases.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-zinc-400">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
-          </div>
-
-          {/* Assignee Filter */}
-          <div className="relative">
-            <select
-              value={filterAssignee}
-              onChange={(e) => setFilterAssignee(e.target.value)}
-              className="appearance-none text-xs py-1.5 pl-2.5 pr-8 rounded-lg bg-[#18181b] border border-zinc-700/80 text-zinc-200 focus:outline-none focus:border-indigo-500 font-medium cursor-pointer"
-            >
-              <option value="all">Semua Assignee</option>
-              <option value="me">Ditugaskan ke Saya</option>
-              <option value="unassigned">Belum Ditugaskan</option>
-              {members.map((m) => (
-                <option key={m.id} value={m.user_id || ''}>
-                  {m.profiles?.full_name || 'User'}
-                </option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-zinc-400">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
-          </div>
-
-          {/* Reset Filters */}
-          {(searchQuery || filterPriority !== 'all' || filterCategory !== 'all' || filterPhase !== 'all' || filterAssignee !== 'all') && (
-            <button
-              onClick={() => {
-                setSearchQuery('')
-                setFilterPriority('all')
-                setFilterCategory('all')
-                setFilterPhase('all')
-                setFilterAssignee('all')
-              }}
-              className="text-[11px] font-semibold text-rose-400 hover:text-rose-300 px-2 py-1 rounded hover:bg-rose-950/40 transition"
-            >
-              Reset Filter
-            </button>
-          )}
-        </div>
-
-        <div className="text-[11px] text-zinc-400 font-mono">
-          Menampilkan <span className="font-bold text-white">{filteredTasks.length}</span> dari {tasks.length} task
         </div>
       </div>
 
-      <DndContext
-        sensors={sensors}
-        onDragStart={handleDragStart}
-        onDragOver={handleDragOver}
-        onDragEnd={handleDragEnd}
-      >
-        <div className="flex gap-6 items-start pr-6 sm:pr-10 pb-4">
-          {columns.map((col) => {
-            const colTasks = filteredTasks.filter((t) => t.column_id === col.id)
-            return (
-              <ColumnContainer
-                key={col.id}
-                column={col}
-                tasks={colTasks}
-                columns={columns}
-                members={members}
-                currentUserId={currentUserId}
-                staleThresholdHours={staleThresholdHours}
-              />
-            )
-          })}
-          <AddColumnButton boardId={boardId} />
-        </div>
+      {/* Kanban Columns (Scrollable Area) */}
+      <div className="flex-1 overflow-x-auto overflow-y-auto px-4 sm:px-8 py-4 min-h-0">
+        <DndContext
+          sensors={sensors}
+          onDragStart={handleDragStart}
+          onDragOver={handleDragOver}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="flex gap-6 items-start pb-6 min-w-max">
+            {columns.map((col) => {
+              const colTasks = filteredTasks.filter((t) => t.column_id === col.id)
+              return (
+                <ColumnContainer
+                  key={col.id}
+                  column={col}
+                  tasks={colTasks}
+                  columns={columns}
+                  members={members}
+                  currentUserId={currentUserId}
+                  staleThresholdHours={staleThresholdHours}
+                />
+              )
+            })}
+            <AddColumnButton boardId={boardId} />
+          </div>
 
-        <DragOverlay>
-          {activeTask ? (
-            <div className="opacity-80 rotate-2 scale-105 shadow-2xl">
-              <TaskCard
-                task={activeTask}
-                columns={columns}
-                members={members}
-                currentUserId={currentUserId}
-              />
-            </div>
-          ) : null}
-        </DragOverlay>
-      </DndContext>
+          <DragOverlay>
+            {activeTask ? (
+              <div className="opacity-80 rotate-2 scale-105 shadow-2xl">
+                <TaskCard
+                  task={activeTask}
+                  columns={columns}
+                  members={members}
+                  currentUserId={currentUserId}
+                />
+              </div>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+      </div>
     </div>
   )
 }
