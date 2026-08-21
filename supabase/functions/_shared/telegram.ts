@@ -1,4 +1,5 @@
 // Helper module for Telegram Bot API interactions (Deno Runtime)
+declare const Deno: { env: { get: (key: string) => string | undefined } }
 
 export interface TelegramMessageOptions {
   chat_id: string | number
@@ -44,16 +45,21 @@ export function formatBoardLink(boardId: string): string {
 }
 
 export function formatPriorityBadge(priority?: string): string {
-  const p = (priority || 'medium').toLowerCase()
+  const p = (priority || 'P2').toLowerCase()
   switch (p) {
+    case 'p0':
     case 'urgent':
-      return '[🔴 URGENT] '
+      return '[P0] '
+    case 'p1':
     case 'high':
-      return '[🟠 HIGH] '
+      return '[P1] '
+    case 'p3':
     case 'low':
-      return '[⚪ LOW] '
+      return '[P3] '
+    case 'p2':
+    case 'medium':
     default:
-      return '[🔵 MED] '
+      return '[P2] '
   }
 }
 

@@ -107,7 +107,7 @@ export function BoardHeader({ board, isOwner, members, columns = [], tasks = [] 
   }
 
   return (
-    <div className="sticky top-0 z-30 border-b border-zinc-800/80 bg-[#1A1A1E]/90 backdrop-blur-md px-4 sm:px-6 py-3 w-full">
+    <div className="sticky top-0 z-30 border-b border-zinc-800/80 bg-[#2C2C30] px-5 sm:px-8 py-3.5 w-full">
       <div className="flex flex-wrap items-center justify-between gap-3 w-full">
         <div className="flex items-center gap-3">
           {isEditing ? (

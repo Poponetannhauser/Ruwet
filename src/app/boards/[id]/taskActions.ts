@@ -27,11 +27,27 @@ export async function createTask(boardId: string, columnId: string, formData: Fo
   const description = (formData.get('description') as string) || null
   const assigneeId = (formData.get('assignee_id') as string) || null
   const dueDate = (formData.get('due_date') as string) || null
-  const priorityRaw = (formData.get('priority') as string) || 'medium'
+  const priorityRaw = (formData.get('priority') as string) || 'P2'
+  const categoryRaw = (formData.get('category') as string) || null
+  const phaseRaw = (formData.get('phase') as string) || null
 
-  const priority = ['low', 'medium', 'high', 'urgent'].includes(priorityRaw.toLowerCase())
-    ? priorityRaw.toLowerCase()
-    : 'medium'
+  const validPriorities = ['P0', 'P1', 'P2', 'P3']
+  let priority = 'P2'
+  if (priorityRaw) {
+    const upper = priorityRaw.toUpperCase()
+    if (validPriorities.includes(upper)) {
+      priority = upper
+    } else if (priorityRaw.toLowerCase() === 'urgent') {
+      priority = 'P0'
+    } else if (priorityRaw.toLowerCase() === 'high') {
+      priority = 'P1'
+    } else if (priorityRaw.toLowerCase() === 'low') {
+      priority = 'P3'
+    }
+  }
+
+  const category = categoryRaw && categoryRaw.trim() !== '' ? categoryRaw.trim().slice(0, 50) : null
+  const phase = phaseRaw && phaseRaw.trim() !== '' ? phaseRaw.trim().slice(0, 50) : null
 
   if (!title || title.trim() === '') {
     return { error: 'Judul task tidak boleh kosong' }
@@ -74,6 +90,8 @@ export async function createTask(boardId: string, columnId: string, formData: Fo
       assignee_id: targetAssignee,
       due_date: dueDate && dueDate !== '' ? dueDate : null,
       priority,
+      category,
+      phase,
       position: newPosition,
       created_by: user.id,
       status_updated_at: now,
@@ -123,6 +141,8 @@ export async function updateTask(taskId: string, boardId: string, formData: Form
   const dueDate = (formData.get('due_date') as string) || null
   const columnId = (formData.get('column_id') as string) || null
   const priorityRaw = (formData.get('priority') as string) || null
+  const categoryRaw = formData.has('category') ? (formData.get('category') as string) : undefined
+  const phaseRaw = formData.has('phase') ? (formData.get('phase') as string) : undefined
 
   if (!title || title.trim() === '') {
     return { error: 'Judul task tidak boleh kosong' }
@@ -165,8 +185,27 @@ export async function updateTask(taskId: string, boardId: string, formData: Form
     updated_at: now,
   }
 
-  if (priorityRaw && ['low', 'medium', 'high', 'urgent'].includes(priorityRaw.toLowerCase())) {
-    updateData.priority = priorityRaw.toLowerCase()
+  if (categoryRaw !== undefined) {
+    updateData.category = categoryRaw && categoryRaw.trim() !== '' ? categoryRaw.trim().slice(0, 50) : null
+  }
+
+  if (phaseRaw !== undefined) {
+    updateData.phase = phaseRaw && phaseRaw.trim() !== '' ? phaseRaw.trim().slice(0, 50) : null
+  }
+
+  if (priorityRaw) {
+    const upper = priorityRaw.toUpperCase()
+    if (['P0', 'P1', 'P2', 'P3'].includes(upper)) {
+      updateData.priority = upper
+    } else if (priorityRaw.toLowerCase() === 'urgent') {
+      updateData.priority = 'P0'
+    } else if (priorityRaw.toLowerCase() === 'high') {
+      updateData.priority = 'P1'
+    } else if (priorityRaw.toLowerCase() === 'low') {
+      updateData.priority = 'P3'
+    } else if (priorityRaw.toLowerCase() === 'medium') {
+      updateData.priority = 'P2'
+    }
   }
 
   if (isColumnChanged) {

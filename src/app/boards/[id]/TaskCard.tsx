@@ -34,6 +34,8 @@ type Task = {
   status_updated_at?: string | null
   task_number?: number
   priority?: string
+  category?: string | null
+  phase?: string | null
   profiles: {
     full_name: string
     avatar_url: string | null
@@ -163,16 +165,41 @@ export function TaskCard({
               {task.priority && (
                 <span
                   className={`inline-block text-[9px] font-bold uppercase px-1.5 py-0.2 rounded border ${
-                    task.priority === 'urgent'
-                      ? 'bg-rose-950/60 border-rose-800/40 text-rose-300'
-                      : task.priority === 'high'
-                      ? 'bg-amber-950/60 border-amber-800/40 text-amber-300'
-                      : task.priority === 'low'
-                      ? 'bg-zinc-850 border-zinc-700/40 text-zinc-400'
-                      : 'bg-indigo-950/60 border-indigo-800/40 text-indigo-300'
+                    task.priority.toUpperCase() === 'P0' || task.priority === 'urgent'
+                      ? 'bg-rose-950/70 border-rose-700/60 text-rose-300 font-extrabold shadow-xs shadow-rose-950'
+                      : task.priority.toUpperCase() === 'P1' || task.priority === 'high'
+                      ? 'bg-amber-950/60 border-amber-700/50 text-amber-300'
+                      : task.priority.toUpperCase() === 'P3' || task.priority === 'low'
+                      ? 'bg-zinc-800/80 border-zinc-700/50 text-zinc-400'
+                      : 'bg-indigo-950/60 border-indigo-700/50 text-indigo-300'
                   }`}
+                  title={`Prioritas: ${task.priority.toUpperCase()}`}
                 >
-                  {task.priority}
+                  {task.priority.toUpperCase() === 'URGENT'
+                    ? 'P0'
+                    : task.priority.toUpperCase() === 'HIGH'
+                    ? 'P1'
+                    : task.priority.toUpperCase() === 'LOW'
+                    ? 'P3'
+                    : task.priority.toUpperCase() === 'MEDIUM'
+                    ? 'P2'
+                    : task.priority.toUpperCase()}
+                </span>
+              )}
+              {task.category && (
+                <span
+                  className="inline-block text-[9px] font-semibold text-emerald-400 bg-emerald-950/50 border border-emerald-800/50 px-1.5 py-0.2 rounded"
+                  title={`Kategori: ${task.category}`}
+                >
+                  {task.category}
+                </span>
+              )}
+              {task.phase && (
+                <span
+                  className="inline-block text-[9px] font-semibold text-purple-300 bg-purple-950/50 border border-purple-800/50 px-1.5 py-0.2 rounded"
+                  title={`Fase: ${task.phase}`}
+                >
+                  {task.phase}
                 </span>
               )}
               <h4 className="text-xs font-bold text-zinc-100 group-hover:text-indigo-400 transition-colors leading-snug">

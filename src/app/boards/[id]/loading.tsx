@@ -29,7 +29,7 @@ export default function BoardLoading() {
       {/* Main Board Area */}
       <div className="flex flex-1 flex-col min-w-0">
         {/* Board Header Skeleton */}
-        <div className="sticky top-0 z-30 border-b border-zinc-800/80 bg-[#1A1A1E]/90 backdrop-blur-md px-4 sm:px-6 py-3 w-full">
+        <div className="sticky top-0 z-30 border-b border-zinc-800/80 bg-[#2C2C30] px-5 sm:px-8 py-3.5 w-full">
           <div className="flex flex-wrap items-center justify-between gap-4 w-full">
             <div className="flex items-center gap-3">
               <div className="h-7 w-20 rounded-lg bg-[#383840] animate-pulse" />
@@ -44,8 +44,21 @@ export default function BoardLoading() {
           </div>
         </div>
 
-        {/* Kanban Columns & Task Cards Skeleton */}
-        <main className="flex-1 p-4 sm:p-6 overflow-x-auto">
+        {/* Board Workspace Content Skeleton */}
+        <main className="flex-1 p-4 sm:p-8 overflow-x-auto space-y-6">
+          {/* Filter Toolbar Skeleton */}
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-[#232328] p-3 sm:p-4 rounded-xl border border-zinc-800/80">
+            <div className="flex flex-wrap items-center gap-2.5 flex-1 min-w-[280px]">
+              <div className="h-8 w-44 rounded-lg bg-[#18181b] border border-zinc-800 animate-pulse" />
+              <div className="h-8 w-32 rounded-lg bg-[#18181b] border border-zinc-800 animate-pulse" />
+              <div className="h-8 w-32 rounded-lg bg-[#18181b] border border-zinc-800 animate-pulse" />
+              <div className="h-8 w-28 rounded-lg bg-[#18181b] border border-zinc-800 animate-pulse" />
+              <div className="h-8 w-32 rounded-lg bg-[#18181b] border border-zinc-800 animate-pulse" />
+            </div>
+            <div className="h-4 w-36 rounded bg-[#383840]/60 animate-pulse" />
+          </div>
+
+          {/* Kanban Columns & Task Cards Skeleton */}
           <div className="flex gap-4 sm:gap-6 items-start pr-6 sm:pr-10 pb-4">
             {[1, 2, 3, 4].map((col) => (
               <div
@@ -94,4 +107,3 @@ export default function BoardLoading() {
     </div>
   )
 }
-

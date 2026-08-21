@@ -31,6 +31,8 @@ type Task = {
   assignee_id: string | null
   due_date: string | null
   priority?: string
+  category?: string | null
+  phase?: string | null
 }
 
 
@@ -253,33 +255,88 @@ export function EditTaskModal({
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-                    Tenggat Waktu (Due Date)
-                  </label>
-                  <input
-                    name="due_date"
-                    type="date"
-                    defaultValue={task.due_date ? task.due_date.split('T')[0] : ''}
-                    className="w-full rounded-md border border-zinc-300 px-3 py-2 text-xs text-zinc-900 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
-                  />
-                </div>
+              <div>
+                <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                  Tenggat Waktu (Due Date)
+                </label>
+                <input
+                  name="due_date"
+                  type="date"
+                  defaultValue={task.due_date ? task.due_date.split('T')[0] : ''}
+                  className="w-full rounded-md border border-zinc-300 px-3 py-2 text-xs text-zinc-900 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                />
+              </div>
 
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
                     Prioritas Task
                   </label>
                   <select
                     name="priority"
-                    defaultValue={task.priority || 'medium'}
+                    defaultValue={
+                      task.priority?.toUpperCase() === 'URGENT'
+                        ? 'P0'
+                        : task.priority?.toUpperCase() === 'HIGH'
+                        ? 'P1'
+                        : task.priority?.toUpperCase() === 'LOW'
+                        ? 'P3'
+                        : task.priority?.toUpperCase() === 'MEDIUM'
+                        ? 'P2'
+                        : task.priority?.toUpperCase() || 'P2'
+                    }
                     className="w-full rounded-md border border-zinc-300 px-3 py-2 text-xs text-zinc-900 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white font-medium"
                   >
-                    <option value="low">Low (Rendah)</option>
-                    <option value="medium">Medium (Sedang)</option>
-                    <option value="high">High (Tinggi)</option>
-                    <option value="urgent">Urgent (Mendesak)</option>
+                    <option value="P0">P0 - Blocker / Critical</option>
+                    <option value="P1">P1 - High Priority</option>
+                    <option value="P2">P2 - Medium Priority</option>
+                    <option value="P3">P3 - Low Priority</option>
                   </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                    Kategori (Category)
+                  </label>
+                  <input
+                    name="category"
+                    type="text"
+                    list="edit-category-suggestions"
+                    defaultValue={task.category || ''}
+                    placeholder="e.g. Design, Dev"
+                    className="w-full rounded-md border border-zinc-300 px-3 py-2 text-xs text-zinc-900 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                  />
+                  <datalist id="edit-category-suggestions">
+                    <option value="Programming" />
+                    <option value="Design" />
+                    <option value="Art & Assets" />
+                    <option value="Audio / SFX" />
+                    <option value="Content & Writing" />
+                    <option value="QA & Testing" />
+                    <option value="Marketing & Ops" />
+                  </datalist>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                    Fase (Phase)
+                  </label>
+                  <input
+                    name="phase"
+                    type="text"
+                    list="edit-phase-suggestions"
+                    defaultValue={task.phase || ''}
+                    placeholder="e.g. Prototype, Prod"
+                    className="w-full rounded-md border border-zinc-300 px-3 py-2 text-xs text-zinc-900 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                  />
+                  <datalist id="edit-phase-suggestions">
+                    <option value="Prototype" />
+                    <option value="Core Production" />
+                    <option value="Content" />
+                    <option value="Polish" />
+                    <option value="Testing" />
+                    <option value="Release" />
+                  </datalist>
                 </div>
               </div>
 
