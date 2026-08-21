@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { createDocument, DOCUMENT_TEMPLATES, type DocumentType } from './docActions'
+import { createDocument } from './docActions'
+import { DOCUMENT_TEMPLATES, type DocumentType } from './docTypes'
 
 type CreateDocumentModalProps = {
   boardId: string

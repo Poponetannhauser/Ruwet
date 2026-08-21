@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import {
   type BoardDocument,
-} from './docActions'
+} from './docTypes'
 import { DocumentList } from './DocumentList'
 import { DocumentEditor } from './DocumentEditor'
 import { CreateDocumentModal } from './CreateDocumentModal'
@@ -82,7 +82,7 @@ export function DocsClientView({
         boardId={boardId}
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
-        onCreated={(newId) => {
+        onCreated={(_newId) => {
           // Re-trigger reload / add to local documents if needed
           window.location.reload()
         }}

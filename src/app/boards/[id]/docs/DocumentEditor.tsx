@@ -5,6 +5,8 @@ import {
   type BoardDocument,
   type DocumentType,
   DOCUMENT_TEMPLATES,
+} from './docTypes'
+import {
   updateDocument,
   deleteDocument,
 } from './docActions'

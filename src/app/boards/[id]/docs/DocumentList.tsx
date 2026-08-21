@@ -5,7 +5,7 @@ import {
   type BoardDocument,
   type DocumentType,
   DOCUMENT_TEMPLATES,
-} from './docActions'
+} from './docTypes'
 
 type DocumentListProps = {
   documents: BoardDocument[]

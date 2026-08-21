@@ -1,4 +1,5 @@
 // Helper module for Telegram Bot API interactions (Deno Runtime)
+declare const Deno: { env: { get: (key: string) => string | undefined } }
 
 export interface TelegramMessageOptions {
   chat_id: string | number
