@@ -43,3 +43,47 @@ export const DOCUMENT_TYPE_LABELS: Record<
     description: 'General Document',
   },
 }
+
+export const MAX_DOC_FILE_SIZE_BYTES = 5 * 1024 * 1024 // 5MB
+
+export const ALLOWED_DOC_EXTENSIONS = [
+  '.pdf',
+  '.doc',
+  '.docx',
+  '.md',
+  '.markdown',
+  '.txt',
+  '.json',
+  '.yaml',
+  '.yml',
+  '.png',
+  '.jpg',
+  '.jpeg',
+  '.webp',
+]
+
+export const DISALLOWED_DOC_EXTENSIONS = [
+  '.html',
+  '.htm',
+  '.svg',
+  '.exe',
+  '.bat',
+  '.cmd',
+  '.sh',
+  '.php',
+  '.py',
+  '.js',
+  '.mjs',
+  '.cjs',
+  '.vbs',
+  '.apk',
+  '.dll',
+]
+
+export function isValidDocumentExtension(fileName: string): boolean {
+  const lower = fileName.toLowerCase().trim()
+  const isExplicitlyDisallowed = DISALLOWED_DOC_EXTENSIONS.some((ext) => lower.endsWith(ext))
+  if (isExplicitlyDisallowed) return false
+
+  return ALLOWED_DOC_EXTENSIONS.some((ext) => lower.endsWith(ext))
+}

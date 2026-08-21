@@ -241,7 +241,12 @@ export function DocumentEditor({
           </div>
         ) : isPdf ? (
           <div className="h-full flex flex-col items-center justify-center space-y-4">
-            <iframe src={doc.content} className="w-full h-full min-h-[500px] rounded-lg border border-zinc-800" title={doc.title} />
+            <iframe
+              src={doc.content}
+              className="w-full h-full min-h-[500px] rounded-lg border border-zinc-800"
+              title={doc.title}
+              sandbox="allow-same-origin allow-downloads"
+            />
           </div>
         ) : isMarkdownOrText ? (
           <div className="max-w-3xl mx-auto">

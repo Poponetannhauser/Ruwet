@@ -46,8 +46,8 @@ export async function createTask(boardId: string, columnId: string, formData: Fo
     }
   }
 
-  const category = categoryRaw && categoryRaw.trim() !== '' ? categoryRaw.trim() : null
-  const phase = phaseRaw && phaseRaw.trim() !== '' ? phaseRaw.trim() : null
+  const category = categoryRaw && categoryRaw.trim() !== '' ? categoryRaw.trim().slice(0, 50) : null
+  const phase = phaseRaw && phaseRaw.trim() !== '' ? phaseRaw.trim().slice(0, 50) : null
 
   if (!title || title.trim() === '') {
     return { error: 'Judul task tidak boleh kosong' }
@@ -186,11 +186,11 @@ export async function updateTask(taskId: string, boardId: string, formData: Form
   }
 
   if (categoryRaw !== undefined) {
-    updateData.category = categoryRaw && categoryRaw.trim() !== '' ? categoryRaw.trim() : null
+    updateData.category = categoryRaw && categoryRaw.trim() !== '' ? categoryRaw.trim().slice(0, 50) : null
   }
 
   if (phaseRaw !== undefined) {
-    updateData.phase = phaseRaw && phaseRaw.trim() !== '' ? phaseRaw.trim() : null
+    updateData.phase = phaseRaw && phaseRaw.trim() !== '' ? phaseRaw.trim().slice(0, 50) : null
   }
 
   if (priorityRaw) {
